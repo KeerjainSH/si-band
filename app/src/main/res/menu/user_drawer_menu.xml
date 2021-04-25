@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/userHomeFragment"
+        android:title="Home"/>
+
+    <item
+        android:id="@+id/userComplaintFragment"
+        android:title="List Komplain"/>
+
+    <item
+        android:id="@+id/userLogoutOption"
+        android:title="Logout"/>
+
+</menu>
