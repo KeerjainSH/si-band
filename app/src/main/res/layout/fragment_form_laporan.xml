@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".user.view.FormLaporanFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fragment_laporan_lokasi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Lokasi"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="20sp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fragment_laporan_tipe"
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tipe Kerusakan"
+                android:enabled="false"
+                android:textColor="@color/black"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_light_grey_rounded">
+
+            <ImageView
+                android:id="@+id/fragment_laporan_dokumentasi"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:layout_gravity="center"
+                android:visibility="invisible"
+                android:src="@drawable/plasceholder_lantai"/>
+
+            <ImageView
+                android:id="@+id/fragment_laporan_dokumentasi_icon"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_camera_alt_24"/>
+        </FrameLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fragment_laporan_keterangan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Keterangan"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fragment_laporan_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_gravity="center_horizontal"
+            android:text="submit"/>
+    </LinearLayout>
+</ScrollView>
