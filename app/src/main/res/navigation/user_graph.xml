@@ -102,4 +102,10 @@
         android:name="com.machina.siband.user.view.FormPelaporanFragment"
         android:label="Pelaporan"
         tools:layout="@layout/fragment_form_pelaporan" />
+
+
+    <fragment
+        android:id="@+id/swipeLaporanFragment"
+        android:name="com.machina.siband.user.view.SwipeLaporanFragment"
+        android:label="List Laporan" />
 </navigation>

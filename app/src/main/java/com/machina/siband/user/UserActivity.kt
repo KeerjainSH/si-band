@@ -31,7 +31,7 @@ class UserActivity: AppCompatActivity() {
 
     private fun initiateDrawerLayout() {
         // Create set for Top-Level destination in DrawerLayout
-        val topLevelDestinations: Set<Int> = setOf(R.id.userHomeFragment, R.id.userLaporanFragment, R.id.formPelaporanFragment)
+        val topLevelDestinations: Set<Int> = setOf(R.id.userHomeFragment, R.id.swipeLaporanFragment, R.id.formPelaporanFragment)
         appBarConfiguration = AppBarConfiguration
                 .Builder(topLevelDestinations)
                 .setOpenableLayout(drawerLayout)
