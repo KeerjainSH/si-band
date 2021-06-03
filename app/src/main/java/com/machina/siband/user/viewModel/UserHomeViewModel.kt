@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.machina.siband.user.model.Lantai
@@ -18,10 +19,7 @@ import com.machina.siband.user.model.LaporanRuangan
 import com.machina.siband.user.model.LaporanRuangan.Companion.toLaporanRuangan
 import com.machina.siband.user.model.Ruangan
 import com.machina.siband.user.repository.UserFirestoreRepo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class UserHomeViewModel: ViewModel() {
 
@@ -49,6 +47,15 @@ class UserHomeViewModel: ViewModel() {
     private var _listLaporanBase = MutableLiveData<List<LaporanBase>>()
     val listLaporanBase: LiveData<List<LaporanBase>> = _listLaporanBase
 
+    private var _listLaporanNoProgressYet = MutableLiveData<List<LaporanRuangan>>()
+    val listLaporanNoProgressYet: LiveData<List<LaporanRuangan>> = _listLaporanNoProgressYet
+
+    private var _listLaporanOnProgress = MutableLiveData<List<LaporanRuangan>>()
+    val listLaporanOnProgress: LiveData<List<LaporanRuangan>> = _listLaporanOnProgress
+
+    private var _listLaporanDone = MutableLiveData<List<LaporanRuangan>>()
+    val listLaporanDone: LiveData<List<LaporanRuangan>> = _listLaporanDone
+
     // All listener to a firestore
     private lateinit var lantaiListener: ListenerRegistration
 
@@ -65,25 +72,57 @@ class UserHomeViewModel: ViewModel() {
         for (item in laporanBase) {
             UserFirestoreRepo.getListLaporanRuanganRef(item.email, item.tanggal, item.lokasi).get()
                 .addOnSuccessListener { coll ->
+
                     var temp = coll.mapNotNull { it.toLaporanRuangan() }
-                    temp = temp.filter {
-                        return@filter it.tipe.isNotEmpty()
-                    }
+                    temp = temp.filter { it.tipe.isNotEmpty() }
                     tempMutable.addAll(temp)
                     _listLaporanRuangan.value = tempMutable
+                    viewModelScope.launch(Dispatchers.Default) {
+                        filterListLaporan()
+                    }
                 }
                 .addOnFailureListener { error ->
                     sendCrashlytics("Failed to fetch LaporanRuangan", error)
                 }
         }
-
-        viewModelScope.launch(Dispatchers.Default) {
-            for (item in tempMutable) {
-                Log.d(TAG, "item : ${item.nama}, tanggal : ${item.tanggal}")
-            }
-        }
-
     }
+
+    private suspend fun filterListLaporan() {
+        val listLaporan =  _listLaporanRuangan.value
+        println(Thread.currentThread().name)
+        if (listLaporan != null) {
+            var temp = listLaporan.filter { it.status == NO_PROGRESS }
+            setListLaporanNoProgressYet(temp)
+//            for (item in temp) Log.d(TAG, "item : ${item.nama}, status : ${item.status}")
+
+            temp = listLaporan.filter { it.status == ON_PROGRESS }
+            setListLaporanOnProgress(temp)
+//            for (item in temp) Log.d(TAG, "item : ${item.nama}, status : ${item.status}")
+
+            temp = listLaporan.filter { it.status == DONE }
+            setListLaporanDone(temp)
+//            for (item in temp) Log.d(TAG, "item : ${item.nama}, status : ${item.status}")
+        }
+    }
+
+    private suspend fun setListLaporanNoProgressYet(data: List<LaporanRuangan>) {
+        withContext(Dispatchers.Main) {
+            _listLaporanNoProgressYet.value = data
+        }
+    }
+
+    private suspend fun setListLaporanOnProgress(data: List<LaporanRuangan>) {
+        withContext(Dispatchers.Main) {
+            _listLaporanOnProgress.value = data
+        }
+    }
+
+    private suspend fun setListLaporanDone(data: List<LaporanRuangan>) {
+        withContext(Dispatchers.Main) {
+            _listLaporanDone.value = data
+        }
+    }
+
 
 
     fun getListLaporanBase(email: String) {
@@ -214,6 +253,9 @@ class UserHomeViewModel: ViewModel() {
 
     fun clearLaporanRuangan() {
         _listLaporanRuangan.value = mutableListOf()
+        _listLaporanNoProgressYet.value = mutableListOf()
+        _listLaporanOnProgress.value = mutableListOf()
+        _listLaporanDone.value = mutableListOf()
     }
 
     // Get the list of report of some Ruangan at current date
@@ -278,5 +320,8 @@ class UserHomeViewModel: ViewModel() {
     }
     companion object {
         private const val TAG = "UserHome"
+        private const val NO_PROGRESS = "No Progress Yet"
+        private const val ON_PROGRESS = "On Progress"
+        private const val DONE = "Done"
     }
 }

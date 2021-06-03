@@ -19,7 +19,7 @@ import com.machina.siband.user.viewModel.UserHomeViewModel
  * Use the [UserLaporanFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class UserLaporanFragment : Fragment() {
+class UserLaporanFragment(private val position: Int) : Fragment() {
 
     private var _binding: FragmentUserLaporanBinding? = null
     private val binding get() = _binding!!
@@ -42,9 +42,18 @@ class UserLaporanFragment : Fragment() {
     }
 
     private fun setupObserver() {
-        viewModel.listLaporanRuangan.observe(viewLifecycleOwner, {
-            mAdapter.setData(it)
-        })
+        when (position) {
+            0 -> {
+                viewModel.listLaporanNoProgressYet.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+//                viewModel.listLaporanRuangan.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+            }
+            1 -> {
+                viewModel.listLaporanOnProgress.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+            }
+            2 -> {
+                viewModel.listLaporanDone.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+            }
+        }
     }
 
     private fun setupRecycler() {
@@ -55,8 +64,6 @@ class UserLaporanFragment : Fragment() {
             adapter = mAdapter
             layoutManager = mLinearLayoutManager
         }
-        val email = "admin@gmail.com"
-        viewModel.getListLaporanBase(email)
     }
 
     private fun onItemLaporanClick(data: LaporanRuangan) {
@@ -66,26 +73,10 @@ class UserLaporanFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.clearLaporanRuangan()
         _binding = null
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment UserComplaintFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UserLaporanFragment().apply {
-                arguments = Bundle().apply {
-
-                }
-            }
+        private const val TAG = "UserLaporanFragment"
     }
 }

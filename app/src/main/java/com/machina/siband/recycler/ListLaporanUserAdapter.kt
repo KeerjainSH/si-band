@@ -51,6 +51,7 @@ class ComplaintVh(binding: ItemComplaintBinding): RecyclerView.ViewHolder(bindin
         lokasiTv.text = data.lokasi
         tanggalTv.text = data.tanggal
         itemTv.text = data.nama
+        statusTv.text = data.status
 
         container.setOnClickListener { listener(data) }
     }

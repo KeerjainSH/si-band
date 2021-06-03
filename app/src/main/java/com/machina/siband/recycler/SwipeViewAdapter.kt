@@ -3,6 +3,7 @@ package com.machina.siband.recycler
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.machina.siband.user.view.UserLaporanFragment
+import com.machina.siband.user.viewModel.UserHomeViewModel
 
 class SwipeViewAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
@@ -10,8 +11,6 @@ class SwipeViewAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
     }
 
     override fun createFragment(position: Int): Fragment {
-        return when (position) {
-            else -> UserLaporanFragment()
-        }
+        return UserLaporanFragment(position)
     }
 }
