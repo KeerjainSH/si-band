@@ -12,8 +12,8 @@ object UserFirestoreRepo {
     private const val COL_LANTAI = "list-lantai"
     private const val COL_LAPORAN = "list-laporan"
 
-    fun getLaporanBaseRef(email: String, tanggal: String, namaRuangan: String): DocumentReference {
-        val path = "${email}_${tanggal}_${namaRuangan}"
+    fun getLaporanBaseRef(email: String, tanggal: String, lokasi: String): DocumentReference {
+        val path = "${email}_${tanggal}_${lokasi}"
         return Firebase.firestore
                 .collection(COL_LAPORAN)
                 .document(path)
@@ -28,9 +28,9 @@ object UserFirestoreRepo {
      * @param namaRuangan
      * @return CollectionReference to a List of Laporan.
      */
-    fun getListLaporanRuanganRef(email: String, tanggal: String, namaRuangan: String): CollectionReference {
+    fun getListLaporanRuanganRef(email: String, tanggal: String, lokasi: String): CollectionReference {
         // Change this path to actual parameter later, this was only for development purpose
-        val path = "${email}_${tanggal}_${namaRuangan}"
+        val path = "${email}_${tanggal}_${lokasi}"
         return Firebase.firestore
                 .collection(COL_LAPORAN)
                 .document(path)
@@ -61,8 +61,8 @@ object UserFirestoreRepo {
      * @param name the name of item in Ruangan.
      * @return DoccumentReference to a Laporan.
      */
-    fun getLaporanRuanganRef(email: String, tanggal: String, namaRuangan: String, nama: String): DocumentReference{
-        val path = "${email}_${tanggal}_${namaRuangan}"
+    fun getLaporanRuanganRef(email: String, tanggal: String, lokasi: String, nama: String): DocumentReference{
+        val path = "${email}_${tanggal}_${lokasi}"
         return Firebase.firestore
                 .collection(COL_LAPORAN)
                 .document(path)

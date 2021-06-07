@@ -10,18 +10,18 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.machina.siband.R
-import com.machina.siband.databinding.FragmentSwipeLaporanBinding
+import com.machina.siband.databinding.FragmentUserSwipeLaporanBinding
 import com.machina.siband.recycler.SwipeViewAdapter
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
-class SwipeLaporanFragment: Fragment() {
+class UserSwipeLaporanFragment: Fragment() {
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
     private lateinit var mSwipeViewAdapter: SwipeViewAdapter
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
 
-    private var _binding: FragmentSwipeLaporanBinding? = null
+    private var _binding: FragmentUserSwipeLaporanBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: UserHomeViewModel by activityViewModels()
@@ -34,7 +34,7 @@ class SwipeLaporanFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        _binding = FragmentSwipeLaporanBinding.inflate(inflater)
+        _binding = FragmentUserSwipeLaporanBinding.inflate(inflater)
         return binding.root
     }
 

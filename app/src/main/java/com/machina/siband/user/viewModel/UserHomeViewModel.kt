@@ -138,6 +138,19 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
+    fun putFormPelaporan(laporanBase: LaporanBase, laporanRuangan: LaporanRuangan) {
+        val baseReference = UserFirestoreRepo.getLaporanBaseRef(laporanBase.email, laporanBase.tanggal, laporanBase.lokasi)
+        val laporanReference = UserFirestoreRepo.getLaporanRuanganRef(laporanBase.email, laporanRuangan.tanggal, laporanRuangan.lokasi, laporanRuangan.nama)
+
+        baseReference.set(laporanBase)
+            .addOnSuccessListener {
+                laporanReference.set(laporanRuangan)
+                    .addOnFailureListener { exception ->
+                        sendCrashlytics("Cannot put LaporanRuangan with Pelaporan", exception)
+                    }
+            }
+    }
+
 
     /**
      * Put the local change that has been made
@@ -145,18 +158,18 @@ class UserHomeViewModel: ViewModel() {
      *
      * @param email
      * @param tanggal date that this function is called
-     * @param namaRuangan
+     * @param lokasi
      */
-    fun putUpdatedListLaporanRuangan(email: String, tanggal: String, namaRuangan: String) {
+    fun putUpdatedListLaporanRuangan(email: String, tanggal: String, lokasi: String) {
         val listRef = mutableListOf<DocumentReference>()
         val listTemp = listLaporanRuangan.value
-        val baseLaporanRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, namaRuangan)
+        val baseLaporanRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
 
         baseLaporanRef.update("isSubmitted", true)
 
         if (listTemp != null) {
             for (item in listTemp) {
-                val tempRef = UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, namaRuangan, item.nama)
+                val tempRef = UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, item.nama)
                 listRef.add(tempRef)
             }
 
@@ -182,15 +195,30 @@ class UserHomeViewModel: ViewModel() {
      * @param newKeterangan value of new Keterangan
      */
     fun applyLocalChangeLaporan(nama: String, newTipe: String, newKeterangan: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            mapListLaporanRuanganDefault(nama, newTipe, newKeterangan)
+        }
+    }
+
+    private suspend fun mapListLaporanRuanganDefault(nama: String, newTipe: String, newKeterangan: String) {
         val newList = _listLaporanRuangan.value?.map {
             if (it.nama == nama) {
                 Log.d(TAG, "$newTipe $newKeterangan")
-                return@map it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true)
-            } else
-                return@map it.copy()
+                it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true)
+            } else {
+                it.copy()
+            }
         }
-        if (newList != null)
-            _listLaporanRuangan.value = newList as List<LaporanRuangan>
+
+        if (newList != null) {
+            changeListLaporanRuanganMain(newList)
+        }
+    }
+
+    private suspend fun changeListLaporanRuanganMain(newList: List<LaporanRuangan>) {
+        withContext(Dispatchers.Main) {
+            _listLaporanRuangan.value = newList
+        }
     }
 
 
@@ -208,10 +236,10 @@ class UserHomeViewModel: ViewModel() {
 
     // this function only called one time in one day, when user open ListLaporan for the first time
     // Generate dummy laporan in appropriate path
-    private fun setListLaporanRuangan(idLantai: String, email: String, tanggal: String, namaRuangan: String) {
-        val laporanBaseRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, namaRuangan)
-        val laporanBase = LaporanBase(namaRuangan, email, tanggal, "On Process",false)
-        val listDetailRuanganRef = UserFirestoreRepo.getListDetailRuanganRef(idLantai, namaRuangan)
+    private fun setListLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String) {
+        val laporanBaseRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
+        val laporanBase = LaporanBase(lokasi, email, tanggal,false)
+        val listDetailRuanganRef = UserFirestoreRepo.getListDetailRuanganRef(idLantai, lokasi)
 
         laporanBaseRef.set(laporanBase)
                 .addOnSuccessListener {
@@ -221,8 +249,8 @@ class UserHomeViewModel: ViewModel() {
                                 if (arrayTemp != null) {
                                     val listTemp = convertToMutableList(arrayTemp as ArrayList<*>)
                                     for (item in listTemp)
-                                        putLaporanRuangan(email, tanggal, namaRuangan, item.nama)
-                                    getListLaporanRuangan(idLantai, email, tanggal, namaRuangan)
+                                        putLaporanRuangan(email, tanggal, lokasi, item.nama)
+                                    getListLaporanRuangan(idLantai, email, tanggal, lokasi)
                                 }
                             }
                             .addOnFailureListener {
@@ -259,11 +287,11 @@ class UserHomeViewModel: ViewModel() {
     }
 
     // Get the list of report of some Ruangan at current date
-    fun getListLaporanRuangan(idLantai: String, email: String, tanggal: String, namaRuangan: String) {
-        UserFirestoreRepo.getListLaporanRuanganRef(email, tanggal, namaRuangan).get()
+    fun getListLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String) {
+        UserFirestoreRepo.getListLaporanRuanganRef(email, tanggal, lokasi).get()
                 .addOnSuccessListener { coll ->
                     if (coll.isEmpty) {
-                        setListLaporanRuangan(idLantai, email, tanggal, namaRuangan)
+                        setListLaporanRuangan(idLantai, email, tanggal, lokasi)
                         return@addOnSuccessListener
                     } else {
                         _listLaporanRuangan.value = coll.mapNotNull { it.toLaporanRuangan() }
@@ -320,8 +348,8 @@ class UserHomeViewModel: ViewModel() {
     }
     companion object {
         private const val TAG = "UserHome"
-        private const val NO_PROGRESS = "No Progress Yet"
-        private const val ON_PROGRESS = "On Progress"
-        private const val DONE = "Done"
+        const val NO_PROGRESS = "No Progress Yet"
+        const val ON_PROGRESS = "On Progress"
+        const val DONE = "Done"
     }
 }

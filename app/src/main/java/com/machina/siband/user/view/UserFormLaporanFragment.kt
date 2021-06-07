@@ -11,20 +11,20 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.machina.siband.R
-import com.machina.siband.databinding.FragmentFormLaporanBinding
+import com.machina.siband.databinding.FragmentUserFormLaporanBinding
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
 /**
  * A simple [Fragment] subclass.
- * Use the [FormLaporanFragment.newInstance] factory method to
+ * Use the [UserFormLaporanFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FormLaporanFragment : Fragment() {
+class UserFormLaporanFragment : Fragment() {
 
-    private var _binding: FragmentFormLaporanBinding? = null
+    private var _binding: FragmentUserFormLaporanBinding? = null
     private val binding get() = _binding!!
 
-    private val args: FormLaporanFragmentArgs by navArgs()
+    private val args: UserFormLaporanFragmentArgs by navArgs()
     private val viewModel: UserHomeViewModel by activityViewModels()
 
 
@@ -33,10 +33,13 @@ class FormLaporanFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentFormLaporanBinding.inflate(inflater, container, false)
+        _binding = FragmentUserFormLaporanBinding.inflate(inflater, container, false)
 
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         resolveForm()
-
 
         val tipeKerusakan = resources.getStringArray(R.array.tipe)
 
@@ -46,8 +49,6 @@ class FormLaporanFragment : Fragment() {
         binding.fragmentLaporanSubmit.setOnClickListener {
             onSubmitLaporan()
         }
-
-        return binding.root
     }
 
 
@@ -91,7 +92,7 @@ class FormLaporanFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            FormLaporanFragment().apply {
+            UserFormLaporanFragment().apply {
                 arguments = Bundle().apply {
 
                 }

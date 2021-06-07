@@ -11,18 +11,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.machina.siband.databinding.FragmentDetailRuanganBinding
+import com.machina.siband.databinding.FragmentUserDetailRuanganBinding
 import com.machina.siband.recycler.ListLaporanRuanganAdapter
 import com.machina.siband.user.model.LaporanRuangan
 import com.machina.siband.user.viewModel.UserHomeViewModel
 import java.util.*
 
-class DetailRuanganFragment : Fragment() {
+class UserDetailRuanganFragment : Fragment() {
 
-    private var _binding: FragmentDetailRuanganBinding? = null
+    private var _binding: FragmentUserDetailRuanganBinding? = null
     private val binding get() = _binding!!
 
-    private val args: DetailRuanganFragmentArgs by navArgs()
+    private val args: UserDetailRuanganFragmentArgs by navArgs()
     private val viewModel: UserHomeViewModel by activityViewModels()
 
     private lateinit var mAdapter: ListLaporanRuanganAdapter
@@ -30,7 +30,7 @@ class DetailRuanganFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentDetailRuanganBinding.inflate(inflater, container, false)
+        _binding = FragmentUserDetailRuanganBinding.inflate(inflater, container, false)
 
         setupRecycler()
         setupObserver()
@@ -38,9 +38,9 @@ class DetailRuanganFragment : Fragment() {
         binding.fragmentDetailRuanganSubmit.setOnClickListener {
             val email = "admin@gmail.com"
             val tanggal = "29-04-2021"
-            val namaRuangan = args.namaRuangan
+            val lokasi = args.lokasi
 
-            viewModel.putUpdatedListLaporanRuangan(email, tanggal, namaRuangan)
+            viewModel.putUpdatedListLaporanRuangan(email, tanggal, lokasi)
             findNavController().navigateUp()
         }
 
@@ -55,7 +55,7 @@ class DetailRuanganFragment : Fragment() {
     }
 
     private fun onItemLaporanClicked(data: LaporanRuangan) {
-        val action = DetailRuanganFragmentDirections
+        val action = UserDetailRuanganFragmentDirections
             .actionDetailRuanganFragmentToLaporanFragment(data)
         findNavController().navigate(action)
     }
@@ -82,7 +82,7 @@ class DetailRuanganFragment : Fragment() {
         val idLantai = args.idLantai
         val email = "admin@gmail.com"
         val tanggal = "29-04-2021"
-        val namaRuangan = args.namaRuangan
+        val namaRuangan = args.lokasi
 
         if (viewModel.listLaporanRuangan.value.isNullOrEmpty())
             viewModel.getListLaporanRuangan(idLantai, email, tanggal, namaRuangan)
@@ -107,7 +107,7 @@ class DetailRuanganFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-                DetailRuanganFragment().apply {
+                UserDetailRuanganFragment().apply {
                     arguments = Bundle().apply {
 
                     }

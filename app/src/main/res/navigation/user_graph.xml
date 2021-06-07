@@ -43,15 +43,15 @@
 
     <fragment
         android:id="@+id/detailRuanganFragment"
-        android:name="com.machina.siband.user.view.DetailRuanganFragment"
+        android:name="com.machina.siband.user.view.UserDetailRuanganFragment"
         android:label="Detail Ruangan"
-        tools:layout="@layout/fragment_detail_ruangan" >
+        tools:layout="@layout/fragment_user_detail_ruangan" >
         <argument
             android:name="idLantai"
             app:argType="string"
             android:defaultValue=" "/>
         <argument
-            android:name="namaRuangan"
+            android:name="lokasi"
             app:argType="string"
             android:defaultValue=" "/>
 
@@ -65,9 +65,9 @@
 
     <fragment
         android:id="@+id/formLaporanFragment"
-        android:name="com.machina.siband.user.view.FormLaporanFragment"
+        android:name="com.machina.siband.user.view.UserFormLaporanFragment"
         android:label="Laporan"
-        tools:layout="@layout/fragment_form_laporan">
+        tools:layout="@layout/fragment_user_form_laporan">
 
         <action
             android:id="@+id/action_laporanFragment_to_detailRuanganFragment"
@@ -99,13 +99,13 @@
 
     <fragment
         android:id="@+id/formPelaporanFragment"
-        android:name="com.machina.siband.user.view.FormPelaporanFragment"
+        android:name="com.machina.siband.user.view.UserFormPelaporanFragment"
         android:label="Pelaporan"
-        tools:layout="@layout/fragment_form_pelaporan" />
+        tools:layout="@layout/fragment_user_form_pelaporan" />
 
 
     <fragment
         android:id="@+id/swipeLaporanFragment"
-        android:name="com.machina.siband.user.view.SwipeLaporanFragment"
+        android:name="com.machina.siband.user.view.UserSwipeLaporanFragment"
         android:label="List Laporan" />
 </navigation>
