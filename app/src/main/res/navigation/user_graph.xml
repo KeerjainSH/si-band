@@ -36,9 +36,6 @@
         <action
             android:id="@+id/action_userComplaintFragment_to_userHomeFragment"
             app:destination="@id/userHomeFragment" />
-        <action
-            android:id="@+id/action_userLaporanFragment_to_userReviewLaporanFragment"
-            app:destination="@id/userReviewLaporanFragment" />
     </fragment>
 
     <fragment
@@ -86,15 +83,14 @@
         tools:layout="@layout/fragment_user_review_laporan" >
 
 
-        <action
-            android:id="@+id/action_userReviewLaporanFragment_to_userLaporanFragment"
-            app:destination="@id/userLaporanFragment" />
-
         <argument
             android:name="laporanRuangan"
             app:argType="com.machina.siband.user.model.LaporanRuangan"
             app:nullable="true"
             android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_userReviewLaporanFragment_to_swipeLaporanFragment"
+            app:destination="@id/swipeLaporanFragment" />
     </fragment>
 
     <fragment
@@ -107,5 +103,10 @@
     <fragment
         android:id="@+id/swipeLaporanFragment"
         android:name="com.machina.siband.user.view.UserSwipeLaporanFragment"
-        android:label="List Laporan" />
+        android:label="List Laporan" >
+
+        <action
+            android:id="@+id/action_swipeLaporanFragment_to_userReviewLaporanFragment"
+            app:destination="@id/userReviewLaporanFragment" />
+    </fragment>
 </navigation>

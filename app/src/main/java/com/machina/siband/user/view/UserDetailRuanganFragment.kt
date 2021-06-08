@@ -36,6 +36,10 @@ class UserDetailRuanganFragment : Fragment() {
         setupObserver()
 
         binding.fragmentDetailRuanganSubmit.setOnClickListener {
+            /*
+            //    IMPORTANT!!!!
+            //    CHANGE ON PRODUCTION
+            */
             val email = "admin@gmail.com"
             val tanggal = "29-04-2021"
             val lokasi = args.lokasi
@@ -49,9 +53,7 @@ class UserDetailRuanganFragment : Fragment() {
 
     private fun postSomething() {
         val cal = Calendar.getInstance()
-        val date = "29-04-2021"
-
-        Log.d(TAG, "curr time: ${cal.get(Calendar.DATE)}-${cal.get(Calendar.MONTH) + 1}-${cal.get(Calendar.YEAR)}")
+        Log.d(TAG, "curr date: ${cal.get(Calendar.DATE)}-${cal.get(Calendar.MONTH) + 1}-${cal.get(Calendar.YEAR)}")
     }
 
     private fun onItemLaporanClicked(data: LaporanRuangan) {

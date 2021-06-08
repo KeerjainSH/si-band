@@ -67,7 +67,7 @@ class UserLaporanFragment(private val position: Int) : Fragment() {
     }
 
     private fun onItemLaporanClick(data: LaporanRuangan) {
-        val action = UserLaporanFragmentDirections.actionUserLaporanFragmentToUserReviewLaporanFragment(data)
+        val action = UserSwipeLaporanFragmentDirections.actionSwipeLaporanFragmentToUserReviewLaporanFragment(data)
         findNavController().navigate(action)
     }
 
