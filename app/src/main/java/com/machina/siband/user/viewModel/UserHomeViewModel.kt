@@ -204,7 +204,11 @@ class UserHomeViewModel: ViewModel() {
         val newList = _listLaporanRuangan.value?.map {
             if (it.nama == nama) {
                 Log.d(TAG, "$newTipe $newKeterangan")
-                it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true)
+                if (it.status.isBlank()) {
+                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true, status = "No Progress Yet")
+                } else {
+                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true)
+                }
             } else {
                 it.copy()
             }
@@ -292,7 +296,6 @@ class UserHomeViewModel: ViewModel() {
                 .addOnSuccessListener { coll ->
                     if (coll.isEmpty) {
                         setListLaporanRuangan(idLantai, email, tanggal, lokasi)
-                        return@addOnSuccessListener
                     } else {
                         _listLaporanRuangan.value = coll.mapNotNull { it.toLaporanRuangan() }
                     }

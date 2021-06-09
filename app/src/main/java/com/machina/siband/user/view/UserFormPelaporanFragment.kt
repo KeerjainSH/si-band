@@ -60,7 +60,7 @@ class UserFormPelaporanFragment : Fragment() {
                 lokasi,
                 tanggal,
                 tipe,
-                dokumentasi = "",
+                dokumentasi = listOf<String>(),
                 keterangan,
                 status,
                 dokumentasiPerbaikan = "",

@@ -13,7 +13,7 @@ data class LaporanRuangan(
         val lokasi: String,
         val tanggal: String,
         val tipe: String = "",
-        val dokumentasi: String = "",
+        val dokumentasi: List<String> = listOf(),
         val keterangan: String = "",
         val status: String = "",
         val dokumentasiPerbaikan: String = "",
@@ -29,13 +29,16 @@ data class LaporanRuangan(
                 val lokasi = getString("lokasi")!!
                 val tanggal = getString("tanggal")!!
                 val tipe = getString("tipe")!!
-                val dokumentasi = getString("dokumentasi")!!
+                val dokumentasi = get("dokumentasi")!!
+                if (dokumentasi is ArrayList<*>) {
+                    dokumentasi.toList()
+                }
                 val keterangan = getString("keterangan")!!
                 val status = getString("status")!!
                 val dokumentasiPerbaikan = getString("dokumentasiPerbaikan")!!
                 val isChecked = getBoolean("isChecked")!!
                 Log.d(TAG, "Converted to LaporanRuangan")
-                LaporanRuangan(id, nama, lokasi, tanggal, tipe, dokumentasi, keterangan, status, dokumentasiPerbaikan, isChecked)
+                LaporanRuangan(id, nama, lokasi, tanggal, tipe, dokumentasi as List<String>, keterangan, status, dokumentasiPerbaikan, isChecked)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting to LaporanRuangan", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")
