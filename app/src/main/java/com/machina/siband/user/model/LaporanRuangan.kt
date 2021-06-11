@@ -13,10 +13,10 @@ data class LaporanRuangan(
         val lokasi: String,
         val tanggal: String,
         val tipe: String = "",
-        val dokumentasi: List<String> = listOf(),
+        val dokumentasi: Int = 0,
         val keterangan: String = "",
         val status: String = "",
-        val dokumentasiPerbaikan: List<String> = listOf(),
+        val dokumentasiPerbaikan: Int = 0,
         @field:JvmField
         val isChecked: Boolean = false): Parcelable {
 
@@ -29,19 +29,13 @@ data class LaporanRuangan(
                 val lokasi = getString("lokasi")!!
                 val tanggal = getString("tanggal")!!
                 val tipe = getString("tipe")!!
-                val dokumentasi = get("dokumentasi")!!
-                if (dokumentasi is ArrayList<*>) {
-                    dokumentasi.toList()
-                }
+                val dokumentasi = get("dokumentasi")!! as Long
                 val keterangan = getString("keterangan")!!
                 val status = getString("status")!!
-                val dokumentasiPerbaikan = get("dokumentasiPerbaikan")!!
-                if (dokumentasiPerbaikan is ArrayList<*>) {
-                    dokumentasiPerbaikan.toList()
-                }
+                val dokumentasiPerbaikan = get("dokumentasiPerbaikan")!! as Long
                 val isChecked = getBoolean("isChecked")!!
                 Log.d(TAG, "Converted to LaporanRuangan")
-                LaporanRuangan(id, nama, lokasi, tanggal, tipe, dokumentasi as List<String>, keterangan, status, dokumentasiPerbaikan as List<String>, isChecked)
+                LaporanRuangan(id, nama, lokasi, tanggal, tipe, dokumentasi.toInt(), keterangan, status, dokumentasiPerbaikan.toInt(), isChecked)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting to LaporanRuangan", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")

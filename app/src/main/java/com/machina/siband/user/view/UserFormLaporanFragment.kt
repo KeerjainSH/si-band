@@ -19,7 +19,9 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserFormLaporanBinding
+import com.machina.siband.module.GlideApp
 import com.machina.siband.user.model.LaporanRuangan
+import com.machina.siband.user.repository.UserFirebaseStorageRepo
 import com.machina.siband.user.viewModel.UserHomeViewModel
 import kotlinx.coroutines.coroutineScope
 
@@ -117,14 +119,22 @@ class UserFormLaporanFragment : Fragment() {
         binding.fragmentLaporanDokumentasiContainer.addView(imageView)
     }
 
-    private fun loadImageInternet(imageUri: String, mLayoutParams: LinearLayout.LayoutParams) {
+    private fun loadImageInternet(lokasi: String, nama: String, mLayoutParams: LinearLayout.LayoutParams, index: Int) {
         val imageView = ImageView(context)
         imageView.apply {
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             layoutParams = mLayoutParams
         }
 
-        context?.let { Glide.with(it).load(imageUri).centerInside().into(imageView) }
+        val email = "admin@gmail.com"
+        val tanggal = "29-04-2021"
+        val imageRef = UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}$index")
+
+        context?.let {
+            GlideApp.with(it)
+                .load(imageRef)
+                .into(imageView)
+        }
         binding.fragmentLaporanDokumentasiContainer.addView(imageView)
     }
 
@@ -134,12 +144,12 @@ class UserFormLaporanFragment : Fragment() {
         if (laporanRuangan != null) {
             val nama = laporanRuangan.nama
             val newTipe = binding.fragmentLaporanTipe.editText?.text.toString()
-            val newDokumentasi = viewModel.imagesUri
+            val images = viewModel.imagesUri.toList()
             val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
 
-            val newLaporanRuangan = laporanRuangan.copy(tipe = newTipe, keterangan =  newKeterangan)
+            val newLaporanRuangan = laporanRuangan.copy(tipe = newTipe, keterangan =  newKeterangan, dokumentasi = images.size)
 
-            viewModel.putNewLaporanRuangan(newLaporanRuangan, newDokumentasi)
+            viewModel.putNewLaporanRuangan(newLaporanRuangan, images)
 //            viewModel.applyLocalChangeLaporan(nama, newTipe, newKeterangan)
 //            viewModel.putNewImage(laporanRuangan, newDokumentasi)
         }
@@ -150,21 +160,23 @@ class UserFormLaporanFragment : Fragment() {
     // Fill the form if the selected item is already submitted within the same day
     private fun resolveForm() {
         val lokasi = args.laporanRuangan?.lokasi.toString()
+        val nama = args.laporanRuangan?.nama.toString()
         val tipeKerusakan = args.laporanRuangan?.tipe.toString()
-        val dokumentasi = args.laporanRuangan?.dokumentasi
+        val dokumentasi = args.laporanRuangan?.dokumentasi as Int
         val keterangan = args.laporanRuangan?.keterangan.toString()
 
         binding.fragmentLaporanLokasi.text = lokasi
         binding.fragmentLaporanTipe.editText?.setText(tipeKerusakan)
         binding.fragmentLaporanKeterangan.editText?.setText(keterangan)
 
-        if (dokumentasi != null) {
-            val mLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).also { it.setMargins(0, 20, 0, 20) }
-            for (item in dokumentasi) {
-                loadImageInternet(item, mLayoutParams)
+        val mLayoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).also { it.setMargins(0, 20, 0, 20) }
+
+        if (dokumentasi > 0) {
+            repeat(dokumentasi) {
+                loadImageInternet(lokasi, nama,  mLayoutParams, it)
             }
         }
     }

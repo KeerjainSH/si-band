@@ -46,18 +46,6 @@ class UserFormPelaporanFragment : Fragment() {
         (binding.fragmentPelaporanTipe.editText as? AutoCompleteTextView)?.setAdapter(mArrayAdapter)
 
         binding.fragmentPelaporanSubmit.setOnClickListener { onSubmit() }
-
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
-        val imageRef = UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, "Kebun", "Cangkul0")
-
-        binding.fragmentPelaporanDokumentasiIcon.visibility = View.GONE
-        val imageView = binding.fragmentPelaporanDokumentasi
-        context?.let {
-            GlideApp.with(it)
-                .load(imageRef)
-                .into(imageView)
-        }
     }
 
 
@@ -79,10 +67,10 @@ class UserFormPelaporanFragment : Fragment() {
                 lokasi,
                 tanggal,
                 tipe,
-                dokumentasi = listOf(),
+                dokumentasi = 0,
                 keterangan,
                 status,
-                dokumentasiPerbaikan = listOf(),
+                dokumentasiPerbaikan = 0,
                 true
             )
 

@@ -156,15 +156,14 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
-    private fun putNewImage(laporanRuangan: LaporanRuangan, dokumentasi: List<Uri>) {
+    private fun putNewImage(laporanRuangan: LaporanRuangan, images: List<Uri>) {
         val email = "admin@gmail.com"
         val tanggal = "29-04-2021"
         val lokasi = laporanRuangan.lokasi
         val nama = laporanRuangan.nama
 
-        val laporanRef = UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
+        images.forEachIndexed { index, uri ->
 
-        dokumentasi.forEachIndexed { index, uri ->
             UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
                 .putFile(uri)
                 .addOnSuccessListener {
@@ -174,9 +173,7 @@ class UserHomeViewModel: ViewModel() {
         }
     }
 
-
-
-    fun putNewLaporanRuangan(laporanRuangan: LaporanRuangan,  dokumentasi: List<Uri>) {
+    fun putNewLaporanRuangan(laporanRuangan: LaporanRuangan,  images: List<Uri>) {
         val email = "admin@gmail.com"
         val tanggal = "29-04-2021"
         val lokasi = laporanRuangan.lokasi
@@ -185,7 +182,7 @@ class UserHomeViewModel: ViewModel() {
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
             .set(laporanRuangan)
             .addOnSuccessListener {
-                putNewImage(laporanRuangan, dokumentasi)
+                putNewImage(laporanRuangan, images)
             }
             .addOnFailureListener {
                 exception -> sendCrashlytics("An error occured when trying to upload new laporan", exception)
