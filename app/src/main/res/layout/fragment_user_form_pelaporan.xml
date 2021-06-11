@@ -71,7 +71,6 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerInside"
                 android:layout_gravity="center"
-                android:visibility="invisible"
                 android:src="@drawable/plasceholder_lantai"/>
 
             <ImageView

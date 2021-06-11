@@ -156,13 +156,15 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
-    fun putNewImage(laporanRuangan: LaporanRuangan, newDokumentasi: List<Uri>) {
+    private fun putNewImage(laporanRuangan: LaporanRuangan, dokumentasi: List<Uri>) {
         val email = "admin@gmail.com"
         val tanggal = "29-04-2021"
         val lokasi = laporanRuangan.lokasi
         val nama = laporanRuangan.nama
 
-        newDokumentasi.forEachIndexed { index, uri ->
+        val laporanRef = UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
+
+        dokumentasi.forEachIndexed { index, uri ->
             UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
                 .putFile(uri)
                 .addOnSuccessListener {
@@ -172,6 +174,25 @@ class UserHomeViewModel: ViewModel() {
         }
     }
 
+
+
+    fun putNewLaporanRuangan(laporanRuangan: LaporanRuangan,  dokumentasi: List<Uri>) {
+        val email = "admin@gmail.com"
+        val tanggal = "29-04-2021"
+        val lokasi = laporanRuangan.lokasi
+        val nama = laporanRuangan.nama
+
+        UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
+            .set(laporanRuangan)
+            .addOnSuccessListener {
+                putNewImage(laporanRuangan, dokumentasi)
+            }
+            .addOnFailureListener {
+                exception -> sendCrashlytics("An error occured when trying to upload new laporan", exception)
+            }
+    }
+
+
     /**
      * Put the local change that has been made
      * to listKeluhanRuangan to the database
@@ -180,29 +201,29 @@ class UserHomeViewModel: ViewModel() {
      * @param tanggal date that this function is called
      * @param lokasi
      */
-    fun putUpdatedListLaporanRuangan(email: String, tanggal: String, lokasi: String) {
+    fun putLaporanLantai(email: String, tanggal: String, lokasi: String) {
         val listRef = mutableListOf<DocumentReference>()
         val listTemp = listLaporanRuangan.value
         val baseLaporanRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
 
         baseLaporanRef.update("isSubmitted", true)
-
-        if (listTemp != null) {
-            for (item in listTemp) {
-                val tempRef = UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, item.nama)
-                listRef.add(tempRef)
-            }
-
-            val db = Firebase.firestore
-            db.runBatch { batch ->
-                for ((counter, item) in listRef.withIndex()) {
-                    batch.set(item, listTemp[counter])
-                }
-            }
-            .addOnFailureListener { e ->
-                sendCrashlytics("An error occurred while batch write", e)
-            }
-        }
+//
+//        if (listTemp != null) {
+//            for (item in listTemp) {
+//                val tempRef = UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, item.nama)
+//                listRef.add(tempRef)
+//            }
+//
+//            val db = Firebase.firestore
+//            db.runBatch { batch ->
+//                for ((counter, item) in listRef.withIndex()) {
+//                    batch.set(item, listTemp[counter])
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                sendCrashlytics("An error occurred while batch write", e)
+//            }
+//        }
     }
 
 
@@ -214,29 +235,29 @@ class UserHomeViewModel: ViewModel() {
      * @param newTipe value of new Tipe (Sedang, Darurat)
      * @param newKeterangan value of new Keterangan
      */
-    fun applyLocalChangeLaporan(nama: String, newTipe: String, newKeterangan: String) {
-        viewModelScope.launch(Dispatchers.Default) {
-            mapListLaporanRuanganDefault(nama, newTipe, newKeterangan)
-        }
-    }
-
-    private suspend fun mapListLaporanRuanganDefault(nama: String, newTipe: String, newKeterangan: String) {
-        val newList = _listLaporanRuangan.value?.map {
-            if (it.nama == nama) {
-                if (it.status.isBlank()) {
-                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true, status = "No Progress Yet")
-                } else {
-                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true)
-                }
-            } else {
-                it.copy()
-            }
-        }
-
-        if (newList != null) {
-            changeListLaporanRuanganMain(newList)
-        }
-    }
+//    fun applyLocalChangeLaporan(nama: String, newTipe: String, newKeterangan: String) {
+//        viewModelScope.launch(Dispatchers.Default) {
+//            mapListLaporanRuanganDefault(nama, newTipe, newKeterangan)
+//        }
+//    }
+//
+//    private suspend fun mapListLaporanRuanganDefault(nama: String, newTipe: String, newKeterangan: String) {
+//        val newList = _listLaporanRuangan.value?.map {
+//            if (it.nama == nama) {
+//                if (it.status.isBlank()) {
+//                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true, status = "No Progress Yet")
+//                } else {
+//                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true)
+//                }
+//            } else {
+//                it.copy()
+//            }
+//        }
+//
+//        if (newList != null) {
+//            changeListLaporanRuanganMain(newList)
+//        }
+//    }
 
     private suspend fun changeListLaporanRuanganMain(newList: List<LaporanRuangan>) {
         withContext(Dispatchers.Main) {

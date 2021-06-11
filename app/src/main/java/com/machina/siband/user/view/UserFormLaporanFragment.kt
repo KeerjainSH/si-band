@@ -19,6 +19,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserFormLaporanBinding
+import com.machina.siband.user.model.LaporanRuangan
 import com.machina.siband.user.viewModel.UserHomeViewModel
 import kotlinx.coroutines.coroutineScope
 
@@ -136,8 +137,11 @@ class UserFormLaporanFragment : Fragment() {
             val newDokumentasi = viewModel.imagesUri
             val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
 
-            viewModel.applyLocalChangeLaporan(nama, newTipe, newKeterangan)
-            viewModel.putNewImage(laporanRuangan, newDokumentasi)
+            val newLaporanRuangan = laporanRuangan.copy(tipe = newTipe, keterangan =  newKeterangan)
+
+            viewModel.putNewLaporanRuangan(newLaporanRuangan, newDokumentasi)
+//            viewModel.applyLocalChangeLaporan(nama, newTipe, newKeterangan)
+//            viewModel.putNewImage(laporanRuangan, newDokumentasi)
         }
         findNavController().navigateUp()
     }

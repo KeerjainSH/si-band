@@ -44,7 +44,7 @@ class UserDetailRuanganFragment : Fragment() {
             val tanggal = "29-04-2021"
             val lokasi = args.lokasi
 
-            viewModel.putUpdatedListLaporanRuangan(email, tanggal, lokasi)
+            viewModel.putLaporanLantai(email, tanggal, lokasi)
             findNavController().navigateUp()
         }
 

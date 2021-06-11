@@ -13,10 +13,13 @@ import android.widget.AutoCompleteTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserFormPelaporanBinding
+import com.machina.siband.module.GlideApp
 import com.machina.siband.user.model.LaporanBase
 import com.machina.siband.user.model.LaporanRuangan
+import com.machina.siband.user.repository.UserFirebaseStorageRepo
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
 
@@ -43,6 +46,18 @@ class UserFormPelaporanFragment : Fragment() {
         (binding.fragmentPelaporanTipe.editText as? AutoCompleteTextView)?.setAdapter(mArrayAdapter)
 
         binding.fragmentPelaporanSubmit.setOnClickListener { onSubmit() }
+
+        val email = "admin@gmail.com"
+        val tanggal = "29-04-2021"
+        val imageRef = UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, "Kebun", "Cangkul0")
+
+        binding.fragmentPelaporanDokumentasiIcon.visibility = View.GONE
+        val imageView = binding.fragmentPelaporanDokumentasi
+        context?.let {
+            GlideApp.with(it)
+                .load(imageRef)
+                .into(imageView)
+        }
     }
 
 
