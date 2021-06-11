@@ -1,5 +1,6 @@
 package com.machina.siband.user.viewModel
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,9 +19,9 @@ import com.machina.siband.user.model.LaporanBase.Companion.toLaporanBase
 import com.machina.siband.user.model.LaporanRuangan
 import com.machina.siband.user.model.LaporanRuangan.Companion.toLaporanRuangan
 import com.machina.siband.user.model.Ruangan
+import com.machina.siband.user.repository.UserFirebaseStorageRepo
 import com.machina.siband.user.repository.UserFirestoreRepo
 import kotlinx.coroutines.*
-
 class UserHomeViewModel: ViewModel() {
 
     // List of Lantai Object
@@ -55,6 +56,10 @@ class UserHomeViewModel: ViewModel() {
 
     private var _listLaporanDone = MutableLiveData<List<LaporanRuangan>>()
     val listLaporanDone: LiveData<List<LaporanRuangan>> = _listLaporanDone
+
+    val imagesUri = mutableListOf<Uri>()
+
+    val downloadImagesUri = mutableListOf<String>()
 
     // All listener to a firestore
     private lateinit var lantaiListener: ListenerRegistration
@@ -151,6 +156,21 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
+    fun putNewImage(laporanRuangan: LaporanRuangan, newDokumentasi: List<Uri>) {
+        val email = "admin@gmail.com"
+        val tanggal = "29-04-2021"
+        val lokasi = laporanRuangan.lokasi
+        val nama = laporanRuangan.nama
+
+        newDokumentasi.forEachIndexed { index, uri ->
+            UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
+                .putFile(uri)
+                .addOnSuccessListener {
+
+                }
+
+        }
+    }
 
     /**
      * Put the local change that has been made
@@ -203,7 +223,6 @@ class UserHomeViewModel: ViewModel() {
     private suspend fun mapListLaporanRuanganDefault(nama: String, newTipe: String, newKeterangan: String) {
         val newList = _listLaporanRuangan.value?.map {
             if (it.nama == nama) {
-                Log.d(TAG, "$newTipe $newKeterangan")
                 if (it.status.isBlank()) {
                     it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true, status = "No Progress Yet")
                 } else {

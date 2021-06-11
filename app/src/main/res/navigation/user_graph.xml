@@ -57,11 +57,11 @@
             app:destination="@id/userHomeFragment" />
         <action
             android:id="@+id/action_detailRuanganFragment_to_laporanFragment"
-            app:destination="@id/formLaporanFragment" />
+            app:destination="@id/userFormLaporanFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/formLaporanFragment"
+        android:id="@+id/userFormLaporanFragment"
         android:name="com.machina.siband.user.view.UserFormLaporanFragment"
         android:label="Laporan"
         tools:layout="@layout/fragment_user_form_laporan">
