@@ -9,13 +9,27 @@
         android:id="@+id/adminListLantaiFragment"
         android:name="com.machina.siband.admin.view.AdminListLantaiFragment"
         android:label="List Lantai"
-        tools:layout="@layout/fragment_admin_list_lantai" />
+        tools:layout="@layout/fragment_admin_list_lantai" >
+        <action
+            android:id="@+id/action_adminListLantaiFragment_to_adminListRuanganFragment"
+            app:destination="@id/adminListRuanganFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/adminListUserFragment"
         android:name="com.machina.siband.admin.view.AdminListUserFragment"
         android:label="List User"
         tools:layout="@layout/fragment_admin_list_user" />
+
+    <fragment
+        android:id="@+id/adminListRuanganFragment"
+        android:name="com.machina.siband.admin.view.AdminListRuanganFragment"
+        android:label="List Ruangan"
+        tools:layout="@layout/fragment_admin_list_ruangan" >
+        <argument
+            android:name="lantai"
+            app:argType="com.machina.siband.model.Lantai" />
+    </fragment>
 
 
 </navigation>

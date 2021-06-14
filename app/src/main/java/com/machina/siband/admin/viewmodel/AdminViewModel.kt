@@ -8,15 +8,16 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.machina.siband.admin.repository.AdminFirestoreRepo
 import com.machina.siband.model.Lantai
 import com.machina.siband.model.Lantai.Companion.toLantai
-import com.machina.siband.user.viewModel.UserHomeViewModel
+import com.machina.siband.model.Ruangan
+import com.machina.siband.model.Ruangan.Companion.toRuangan
 
 class AdminViewModel: ViewModel() {
 
     private val _listLantai = MutableLiveData<List<Lantai>>()
     val listLantai: LiveData<List<Lantai>> = _listLantai
 
-
-
+    private val _listRuangan = MutableLiveData<List<Ruangan>>()
+    val listRuangan: LiveData<List<Ruangan>> = _listRuangan
 
 
     fun getListLantai() {
@@ -27,6 +28,28 @@ class AdminViewModel: ViewModel() {
             }
             .addOnFailureListener { exception ->
                 sendCrashlytic("Error getting ListLantai on admin", exception)
+            }
+    }
+
+    fun getListRuangan(nama: String) {
+        AdminFirestoreRepo.getLantaiRef(nama)
+            .get()
+            .addOnSuccessListener { lantaiSnapshot ->
+                val document = lantaiSnapshot.documents.first()
+                if (document != null) {
+                    AdminFirestoreRepo.getListRuanganRef(document.id)
+                        .get()
+                        .addOnSuccessListener { ruanganSnapshot ->
+                            val temp = ruanganSnapshot.documents.mapNotNull { it.toRuangan() }
+                            _listRuangan.value = temp
+                        }
+                        .addOnFailureListener { exception ->
+                            sendCrashlytic("Failed to fetch List Ruangan", exception)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                sendCrashlytic("Failed to fetch Lantai", exception)
             }
     }
 

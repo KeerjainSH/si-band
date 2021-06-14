@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListLantaiBinding
+import com.machina.siband.model.Lantai
 import com.machina.siband.user.recycler.AdminListLantaiAdapter
 
 /**
@@ -39,7 +41,7 @@ class AdminListLantaiFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        mAdapter = AdminListLantaiAdapter()
+        mAdapter = AdminListLantaiAdapter(this::onItemClick)
         val recycler = binding.fragmentAdminListLantaiRecycler
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         viewModel.getListLantai()
@@ -54,6 +56,13 @@ class AdminListLantaiFragment : Fragment() {
         viewModel.listLantai.observe(viewLifecycleOwner) {
             mAdapter.setData(it)
         }
+    }
+
+    private fun onItemClick(lantai: Lantai) {
+        val action = AdminListLantaiFragmentDirections
+            .actionAdminListLantaiFragmentToAdminListRuanganFragment(lantai)
+
+        findNavController().navigate(action)
     }
 
     override fun onDestroy() {

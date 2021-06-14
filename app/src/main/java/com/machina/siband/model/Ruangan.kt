@@ -8,8 +8,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Ruangan(
-        val nama: String,
-        val isChecked: Boolean = false): Parcelable {
+        val listKeluhan: List<String>,
+        val nama: String = ""
+): Parcelable {
 
     companion object {
         private const val TAG = "Ruangan"
@@ -17,9 +18,14 @@ data class Ruangan(
         fun DocumentSnapshot.toRuangan(): Ruangan? {
             return try {
                 val nama = getString("nama")!!
-                Ruangan(nama, )
+                var listKeluhan = get("list-keluhan")!!
+                if (listKeluhan is ArrayList<*>) {
+                    listKeluhan = listKeluhan.toList()
+                }
+
+                Ruangan(listKeluhan as List<String>, nama)
             } catch (e: Exception) {
-                Log.e(TAG, "Error converting lantai data", e)
+                Log.e(TAG, "Error converting ruangan data", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")
                 FirebaseCrashlytics.getInstance().setCustomKey("userId", id)
                 FirebaseCrashlytics.getInstance().recordException(e)

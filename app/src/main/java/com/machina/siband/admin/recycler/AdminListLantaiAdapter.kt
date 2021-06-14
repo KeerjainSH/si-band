@@ -6,7 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemLantaiBinding
 import com.machina.siband.model.Lantai
 
-class AdminListLantaiAdapter: RecyclerView.Adapter<ItemLantai>() {
+class AdminListLantaiAdapter(
+    private val onItemClick: (Lantai) -> (Unit)
+): RecyclerView.Adapter<ItemLantai>() {
+
 
     private var dataSet = listOf<Lantai>()
 
@@ -23,7 +26,7 @@ class AdminListLantaiAdapter: RecyclerView.Adapter<ItemLantai>() {
     }
 
     override fun onBindViewHolder(holder: ItemLantai, position: Int) {
-        holder.onBind(dataSet[position])
+        holder.onBind(dataSet[position], onItemClick)
     }
 
     override fun getItemCount(): Int {
@@ -31,14 +34,15 @@ class AdminListLantaiAdapter: RecyclerView.Adapter<ItemLantai>() {
     }
 }
 
-
-
-
 class ItemLantai(binding: ItemLantaiBinding): RecyclerView.ViewHolder(binding.root) {
 
     private val namaLantai = binding.itemLantaiNamaLantai
+    private val detail = binding.itemLantaiDetail
 
-    fun onBind(lantai: Lantai) {
+    fun onBind(lantai: Lantai, onItemClick: (Lantai) -> (Unit)) {
         namaLantai.text = lantai.nama
+        detail.setOnClickListener {
+            onItemClick(lantai)
+        }
     }
 }

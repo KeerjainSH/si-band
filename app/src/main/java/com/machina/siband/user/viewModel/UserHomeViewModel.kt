@@ -244,7 +244,7 @@ class UserHomeViewModel: ViewModel() {
      * @return nothing.
      */
     private fun putLaporanRuangan(email: String, tanggal: String, lokasi: String, nama: String) {
-        val emptyLaporan = LaporanRuangan(nama, nama, lokasi, tanggal)
+        val emptyLaporan = LaporanRuangan(nama, nama, lokasi, tanggal, status = NO_PROGRESS)
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
                 .set(emptyLaporan)
     }
