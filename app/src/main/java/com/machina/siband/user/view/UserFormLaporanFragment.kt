@@ -150,8 +150,6 @@ class UserFormLaporanFragment : Fragment() {
             val newLaporanRuangan = laporanRuangan.copy(tipe = newTipe, keterangan =  newKeterangan, dokumentasi = images.size)
 
             viewModel.putNewLaporanRuangan(newLaporanRuangan, images)
-//            viewModel.applyLocalChangeLaporan(nama, newTipe, newKeterangan)
-//            viewModel.putNewImage(laporanRuangan, newDokumentasi)
         }
         findNavController().navigateUp()
     }
@@ -174,11 +172,11 @@ class UserFormLaporanFragment : Fragment() {
             LinearLayout.LayoutParams.WRAP_CONTENT
         ).also { it.setMargins(0, 20, 0, 20) }
 
-        if (dokumentasi > 0) {
-            repeat(dokumentasi) {
-                loadImageInternet(lokasi, nama,  mLayoutParams, it)
-            }
-        }
+//        if (dokumentasi > 0) {
+//            repeat(dokumentasi) {
+//                loadImageInternet(lokasi, nama,  mLayoutParams, it)
+//            }
+//        }
     }
 
     override fun onDestroy() {

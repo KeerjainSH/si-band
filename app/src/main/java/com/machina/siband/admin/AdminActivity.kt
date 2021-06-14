@@ -1,29 +1,29 @@
-package com.machina.siband.user
+package com.machina.siband.admin
 
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.*
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
 import com.google.android.material.navigation.NavigationView
 import com.machina.siband.R
-import com.machina.siband.databinding.ActivityUserBinding
-import com.machina.siband.user.view.UserHomeFragmentDirections
+import com.machina.siband.databinding.ActivityAdminBinding
 
-class UserActivity: AppCompatActivity() {
+class AdminActivity: AppCompatActivity() {
 
-    private var _binding: ActivityUserBinding? = null
+    private var _binding: ActivityAdminBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,31 +32,28 @@ class UserActivity: AppCompatActivity() {
     }
 
     private fun initiateView() {
-        _binding = ActivityUserBinding.inflate(layoutInflater)
+        _binding = ActivityAdminBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.activity_user_nav_host) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.activity_admin_nav_host) as NavHostFragment
         navController = navHostFragment.navController
-        drawerLayout = binding.activityUserDrawerLayout
-        navigationView = binding.activityUserDrawer
+        drawerLayout = binding.activityAdminDrawerLayout
+        navigationView = binding.activityAdminDrawer
     }
 
     private fun initiateDrawerLayout() {
-        // Create set for Top-Level destination in DrawerLayout
-        val topLevelDestinations: Set<Int> = setOf(R.id.userHomeFragment, R.id.swipeLaporanFragment, R.id.formPelaporanFragment)
+        val topLevelDestination: Set<Int> = setOf(R.id.adminListLantaiFragment, R.id.adminListUserFragment)
         appBarConfiguration = AppBarConfiguration
-                .Builder(topLevelDestinations)
-                .setOpenableLayout(drawerLayout)
-                .build()
+            .Builder(topLevelDestination)
+            .setOpenableLayout(drawerLayout)
+            .build()
 
-        // Bind action bar to change based on destination that opened
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
-        // Set listener to NavigationView item
-        navigationView.setCheckedItem(R.id.userHomeFragment)
+        navigationView.setCheckedItem(R.id.adminListLantaiFragment)
         navigationView.setNavigationItemSelectedListener { dest ->
             when (dest.itemId) {
-                R.id.userLogoutOption -> Log.d(TAG, "logout")
+                R.id.adminLogoutOption -> Log.d(TAG, "log out")
                 else -> {
                     NavigationUI.onNavDestinationSelected(dest, navController)
                     myCloseDrawer()
@@ -66,12 +63,12 @@ class UserActivity: AppCompatActivity() {
         }
     }
 
+
     private fun myCloseDrawer() {
         drawerLayout.closeDrawer(GravityCompat.START)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        // This navController enable drawer layout for multiple top level destinations
         return navController.navigateUp(appBarConfiguration) ||
                 super.onSupportNavigateUp()
     }
@@ -89,7 +86,9 @@ class UserActivity: AppCompatActivity() {
         }
     }
 
+
     companion object {
-        private const val TAG = "UserActivity"
+        private const val TAG = "AdminActivity"
     }
+
 }
