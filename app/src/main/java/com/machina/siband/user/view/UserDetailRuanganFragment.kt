@@ -12,8 +12,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.FragmentUserDetailRuanganBinding
-import com.machina.siband.recycler.ListLaporanRuanganAdapter
-import com.machina.siband.user.model.LaporanRuangan
+import com.machina.siband.user.recycler.ListLaporanRuanganAdapter
+import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.user.viewModel.UserHomeViewModel
 import java.util.*
 

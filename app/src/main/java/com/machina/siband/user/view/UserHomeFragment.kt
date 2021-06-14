@@ -1,7 +1,6 @@
 package com.machina.siband.user.view
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,13 +10,12 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserHomeBinding
-import com.machina.siband.recycler.ListRuanganAdapter
+import com.machina.siband.user.recycler.ListRuanganAdapter
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
 /**

@@ -1,4 +1,4 @@
-package com.machina.siband.recycler
+package com.machina.siband.user.recycler
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

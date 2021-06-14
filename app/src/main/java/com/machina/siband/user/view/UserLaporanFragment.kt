@@ -10,8 +10,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.FragmentUserLaporanBinding
-import com.machina.siband.recycler.ListComplaintAdapter
-import com.machina.siband.user.model.LaporanRuangan
+import com.machina.siband.user.recycler.ListComplaintAdapter
+import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
 /**
@@ -57,8 +57,8 @@ class UserLaporanFragment(private val position: Int) : Fragment() {
     }
 
     private fun setupRecycler() {
-        val recyclerView = binding.fragmentUserLaporanRecycler
         mAdapter = ListComplaintAdapter(this::onItemLaporanClick)
+        val recyclerView = binding.fragmentUserLaporanRecycler
         val mLinearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         recyclerView.apply {
             adapter = mAdapter

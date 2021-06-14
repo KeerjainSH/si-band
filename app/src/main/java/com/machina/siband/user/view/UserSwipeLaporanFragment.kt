@@ -9,9 +9,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserSwipeLaporanBinding
-import com.machina.siband.recycler.SwipeViewAdapter
+import com.machina.siband.user.recycler.SwipeViewAdapter
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
 class UserSwipeLaporanFragment: Fragment() {

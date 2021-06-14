@@ -1,9 +1,8 @@
-package com.machina.siband.recycler
+package com.machina.siband.user.recycler
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.machina.siband.user.view.UserLaporanFragment
-import com.machina.siband.user.viewModel.UserHomeViewModel
 
 class SwipeViewAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {

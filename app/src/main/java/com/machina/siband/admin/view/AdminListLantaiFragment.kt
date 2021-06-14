@@ -5,7 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListLantaiBinding
+import com.machina.siband.user.recycler.AdminListLantaiAdapter
 
 /**
  * A simple [Fragment] subclass.
@@ -17,7 +22,9 @@ class AdminListLantaiFragment : Fragment() {
     private var _binding : FragmentAdminListLantaiBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: AdminViewModel by activityViewModels()
 
+    private lateinit var mAdapter: AdminListLantaiAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,8 +32,28 @@ class AdminListLantaiFragment : Fragment() {
     ): View? {
         _binding = FragmentAdminListLantaiBinding.inflate(inflater)
 
+        setupRecycler()
+        setupObserver()
 
         return binding.root
+    }
+
+    private fun setupRecycler() {
+        mAdapter = AdminListLantaiAdapter()
+        val recycler = binding.fragmentAdminListLantaiRecycler
+        val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        viewModel.getListLantai()
+
+        recycler.apply {
+            adapter = mAdapter
+            layoutManager = mLayoutManager
+        }
+    }
+
+    private fun setupObserver() {
+        viewModel.listLantai.observe(viewLifecycleOwner) {
+            mAdapter.setData(it)
+        }
     }
 
     override fun onDestroy() {

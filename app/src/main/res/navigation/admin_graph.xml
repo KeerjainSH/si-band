@@ -8,13 +8,13 @@
     <fragment
         android:id="@+id/adminListLantaiFragment"
         android:name="com.machina.siband.admin.view.AdminListLantaiFragment"
-        android:label="fragment_admin_list_lantai"
+        android:label="List Lantai"
         tools:layout="@layout/fragment_admin_list_lantai" />
 
     <fragment
         android:id="@+id/adminListUserFragment"
         android:name="com.machina.siband.admin.view.AdminListUserFragment"
-        android:label="fragment_admin_list_user"
+        android:label="List User"
         tools:layout="@layout/fragment_admin_list_user" />
 
 

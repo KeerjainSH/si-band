@@ -1,4 +1,4 @@
-package com.machina.siband.user.model
+package com.machina.siband.model
 
 import android.os.Parcelable
 import android.util.Log

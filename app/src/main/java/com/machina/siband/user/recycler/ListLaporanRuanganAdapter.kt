@@ -1,11 +1,11 @@
-package com.machina.siband.recycler
+package com.machina.siband.user.recycler
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.R
 import com.machina.siband.databinding.ItemLaporanRuanganBinding
-import com.machina.siband.user.model.LaporanRuangan
+import com.machina.siband.model.LaporanRuangan
 
 class ListLaporanRuanganAdapter(private val listener: (LaporanRuangan) -> Unit): RecyclerView.Adapter<ItemLaporanRuangan>() {
 

@@ -1,4 +1,4 @@
-package com.machina.siband.user.model
+package com.machina.siband.model
 
 import android.os.Parcelable
 import android.util.Log
@@ -21,10 +21,11 @@ data class Lantai(
             return try {
                 val nama = getString("nama")!!
                 val urlMap = getString("url-map")!!
-                val temp = get("list-ruangan")!! as ArrayList<*>
-                val listRuangan = temp.toList()
-                Log.d(TAG, "isi temp $listRuangan")
-                Lantai(id, nama, urlMap, listRuangan as List<String>)
+                var temp = get("list-ruangan")!!
+                if (temp is ArrayList<*>) {
+                    temp = temp.toList()
+                }
+                Lantai(id, nama, urlMap, temp as List<String>)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting lantai data", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")

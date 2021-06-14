@@ -16,14 +16,11 @@ import android.widget.LinearLayout
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
 import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserFormLaporanBinding
 import com.machina.siband.module.GlideApp
-import com.machina.siband.user.model.LaporanRuangan
 import com.machina.siband.user.repository.UserFirebaseStorageRepo
 import com.machina.siband.user.viewModel.UserHomeViewModel
-import kotlinx.coroutines.coroutineScope
 
 /**
  * A simple [Fragment] subclass.

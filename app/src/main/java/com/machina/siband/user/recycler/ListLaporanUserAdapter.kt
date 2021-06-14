@@ -1,13 +1,10 @@
-package com.machina.siband.recycler
+package com.machina.siband.user.recycler
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemComplaintBinding
-import com.machina.siband.user.listener.OnItemLaporanClickListener
-import com.machina.siband.user.model.LaporanBase
-import com.machina.siband.user.model.LaporanRuangan
-import kotlin.random.Random
+import com.machina.siband.model.LaporanRuangan
 
 class ListComplaintAdapter(private val listener: (LaporanRuangan) -> Unit): RecyclerView.Adapter<ComplaintVh>() {
 
