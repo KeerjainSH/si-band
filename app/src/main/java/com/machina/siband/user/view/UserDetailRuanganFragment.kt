@@ -32,8 +32,8 @@ class UserDetailRuanganFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentUserDetailRuanganBinding.inflate(inflater, container, false)
 
-        setupRecycler()
         setupObserver()
+        setupRecycler()
 
         binding.fragmentDetailRuanganSubmit.setOnClickListener {
             /*
@@ -59,14 +59,14 @@ class UserDetailRuanganFragment : Fragment() {
     private fun onItemLaporanClicked(data: LaporanRuangan) {
         val action = UserDetailRuanganFragmentDirections
             .actionDetailRuanganFragmentToLaporanFragment(data)
+
         findNavController().navigate(action)
     }
 
     // SetUp observer for liveData in this fragment
     private fun setupObserver() {
-        viewModel.listLaporanRuangan.observe(viewLifecycleOwner, { dataSet ->
-            Log.d(TAG, "Adapter dataSet updated")
-            mAdapter.setData(dataSet)
+        viewModel.listLaporanRuangan.observe(viewLifecycleOwner, {
+            mAdapter.setData(it)
         })
     }
 
@@ -86,8 +86,7 @@ class UserDetailRuanganFragment : Fragment() {
         val tanggal = "29-04-2021"
         val namaRuangan = args.lokasi
 
-        if (viewModel.listLaporanRuangan.value.isNullOrEmpty())
-            viewModel.getListLaporanRuangan(idLantai, email, tanggal, namaRuangan)
+        viewModel.getListLaporanRuangan(idLantai, email, tanggal, namaRuangan)
     }
 
     override fun onDestroy() {

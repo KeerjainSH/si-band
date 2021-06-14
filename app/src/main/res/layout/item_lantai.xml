@@ -37,7 +37,8 @@
             android:id="@+id/item_lantai_hapus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hapus"/>
+            android:text="Hapus"
+            app:backgroundTint="@android:color/holo_red_light"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -144,7 +144,12 @@ class UserFormLaporanFragment : Fragment() {
             val images = viewModel.imagesUri.toList()
             val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
 
-            val newLaporanRuangan = laporanRuangan.copy(tipe = newTipe, keterangan =  newKeterangan, dokumentasi = images.size)
+            val newLaporanRuangan = laporanRuangan.copy(
+                tipe = newTipe,
+                keterangan =  newKeterangan,
+                dokumentasi = images.size,
+                isChecked = true
+            )
 
             viewModel.putNewLaporanRuangan(newLaporanRuangan, images)
         }

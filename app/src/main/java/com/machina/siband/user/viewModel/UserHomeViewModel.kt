@@ -181,8 +181,8 @@ class UserHomeViewModel: ViewModel() {
             .addOnSuccessListener {
                 putNewImage(laporanRuangan, images)
             }
-            .addOnFailureListener {
-                exception -> sendCrashlytics("An error occured when trying to upload new laporan", exception)
+            .addOnFailureListener { exception ->
+                sendCrashlytics("An error occured when trying to upload new laporan", exception)
             }
     }
 
@@ -201,75 +201,6 @@ class UserHomeViewModel: ViewModel() {
         val baseLaporanRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
 
         baseLaporanRef.update("isSubmitted", true)
-//
-//        if (listTemp != null) {
-//            for (item in listTemp) {
-//                val tempRef = UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, item.nama)
-//                listRef.add(tempRef)
-//            }
-//
-//            val db = Firebase.firestore
-//            db.runBatch { batch ->
-//                for ((counter, item) in listRef.withIndex()) {
-//                    batch.set(item, listTemp[counter])
-//                }
-//            }
-//            .addOnFailureListener { e ->
-//                sendCrashlytics("An error occurred while batch write", e)
-//            }
-//        }
-    }
-
-
-    /**
-     * Aplly change on Invididual Laporan Form
-     * to a Local Storage before submitted
-     *
-     * @param nama name of the item in DetailRuangan
-     * @param newTipe value of new Tipe (Sedang, Darurat)
-     * @param newKeterangan value of new Keterangan
-     */
-//    fun applyLocalChangeLaporan(nama: String, newTipe: String, newKeterangan: String) {
-//        viewModelScope.launch(Dispatchers.Default) {
-//            mapListLaporanRuanganDefault(nama, newTipe, newKeterangan)
-//        }
-//    }
-//
-//    private suspend fun mapListLaporanRuanganDefault(nama: String, newTipe: String, newKeterangan: String) {
-//        val newList = _listLaporanRuangan.value?.map {
-//            if (it.nama == nama) {
-//                if (it.status.isBlank()) {
-//                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true, status = "No Progress Yet")
-//                } else {
-//                    it.copy(tipe = newTipe, keterangan = newKeterangan, isChecked = true)
-//                }
-//            } else {
-//                it.copy()
-//            }
-//        }
-//
-//        if (newList != null) {
-//            changeListLaporanRuanganMain(newList)
-//        }
-//    }
-
-    private suspend fun changeListLaporanRuanganMain(newList: List<LaporanRuangan>) {
-        withContext(Dispatchers.Main) {
-            _listLaporanRuangan.value = newList
-        }
-    }
-
-
-    // Convert param into mutableList
-    private fun convertToMutableList(arrayTemp: ArrayList<*>): MutableList<Ruangan> {
-        val listTemp = mutableListOf<Ruangan>()
-        if (arrayTemp[0] != null && arrayTemp[0] is String) {
-            for (item in arrayTemp) {
-                val ruangan = Ruangan(item as String, false)
-                listTemp.add(ruangan)
-            }
-        }
-        return listTemp
     }
 
     // this function only called one time in one day, when user open ListLaporan for the first time
@@ -284,10 +215,11 @@ class UserHomeViewModel: ViewModel() {
                     listDetailRuanganRef.get()
                             .addOnSuccessListener { docs ->
                                 val arrayTemp = docs.get("list-keluhan")
-                                if (arrayTemp != null) {
-                                    val listTemp = convertToMutableList(arrayTemp as ArrayList<*>)
-                                    for (item in listTemp)
-                                        putLaporanRuangan(email, tanggal, lokasi, item.nama)
+                                if (arrayTemp != null && arrayTemp is ArrayList<*>) {
+                                    val listTemp = arrayTemp.toList()
+                                    for (item in listTemp as List<String>) {
+                                        putLaporanRuangan(email, tanggal, lokasi, item)
+                                    }
                                     getListLaporanRuangan(idLantai, email, tanggal, lokasi)
                                 }
                             }

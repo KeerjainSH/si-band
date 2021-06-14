@@ -15,7 +15,7 @@ data class LaporanRuangan(
         val tipe: String = "",
         val dokumentasi: Int = 0,
         val keterangan: String = "",
-        val status: String = "",
+        val status: String = "No Progress Yet",
         val dokumentasiPerbaikan: Int = 0,
         @field:JvmField
         val isChecked: Boolean = false): Parcelable {
