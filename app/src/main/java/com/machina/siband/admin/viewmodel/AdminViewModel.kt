@@ -19,6 +19,9 @@ class AdminViewModel: ViewModel() {
     private val _listRuangan = MutableLiveData<List<Ruangan>>()
     val listRuangan: LiveData<List<Ruangan>> = _listRuangan
 
+    private val _listItem = MutableLiveData<List<String>>()
+    val listItem: LiveData<List<String>> = _listItem
+
 
     fun getListLantai() {
         AdminFirestoreRepo.getListLantaiRef()
@@ -26,8 +29,16 @@ class AdminViewModel: ViewModel() {
             .addOnSuccessListener { snapshot ->
                 _listLantai.value = snapshot.mapNotNull { it.toLantai() }
             }
-            .addOnFailureListener { exception ->
-                sendCrashlytic("Error getting ListLantai on admin", exception)
+            .addOnFailureListener {
+                sendCrashlytic("Failed to fetch ListLantai on admin", it)
+            }
+    }
+
+    fun addLantai(lantai: Lantai) {
+        AdminFirestoreRepo.getListLantaiRef()
+            .add(lantai)
+            .addOnFailureListener {
+                sendCrashlytic("Failed to add Lantai on Admin", it)
             }
     }
 
@@ -43,14 +54,39 @@ class AdminViewModel: ViewModel() {
                             val temp = ruanganSnapshot.documents.mapNotNull { it.toRuangan() }
                             _listRuangan.value = temp
                         }
-                        .addOnFailureListener { exception ->
-                            sendCrashlytic("Failed to fetch List Ruangan", exception)
+                        .addOnFailureListener {
+                            sendCrashlytic("Failed to fetch List Ruangan", it)
                         }
                 }
             }
-            .addOnFailureListener { exception ->
-                sendCrashlytic("Failed to fetch Lantai", exception)
+            .addOnFailureListener {
+                sendCrashlytic("Failed to fetch Lantai", it)
             }
+    }
+
+    fun getListItem(lantai: Lantai, ruangan: Ruangan) {
+        AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                var tempArrayList = snapshot.get("list-keluhan")
+
+                if (tempArrayList is ArrayList<*>) {
+                    tempArrayList = tempArrayList.toList()
+                    _listItem.value = tempArrayList as List<String>
+                }
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to fetch List Item in Admin", it)
+            }
+    }
+
+
+    fun clearListRuangan() {
+        _listRuangan.value = listOf()
+    }
+
+    fun clearListItem() {
+        _listItem.value = listOf()
     }
 
     private fun sendCrashlytic(message: String, error: Exception) {

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListLantaiBinding
 import com.machina.siband.model.Lantai
-import com.machina.siband.user.recycler.AdminListLantaiAdapter
+import com.machina.siband.admin.recycler.AdminListLantaiAdapter
 
 /**
  * A simple [Fragment] subclass.
@@ -36,6 +36,10 @@ class AdminListLantaiFragment : Fragment() {
 
         setupRecycler()
         setupObserver()
+
+        binding.fragmentAdminListLantaiFab.setOnClickListener {
+
+        }
 
         return binding.root
     }

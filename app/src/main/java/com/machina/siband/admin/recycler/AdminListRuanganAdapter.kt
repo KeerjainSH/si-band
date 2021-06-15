@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemLantaiBinding
 import com.machina.siband.model.Ruangan
 
-class AdminListRuanganAdapter: RecyclerView.Adapter<ItemRuangan>() {
+class AdminListRuanganAdapter(
+    private val onItemClick: (Ruangan) -> (Unit)
+): RecyclerView.Adapter<ItemRuangan>() {
 
     private var dataSet = listOf<Ruangan>()
 
@@ -23,7 +25,7 @@ class AdminListRuanganAdapter: RecyclerView.Adapter<ItemRuangan>() {
     }
 
     override fun onBindViewHolder(holder: ItemRuangan, position: Int) {
-        holder.onBind(dataSet[position])
+        holder.onBind(dataSet[position], onItemClick)
     }
 
     override fun getItemCount(): Int {
@@ -35,9 +37,15 @@ class AdminListRuanganAdapter: RecyclerView.Adapter<ItemRuangan>() {
 class ItemRuangan(binding: ItemLantaiBinding): RecyclerView.ViewHolder(binding.root) {
 
     val nama = binding.itemLantaiNamaLantai
+    val detailButton = binding.itemLantaiDetail
+    val hapusButton = binding.itemLantaiHapus
 
-    fun onBind(ruangan: Ruangan) {
+    fun onBind(ruangan: Ruangan, onItemClick: (Ruangan) -> Unit) {
         nama.text = ruangan.nama
+
+        detailButton.setOnClickListener {
+            onItemClick(ruangan)
+        }
     }
 
 }

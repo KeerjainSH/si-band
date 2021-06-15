@@ -29,6 +29,24 @@
         <argument
             android:name="lantai"
             app:argType="com.machina.siband.model.Lantai" />
+        <action
+            android:id="@+id/action_adminListRuanganFragment_to_adminListItemFragment"
+            app:destination="@id/adminListItemFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminListItemFragment"
+        android:name="com.machina.siband.admin.view.AdminListItemFragment"
+        android:label="List Item"
+        tools:layout="@layout/fragment_admin_list_item" >
+
+        <argument
+            android:name="lantai"
+            app:argType="com.machina.siband.model.Lantai" />
+        <argument
+            android:name="ruangan"
+            app:argType="com.machina.siband.model.Ruangan" />
+
     </fragment>
 
 
