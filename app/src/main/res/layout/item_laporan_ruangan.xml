@@ -24,13 +24,22 @@
             android:layout_weight="7"
             android:text="Nama Detail Ruangan"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:ellipsize="end"/>
 
         <ImageView
             android:id="@+id/item_laporan_ruangan_check"
             android:layout_width="0dp"
             android:layout_height="32dp"
             android:layout_weight="1"
+            android:layout_marginEnd="12dp"
             android:src="@drawable/ic_baseline_check_box_outline_blank_24"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/item_laporan_ruangan_laporkan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Laporkan"
+            app:backgroundTint="@android:color/holo_red_light"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

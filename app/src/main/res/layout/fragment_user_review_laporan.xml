@@ -64,27 +64,26 @@
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <FrameLayout
+        <LinearLayout
+            android:id="@+id/fragment_user_review_laporan_dokumentasi_container"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:orientation="vertical"
             android:background="@drawable/bg_light_grey_rounded">
-            <ImageView
-                android:id="@+id/fragment_user_review_laporan_dokumentasi"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:layout_gravity="center"
-                android:visibility="invisible"
-                android:src="@drawable/plasceholder_lantai"/>
 
-            <ImageView
+            <LinearLayout
                 android:id="@+id/fragment_user_review_laporan_dokumentasi_icon"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_baseline_camera_alt_24"/>
-        </FrameLayout>
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_gravity="center">
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_baseline_camera_alt_24"/>
+            </LinearLayout>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/fragment_user_review_laporan_keterangan"
@@ -117,28 +116,28 @@
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <FrameLayout
+        <LinearLayout
+            android:id="@+id/fragment_user_review_laporan_dokumentasi_perbaikan_container"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
+            android:orientation="vertical"
             android:background="@drawable/bg_light_grey_rounded">
 
-            <ImageView
-                android:id="@+id/fragment_user_review_laporan_dokumentasi_perbaikan"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
+            <LinearLayout
+                android:id="@+id/fragment_user_review_laporan_dokumentasi_perbaikan_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
                 android:layout_gravity="center"
-                android:visibility="invisible"
-                android:src="@drawable/plasceholder_lantai"/>
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_baseline_camera_alt_24"/>
+            </LinearLayout>
 
-            <ImageView
-                android:id="@+id/fragment_user_review_laporan_dokumentasi_icon_perbaikan"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_baseline_camera_alt_24"/>
-        </FrameLayout>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

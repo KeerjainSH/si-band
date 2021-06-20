@@ -7,7 +7,10 @@ import com.machina.siband.R
 import com.machina.siband.databinding.ItemLaporanRuanganBinding
 import com.machina.siband.model.LaporanRuangan
 
-class ListLaporanRuanganAdapter(private val listener: (LaporanRuangan) -> Unit): RecyclerView.Adapter<ItemLaporanRuangan>() {
+class ListLaporanRuanganAdapter(
+    private val listener: (LaporanRuangan) -> Unit,
+    private val onCheck: (LaporanRuangan) -> Unit
+): RecyclerView.Adapter<ItemLaporanRuangan>() {
 
     private var dataSet = listOf<LaporanRuangan>()
 
@@ -24,7 +27,7 @@ class ListLaporanRuanganAdapter(private val listener: (LaporanRuangan) -> Unit):
     }
 
     override fun onBindViewHolder(holder: ItemLaporanRuangan, position: Int) {
-        holder.onBind(dataSet[position], listener)
+        holder.onBind(dataSet[position], listener, onCheck)
     }
 
     override fun getItemCount(): Int {
@@ -37,17 +40,19 @@ class ListLaporanRuanganAdapter(private val listener: (LaporanRuangan) -> Unit):
 
 class ItemLaporanRuangan(binding: ItemLaporanRuanganBinding): RecyclerView.ViewHolder(binding.root) {
 
-    val itemContainer = binding.itemLaporanRuanganContainer
-    val itemText = binding.itemLaporanRuanganNama
-    val itemCheck = binding.itemLaporanRuanganCheck
+    private val laporkanButton = binding.itemLaporanRuanganLaporkan
+    private val itemText = binding.itemLaporanRuanganNama
+    private val itemCheck = binding.itemLaporanRuanganCheck
 
-    fun onBind(data: LaporanRuangan, listener: (LaporanRuangan) -> Unit) {
+    fun onBind(
+        data: LaporanRuangan,
+        listener: (LaporanRuangan) -> Unit,
+        onCheck: (LaporanRuangan) -> Unit
+    ) {
         itemText.text = data.nama
         resolveChecked(data.isChecked)
-        itemContainer.setOnClickListener {
-            listener(data)
-        }
-
+        laporkanButton.setOnClickListener { listener(data) }
+        itemCheck.setOnClickListener { onCheck(data) }
     }
 
     private fun resolveChecked(isChecked: Boolean) {

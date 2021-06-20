@@ -63,6 +63,10 @@ class UserDetailRuanganFragment : Fragment() {
         findNavController().navigate(action)
     }
 
+    private fun onCheckBoxClicked(data: LaporanRuangan) {
+        viewModel.putLaporanRuanganOnCheck(data, args.idLantai)
+    }
+
     // SetUp observer for liveData in this fragment
     private fun setupObserver() {
         viewModel.listLaporanRuangan.observe(viewLifecycleOwner, {
@@ -73,7 +77,7 @@ class UserDetailRuanganFragment : Fragment() {
 
     private fun setupRecycler() {
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        mAdapter = ListLaporanRuanganAdapter(this::onItemLaporanClicked)
+        mAdapter = ListLaporanRuanganAdapter(this::onItemLaporanClicked, this::onCheckBoxClicked)
 
         binding.fragmentDetailRuanganRecycler.apply {
             adapter = mAdapter
@@ -84,9 +88,9 @@ class UserDetailRuanganFragment : Fragment() {
         val idLantai = args.idLantai
         val email = "admin@gmail.com"
         val tanggal = "29-04-2021"
-        val namaRuangan = args.lokasi
+        val lokasi = args.lokasi
 
-        viewModel.getListLaporanRuangan(idLantai, email, tanggal, namaRuangan)
+        viewModel.getListLaporanRuangan(idLantai, email, tanggal, lokasi)
     }
 
     override fun onDestroy() {

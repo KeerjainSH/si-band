@@ -16,6 +16,7 @@ import android.widget.LinearLayout
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserFormLaporanBinding
 import com.machina.siband.module.GlideApp
@@ -42,10 +43,6 @@ class UserFormLaporanFragment : Fragment() {
         _binding = FragmentUserFormLaporanBinding.inflate(inflater, container, false)
 
 
-        binding.fragmentLaporanDokumentasiIcon.setOnClickListener {
-            selectImage()
-        }
-
         return binding.root
     }
 
@@ -53,12 +50,14 @@ class UserFormLaporanFragment : Fragment() {
         resolveForm()
 
         val tipeKerusakan = resources.getStringArray(R.array.tipe)
-
         val mArrayAdapter = ArrayAdapter(requireContext(), R.layout.item_list_dropdown, tipeKerusakan)
         (binding.fragmentLaporanTipe.editText as? AutoCompleteTextView)?.setAdapter(mArrayAdapter)
 
         binding.fragmentLaporanSubmit.setOnClickListener {
             onSubmitLaporan()
+        }
+        binding.fragmentLaporanDokumentasiPilihFoto.setOnClickListener {
+            selectImage()
         }
     }
 
@@ -71,7 +70,7 @@ class UserFormLaporanFragment : Fragment() {
         }
         startActivityForResult(
             Intent.createChooser(intent, "Select app for this action"),
-            UserFormPelaporanFragment.PICK_IMAGE_CODE
+            PICK_IMAGE_CODE
         )
     }
 
@@ -79,19 +78,21 @@ class UserFormLaporanFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == UserFormPelaporanFragment.PICK_IMAGE_CODE && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == PICK_IMAGE_CODE && resultCode == Activity.RESULT_OK && data != null) {
             val mLayoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                800
             ).also { it.setMargins(0, 20, 0, 20) }
 
+            removeExistImage()
+            viewModel.clearImagesUri()
 
             if (data.clipData != null) {
                 val count = data.clipData!!.itemCount
                 for (i in 0 until count) {
                     val imageUri = data.clipData!!.getItemAt(i).uri
                     loadImageLocally(imageUri, mLayoutParams)
-                    viewModel.imagesUri.add(imageUri)
+                    viewModel.addImageToImagesUri(imageUri)
 
                     Log.d(TAG, "$imageUri")
                 }
@@ -99,11 +100,15 @@ class UserFormLaporanFragment : Fragment() {
                 val imageUri = data.data
                 if (imageUri != null) {
                     loadImageLocally(imageUri, mLayoutParams)
-                    viewModel.imagesUri.add(imageUri)
+                    viewModel.addImageToImagesUri(imageUri)
                 }
             }
             binding.fragmentLaporanDokumentasiIconContainer.visibility = View.GONE
         }
+    }
+
+    private fun removeExistImage() {
+        binding.fragmentLaporanDokumentasiContainer.removeAllViews()
     }
 
     private fun loadImageLocally(imageUri: Uri, mLayoutParams: LinearLayout.LayoutParams) {
@@ -130,6 +135,8 @@ class UserFormLaporanFragment : Fragment() {
         context?.let {
             GlideApp.with(it)
                 .load(imageRef)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .into(imageView)
         }
         binding.fragmentLaporanDokumentasiContainer.addView(imageView)
@@ -141,13 +148,20 @@ class UserFormLaporanFragment : Fragment() {
         if (laporanRuangan != null) {
             val nama = laporanRuangan.nama
             val newTipe = binding.fragmentLaporanTipe.editText?.text.toString()
-            val images = viewModel.imagesUri.toList()
             val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
+            val images = viewModel.getImagesUri().toList()
+            val lastImages = laporanRuangan.dokumentasi
+            var count: Int
 
+            if (images.isNotEmpty()) {
+                count = images.size
+            } else {
+                count = lastImages
+            }
             val newLaporanRuangan = laporanRuangan.copy(
                 tipe = newTipe,
                 keterangan =  newKeterangan,
-                dokumentasi = images.size,
+                dokumentasi = count,
                 isChecked = true
             )
 
@@ -171,26 +185,25 @@ class UserFormLaporanFragment : Fragment() {
 
         val mLayoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            800
         ).also { it.setMargins(0, 20, 0, 20) }
 
-//        if (dokumentasi > 0) {
-//            repeat(dokumentasi) {
-//                loadImageInternet(lokasi, nama,  mLayoutParams, it)
-//            }
-//        }
+        if (dokumentasi > 0) {
+            binding.fragmentLaporanDokumentasiIconContainer.visibility = View.GONE
+            repeat(dokumentasi) {
+                loadImageInternet(lokasi, nama,  mLayoutParams, it)
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-        viewModel.imagesUri.clear()
+        viewModel.clearImagesUri()
     }
 
     companion object {
-
-        const val WITH_DATA = "withData"
-        const val WITHOUT_DATA = "withoutData"
+        private const val PICK_IMAGE_CODE = 200
         private const val TAG = "userFormLaporanFragment"
         /**
          * Use this factory method to create a new instance of

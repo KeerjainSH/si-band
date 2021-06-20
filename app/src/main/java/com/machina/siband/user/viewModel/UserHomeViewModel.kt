@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
 import com.machina.siband.model.Lantai
 import com.machina.siband.model.Lantai.Companion.toLantai
@@ -15,7 +14,6 @@ import com.machina.siband.model.LaporanBase
 import com.machina.siband.model.LaporanBase.Companion.toLaporanBase
 import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.model.LaporanRuangan.Companion.toLaporanRuangan
-import com.machina.siband.model.Ruangan
 import com.machina.siband.user.repository.UserFirebaseStorageRepo
 import com.machina.siband.user.repository.UserFirestoreRepo
 import kotlinx.coroutines.*
@@ -54,9 +52,7 @@ class UserHomeViewModel: ViewModel() {
     private var _listLaporanDone = MutableLiveData<List<LaporanRuangan>>()
     val listLaporanDone: LiveData<List<LaporanRuangan>> = _listLaporanDone
 
-    val imagesUri = mutableListOf<Uri>()
-
-    val downloadImagesUri = mutableListOf<String>()
+    private val _imagesUri = mutableListOf<Uri>()
 
     // All listener to a firestore
     private lateinit var lantaiListener: ListenerRegistration
@@ -74,9 +70,10 @@ class UserHomeViewModel: ViewModel() {
         for (item in laporanBase) {
             UserFirestoreRepo.getListLaporanRuanganRef(item.email, item.tanggal, item.lokasi).get()
                 .addOnSuccessListener { coll ->
-
                     var temp = coll.mapNotNull { it.toLaporanRuangan() }
-                    temp = temp.filter { it.tipe.isNotEmpty() }
+                    temp = temp.filter {
+                        it.tipe.isNotEmpty() && it.isChecked
+                    }
                     tempMutable.addAll(temp)
                     _listLaporanRuangan.value = tempMutable
                     viewModelScope.launch(Dispatchers.Default) {
@@ -186,6 +183,22 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
+    fun putLaporanRuanganOnCheck(laporanRuangan: LaporanRuangan, idLantai: String) {
+        val email = "admin@gmail.com"
+        val tanggal = "29-04-2021"
+        val lokasi = laporanRuangan.lokasi
+        val nama = laporanRuangan.nama
+
+        UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
+            .update("isChecked", !laporanRuangan.isChecked)
+            .addOnSuccessListener {
+                getListLaporanRuangan(idLantai, email, tanggal, lokasi)
+            }
+            .addOnFailureListener {
+                sendCrashlytics("Failed to check laporan item", it)
+            }
+    }
+
 
     /**
      * Put the local change that has been made
@@ -196,10 +209,7 @@ class UserHomeViewModel: ViewModel() {
      * @param lokasi
      */
     fun putLaporanLantai(email: String, tanggal: String, lokasi: String) {
-        val listRef = mutableListOf<DocumentReference>()
-        val listTemp = listLaporanRuangan.value
         val baseLaporanRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
-
         baseLaporanRef.update("isSubmitted", true)
     }
 
@@ -303,6 +313,19 @@ class UserHomeViewModel: ViewModel() {
             tempList.add(item.nama)
 
         _arrayListLantai.value = tempList.toTypedArray()
+    }
+
+    fun clearImagesUri() {
+        while (_imagesUri.size > 0)
+            _imagesUri.removeLast()
+    }
+
+    fun getImagesUri(): MutableList<Uri> {
+        return _imagesUri
+    }
+
+    fun addImageToImagesUri(imageUri: Uri){
+        _imagesUri.add(imageUri)
     }
 
     private fun sendCrashlytics(message: String, error: Exception) {
