@@ -14,6 +14,8 @@ import com.machina.siband.model.LaporanBase
 import com.machina.siband.model.LaporanBase.Companion.toLaporanBase
 import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.model.LaporanRuangan.Companion.toLaporanRuangan
+import com.machina.siband.model.Ruangan
+import com.machina.siband.model.Ruangan.Companion.toRuangan
 import com.machina.siband.user.repository.UserFirebaseStorageRepo
 import com.machina.siband.user.repository.UserFirestoreRepo
 import kotlinx.coroutines.*
@@ -30,6 +32,9 @@ class UserHomeViewModel: ViewModel() {
     // Value of selectedLantai Object, used to populate recyclerAdapter
     private val _selectedLantai = MutableLiveData<Lantai>()
     val selectedLantai: LiveData<Lantai> = _selectedLantai
+
+    private val _listRuangan = MutableLiveData<List<Ruangan>>()
+    val listRuangan: LiveData<List<Ruangan>> = _listRuangan
 
     // Value of selected Lantai position to keep spinner consistent
     private var _selectedPosition: Int = 0
@@ -224,7 +229,7 @@ class UserHomeViewModel: ViewModel() {
                 .addOnSuccessListener {
                     listDetailRuanganRef.get()
                             .addOnSuccessListener { docs ->
-                                val arrayTemp = docs.get("list-keluhan")
+                                val arrayTemp = docs.get("listKeluhan")
                                 if (arrayTemp != null && arrayTemp is ArrayList<*>) {
                                     val listTemp = arrayTemp.toList()
                                     for (item in listTemp as List<String>) {
@@ -268,7 +273,8 @@ class UserHomeViewModel: ViewModel() {
 
     // Get the list of report of some Ruangan at current date
     fun getListLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String) {
-        UserFirestoreRepo.getListLaporanRuanganRef(email, tanggal, lokasi).get()
+        UserFirestoreRepo.getListLaporanRuanganRef(email, tanggal, lokasi)
+                .get()
                 .addOnSuccessListener { coll ->
                     if (coll.isEmpty) {
                         setListLaporanRuangan(idLantai, email, tanggal, lokasi)
@@ -313,6 +319,18 @@ class UserHomeViewModel: ViewModel() {
             tempList.add(item.nama)
 
         _arrayListLantai.value = tempList.toTypedArray()
+    }
+
+    fun updateLantaiListOnHome(lantai: Lantai) {
+        UserFirestoreRepo.getListRuanganRef(lantai.nama)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val temp = snapshot.mapNotNull { it.toRuangan() }
+                _listRuangan.value = temp
+            }
+            .addOnFailureListener {
+                sendCrashlytics("Error to list ruangan on Home Screen", it)
+            }
     }
 
     fun clearImagesUri() {

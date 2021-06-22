@@ -11,8 +11,7 @@ import java.lang.Exception
 data class Lantai(
         val id: String,
         val nama: String,
-        val urlMap: String,
-        val listRuangan: List<String>) : Parcelable {
+        val urlMap: String) : Parcelable {
 
     companion object {
         private const val TAG = "Lantai"
@@ -20,12 +19,8 @@ data class Lantai(
         fun DocumentSnapshot.toLantai(): Lantai? {
             return try {
                 val nama = getString("nama")!!
-                val urlMap = getString("url-map")!!
-                var temp = get("list-ruangan")!!
-                if (temp is ArrayList<*>) {
-                    temp = temp.toList()
-                }
-                Lantai(id, nama, urlMap, temp as List<String>)
+                val urlMap = getString("urlMap")!!
+                Lantai(id, nama, urlMap)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting lantai data", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")

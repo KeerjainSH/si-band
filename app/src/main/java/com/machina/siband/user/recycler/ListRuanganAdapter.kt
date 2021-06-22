@@ -4,14 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemRuanganBinding
+import com.machina.siband.model.Ruangan
 
 class ListRuanganAdapter(
         private val onItemRuanganClicked: (String) -> (Unit))
     : RecyclerView.Adapter<ItemRuangan>() {
 
-    private var dataSet = listOf<String>()
+    private var dataSet = listOf<Ruangan>()
 
-    fun setData(newList: List<String>) {
+    fun setData(newList: List<Ruangan>) {
         dataSet = newList
         notifyDataSetChanged()
     }
@@ -37,11 +38,11 @@ class ItemRuangan(binding: ItemRuanganBinding): RecyclerView.ViewHolder(binding.
     private val textView = binding.itemRuanganName
     private val container = binding.itemRuanganContainer
 
-    fun onBind(name: String, position: Int, listener: (String) -> (Unit)) {
-        val text = "$position. $name"
+    fun onBind(ruangan: Ruangan, position: Int, listener: (String) -> (Unit)) {
+        val text = "$position. ${ruangan.nama}"
         textView.text = text
         container.setOnClickListener {
-            listener(name)
+            listener(ruangan.nama)
         }
     }
 }

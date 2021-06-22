@@ -81,8 +81,12 @@ class UserHomeFragment : Fragment(), AdapterView.OnItemSelectedListener {
 //        })
 
         // Listening to selectedLantai, update adapter dataset when selectedLantai changed
-        viewModel.selectedLantai.observe(viewLifecycleOwner, { selectedLantai ->
-            mAdapter.setData(selectedLantai.listRuangan)
+        viewModel.selectedLantai.observe(viewLifecycleOwner, {
+            viewModel.updateLantaiListOnHome(it)
+        })
+
+        viewModel.listRuangan.observe(viewLifecycleOwner, {
+            mAdapter.setData(it)
         })
 
         // Listening to arrayLantai, update Data for spinner on change

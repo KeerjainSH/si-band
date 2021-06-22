@@ -75,6 +75,13 @@ object UserFirestoreRepo {
                 .collection(COL_LANTAI)
     }
 
+    fun getListRuanganRef(namaLantai: String): CollectionReference {
+        return Firebase.firestore
+            .collection(COL_LANTAI)
+            .document(namaLantai)
+            .collection("col-ruangan")
+    }
+
     fun getListDetailRuanganRef(idLantai: String, namaRuangan: String): DocumentReference {
         return Firebase.firestore
                 .collection(COL_LANTAI)
