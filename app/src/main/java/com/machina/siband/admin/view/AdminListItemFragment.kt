@@ -39,8 +39,8 @@ class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.fragmentAdminListItemFab.setOnClickListener {
-            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener)
-            dialog.show(parentFragmentManager, "Add Item Dialog")
+            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Item")
+            dialog.show(parentFragmentManager, "AddItemDialog")
         }
     }
 

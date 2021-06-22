@@ -38,18 +38,18 @@ class AdminListLantaiFragment : Fragment() {
         setupObserver()
 
 
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.fragmentAdminListLantaiFab.setOnClickListener {
-
+            val action = AdminListLantaiFragmentDirections.actionAdminListLantaiFragmentToAdminAddLantaiFragment()
+            findNavController().navigate(action)
         }
     }
 
     private fun setupRecycler() {
-        mAdapter = AdminListLantaiAdapter(this::onItemClick)
+        mAdapter = AdminListLantaiAdapter(this::onItemClick, this::onItemDelete)
         val recycler = binding.fragmentAdminListLantaiRecycler
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         viewModel.getListLantai()
@@ -71,6 +71,10 @@ class AdminListLantaiFragment : Fragment() {
             .actionAdminListLantaiFragmentToAdminListRuanganFragment(lantai)
 
         findNavController().navigate(action)
+    }
+
+    private fun onItemDelete(lantai: Lantai) {
+        viewModel.deleteLantai(lantai)
     }
 
     override fun onDestroy() {

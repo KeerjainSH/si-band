@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_adminListLantaiFragment_to_adminListRuanganFragment"
             app:destination="@id/adminListRuanganFragment" />
+        <action
+            android:id="@+id/action_adminListLantaiFragment_to_adminAddLantaiFragment"
+            app:destination="@id/adminAddLantaiFragment" />
     </fragment>
 
     <fragment
@@ -54,6 +57,12 @@
         android:name="com.machina.siband.admin.view.AdminListLaporanRuanganFragment"
         android:label="List Laporan"
         tools:layout="@layout/fragment_admin_list_laporan_ruangan" />
+
+    <fragment
+        android:id="@+id/adminAddLantaiFragment"
+        android:name="com.machina.siband.admin.view.AdminAddLantaiFragment"
+        android:label="Tambah Lantai"
+        tools:layout="@layout/fragment_admin_add_lantai" />
 
 
 </navigation>

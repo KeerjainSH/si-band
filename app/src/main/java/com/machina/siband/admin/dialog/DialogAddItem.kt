@@ -7,9 +7,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.machina.siband.databinding.DialogAddItemBinding
 
-class DialogAddItem(private val dialogAddItemListener: DialogAddItemListener) : DialogFragment() {
+class DialogAddItem(private val dialogAddItemListener: DialogAddItemListener, message: String) : DialogFragment() {
 
     internal lateinit var listener: DialogAddItemListener
+    private var textMessage: String = message
 
     interface DialogAddItemListener {
         fun onDialogPositiveClick(dialog: DialogFragment, itemName: String)
@@ -18,13 +19,12 @@ class DialogAddItem(private val dialogAddItemListener: DialogAddItemListener) : 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            val inflater = layoutInflater
             // Use the Builder class for convenient dialog construction
             val builder = AlertDialog.Builder(it)
             val binding = DialogAddItemBinding.inflate(layoutInflater)
             builder.setView(binding.root)
-                .setMessage("Tambah Item")
-                .setPositiveButton("Add") { dialog, id ->
+                .setMessage(textMessage)
+                .setPositiveButton("Add") { _, _ ->
                     val itemName = binding.dialogAddItemNama.editText?.text.toString()
                     if (itemName.isNotEmpty()) {
                         listener.onDialogPositiveClick(this, itemName)
@@ -32,7 +32,7 @@ class DialogAddItem(private val dialogAddItemListener: DialogAddItemListener) : 
                         listener.onDialogNegativeClick(this)
                     }
                 }
-                .setNegativeButton("Cancel") { dialog, id ->
+                .setNegativeButton("Cancel") { _, _ ->
                     listener.onDialogNegativeClick(this)
                 }
             // Create the AlertDialog object and return it

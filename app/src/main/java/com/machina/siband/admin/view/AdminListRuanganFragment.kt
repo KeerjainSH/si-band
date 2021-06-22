@@ -5,12 +5,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.R
+import com.machina.siband.admin.dialog.DialogAddItem
 import com.machina.siband.admin.recycler.AdminListRuanganAdapter
 import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListRuanganBinding
@@ -22,7 +24,7 @@ import com.machina.siband.model.Ruangan
  * Use the [AdminListRuanganFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class AdminListRuanganFragment : Fragment() {
+class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener {
 
     private var _binding : FragmentAdminListRuanganBinding? = null
     private val binding get() = _binding!!
@@ -44,6 +46,13 @@ class AdminListRuanganFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.fragmentAdminListRuanganFab.setOnClickListener {
+            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Ruangan")
+            dialog.show(parentFragmentManager, "AddRuanganDialog")
+        }
+    }
+
     private fun setupObserver() {
         viewModel.listRuangan.observe(viewLifecycleOwner) {
             mAdapter.setData(it)
@@ -51,7 +60,7 @@ class AdminListRuanganFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        mAdapter = AdminListRuanganAdapter(this::onItemClick)
+        mAdapter = AdminListRuanganAdapter(this::onItemClick, this::onItemDelete)
 
         val recycler = binding.fragmentAdminListRuanganRecycler
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -61,6 +70,10 @@ class AdminListRuanganFragment : Fragment() {
             adapter = mAdapter
             layoutManager = mLayoutManager
         }
+    }
+
+    private fun onItemDelete(ruangan: Ruangan) {
+        viewModel.deleteRuangan(args.lantai, ruangan.nama)
     }
 
     private fun onItemClick(ruangan: Ruangan) {
@@ -78,6 +91,8 @@ class AdminListRuanganFragment : Fragment() {
     }
 
     companion object {
+        private const val TAG = "AdminListRuanganFragment"
+
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
@@ -91,5 +106,14 @@ class AdminListRuanganFragment : Fragment() {
         fun newInstance(param1: String, param2: String) =
             AdminListRuanganFragment().apply {
             }
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String) {
+        viewModel.addRuangan(args.lantai, itemName)
+        dialog.dismiss()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+        dialog.dismiss()
     }
 }

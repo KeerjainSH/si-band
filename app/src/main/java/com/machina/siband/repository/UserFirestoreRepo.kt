@@ -1,4 +1,4 @@
-package com.machina.siband.user.repository
+package com.machina.siband.repository
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference

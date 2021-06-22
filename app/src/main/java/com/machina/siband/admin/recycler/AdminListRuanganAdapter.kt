@@ -7,7 +7,8 @@ import com.machina.siband.databinding.ItemLantaiBinding
 import com.machina.siband.model.Ruangan
 
 class AdminListRuanganAdapter(
-    private val onItemClick: (Ruangan) -> (Unit)
+    private val onItemClick: (Ruangan) -> Unit,
+    private val onItemDelete: (Ruangan) -> Unit
 ): RecyclerView.Adapter<ItemRuangan>() {
 
     private var dataSet = listOf<Ruangan>()
@@ -25,7 +26,7 @@ class AdminListRuanganAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemRuangan, position: Int) {
-        holder.onBind(dataSet[position], onItemClick)
+        holder.onBind(dataSet[position], onItemClick, onItemDelete)
     }
 
     override fun getItemCount(): Int {
@@ -40,12 +41,15 @@ class ItemRuangan(binding: ItemLantaiBinding): RecyclerView.ViewHolder(binding.r
     val detailButton = binding.itemLantaiDetail
     val hapusButton = binding.itemLantaiHapus
 
-    fun onBind(ruangan: Ruangan, onItemClick: (Ruangan) -> Unit) {
+    fun onBind(
+        ruangan: Ruangan,
+        onItemClick: (Ruangan) -> Unit,
+        onItemDelete: (Ruangan) -> Unit
+    ) {
         nama.text = ruangan.nama
 
-        detailButton.setOnClickListener {
-            onItemClick(ruangan)
-        }
+        detailButton.setOnClickListener { onItemClick(ruangan) }
+        hapusButton.setOnClickListener { onItemDelete(ruangan) }
     }
 
 }

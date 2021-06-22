@@ -1,4 +1,4 @@
-package com.machina.siband.admin.repository
+package com.machina.siband.repository
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -12,10 +12,10 @@ object AdminFirestoreRepo {
         return Firebase.firestore.collection("list-lantai")
     }
 
-    fun getLantaiRef(nama: String): Query {
+    fun getLantaiRef(nama: String): DocumentReference {
         return Firebase.firestore
             .collection("list-lantai")
-            .whereEqualTo("nama", nama)
+            .document(nama)
     }
 
     fun getListRuanganRef(id: String): CollectionReference {

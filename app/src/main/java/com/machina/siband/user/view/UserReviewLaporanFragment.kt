@@ -9,10 +9,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserReviewLaporanBinding
 import com.machina.siband.module.GlideApp
-import com.machina.siband.user.repository.UserFirebaseStorageRepo
+import com.machina.siband.repository.FirebaseStorageRepo
 
 /**
  * A simple [Fragment] subclass.
@@ -76,7 +75,7 @@ class UserReviewLaporanFragment : Fragment() {
         }
         val email = "admin@gmail.com"
         val tanggal = "29-04-2021"
-        val imageRef = UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}$index")
+        val imageRef = FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}$index")
 
         context?.let {
             GlideApp.with(it)

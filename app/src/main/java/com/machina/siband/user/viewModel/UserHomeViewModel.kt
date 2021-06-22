@@ -16,8 +16,8 @@ import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.model.LaporanRuangan.Companion.toLaporanRuangan
 import com.machina.siband.model.Ruangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
-import com.machina.siband.user.repository.UserFirebaseStorageRepo
-import com.machina.siband.user.repository.UserFirestoreRepo
+import com.machina.siband.repository.FirebaseStorageRepo
+import com.machina.siband.repository.UserFirestoreRepo
 import kotlinx.coroutines.*
 class UserHomeViewModel: ViewModel() {
 
@@ -162,13 +162,11 @@ class UserHomeViewModel: ViewModel() {
         val nama = laporanRuangan.nama
 
         images.forEachIndexed { index, uri ->
-
-            UserFirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
+            FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
                 .putFile(uri)
-                .addOnSuccessListener {
-
+                .addOnFailureListener{
+                    sendCrashlytics("Failed to Put new Dokumentasi Laporan Images", it)
                 }
-
         }
     }
 

@@ -1,15 +1,19 @@
 package com.machina.siband.admin.viewmodel
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.machina.siband.admin.repository.AdminFirestoreRepo
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.machina.siband.repository.AdminFirestoreRepo
 import com.machina.siband.model.Lantai
 import com.machina.siband.model.Lantai.Companion.toLantai
 import com.machina.siband.model.Ruangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
+import com.machina.siband.repository.FirebaseStorageRepo
 
 class AdminViewModel: ViewModel() {
 
@@ -25,6 +29,7 @@ class AdminViewModel: ViewModel() {
     private var _selectedRuangan: Ruangan? = null
     val selectedRuangan get() = _selectedRuangan!!
 
+    var currentImageUri: Uri? = null
 
     fun getListLantai() {
         AdminFirestoreRepo.getListLantaiRef()
@@ -34,14 +39,6 @@ class AdminViewModel: ViewModel() {
             }
             .addOnFailureListener {
                 sendCrashlytic("Failed to fetch ListLantai on admin", it)
-            }
-    }
-
-    fun addLantai(lantai: Lantai) {
-        AdminFirestoreRepo.getListLantaiRef()
-            .add(lantai)
-            .addOnFailureListener {
-                sendCrashlytic("Failed to add Lantai on Admin", it)
             }
     }
 
@@ -66,7 +63,79 @@ class AdminViewModel: ViewModel() {
                 _listItem.value = tempArrayList as ArrayList<String>
             }
             .addOnFailureListener {
-                sendCrashlytic("Failed to fetch List Item in Admin", it)
+                sendCrashlytic("Failed to fetch List Item on Admin", it)
+            }
+    }
+
+    fun deleteLantai(lantai: Lantai) {
+        AdminFirestoreRepo.getListRuanganRef(lantai.nama)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val listRuanganRef = snapshot.mapNotNull { it.toRuangan() }
+                Firebase.firestore.runBatch { batch ->
+                    for (item in listRuanganRef) {
+                        val ref = AdminFirestoreRepo.getRuanganRef(lantai.id, item.nama)
+                        batch.delete(ref)
+                    }
+                }
+                .addOnSuccessListener {
+                    deleteLantaiRef(lantai)
+                }
+                .addOnFailureListener {
+                    sendCrashlytic("Failed to batch delete on Delete Collection", it)
+                }
+            }
+    }
+
+    fun addLantai(lantai: Lantai, imageUri: Uri) {
+        FirebaseStorageRepo.getMapImageRef(lantai.nama)
+            .putFile(imageUri)
+            .addOnFailureListener {
+                sendCrashlytic("Failed to put new Map Image", it)
+            }
+
+        AdminFirestoreRepo.getLantaiRef(lantai.nama)
+            .set(lantai)
+            .addOnSuccessListener {
+                getListLantai()
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to add new lantai", it)
+            }
+    }
+
+    private fun deleteLantaiRef(lantai: Lantai) {
+        AdminFirestoreRepo.getLantaiRef(lantai.nama)
+            .delete()
+            .addOnSuccessListener {
+                getListLantai()
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to delete Lantai on Admin", it)
+            }
+    }
+
+    fun deleteRuangan(lantai: Lantai, itemName: String) {
+        AdminFirestoreRepo.getRuanganRef(lantai.id, itemName)
+            .delete()
+            .addOnSuccessListener {
+                getListRuangan(lantai)
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to delete Ruangan on admin", it)
+            }
+    }
+
+    fun addRuangan(lantai: Lantai, itemName: String) {
+        val newRuangan = Ruangan(arrayListOf(), itemName)
+
+        AdminFirestoreRepo.getRuanganRef(lantai.id, itemName)
+            .set(newRuangan)
+            .addOnSuccessListener {
+                getListRuangan(lantai)
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to add Ruangan on admin", it)
             }
     }
 
