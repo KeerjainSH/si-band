@@ -124,6 +124,7 @@ class UserFormPelaporanFragment : Fragment() {
             val laporanRuangan = LaporanRuangan(
                 item,
                 item,
+                email,
                 lokasi,
                 tanggal,
                 tipe,

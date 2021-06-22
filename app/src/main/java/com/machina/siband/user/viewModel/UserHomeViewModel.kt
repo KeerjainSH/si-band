@@ -66,6 +66,19 @@ class UserHomeViewModel: ViewModel() {
         attachLantaiListener()
     }
 
+    fun getListLaporanBase(email: String) {
+        UserFirestoreRepo.getUserListLaporanRuanganRef(email)
+            .get()
+            .addOnSuccessListener { snapShot ->
+                val tempList = snapShot.documents.mapNotNull { it.toLaporanBase() }
+                _listLaporanBase.value = tempList
+                fetchListLaporanRuangan()
+            }
+            .addOnFailureListener {
+                sendCrashlytics("Error when fetching ListLaporanBase", it)
+            }
+    }
+
     private fun fetchListLaporanRuangan() {
         val tempMutable = mutableListOf<LaporanRuangan>()
         val laporanBase = listLaporanBase.value
@@ -73,7 +86,8 @@ class UserHomeViewModel: ViewModel() {
 
         // Call data for each item in
         for (item in laporanBase) {
-            UserFirestoreRepo.getListLaporanRuanganRef(item.email, item.tanggal, item.lokasi).get()
+            UserFirestoreRepo.getListLaporanRuanganRef(item.email, item.tanggal, item.lokasi)
+                .get()
                 .addOnSuccessListener { coll ->
                     var temp = coll.mapNotNull { it.toLaporanRuangan() }
                     temp = temp.filter {
@@ -128,20 +142,6 @@ class UserHomeViewModel: ViewModel() {
     }
 
 
-
-    fun getListLaporanBase(email: String) {
-        UserFirestoreRepo.getUserListLaporanRuanganRef(email)
-            .get()
-            .addOnSuccessListener { snapShot ->
-                val tempList = snapShot.documents.mapNotNull { it.toLaporanBase() }
-                _listLaporanBase.value = tempList
-                fetchListLaporanRuangan()
-            }
-            .addOnFailureListener {
-                sendCrashlytics("Error when fetching ListLaporanBase", it)
-            }
-    }
-
     fun putFormPelaporan(laporanBase: LaporanBase, laporanRuangan: LaporanRuangan) {
         val baseReference = UserFirestoreRepo.getLaporanBaseRef(laporanBase.email, laporanBase.tanggal, laporanBase.lokasi)
         val laporanReference = UserFirestoreRepo.getLaporanRuanganRef(laporanBase.email, laporanRuangan.tanggal, laporanRuangan.lokasi, laporanRuangan.nama)
@@ -155,24 +155,9 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
-    private fun putNewImage(laporanRuangan: LaporanRuangan, images: List<Uri>) {
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
-        val lokasi = laporanRuangan.lokasi
-        val nama = laporanRuangan.nama
-
-        images.forEachIndexed { index, uri ->
-            FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
-                .putFile(uri)
-                .addOnFailureListener{
-                    sendCrashlytics("Failed to Put new Dokumentasi Laporan Images", it)
-                }
-        }
-    }
-
     fun putNewLaporanRuangan(laporanRuangan: LaporanRuangan,  images: List<Uri>) {
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
+        val email = laporanRuangan.email
+        val tanggal = laporanRuangan.tanggal
         val lokasi = laporanRuangan.lokasi
         val nama = laporanRuangan.nama
 
@@ -186,9 +171,24 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
+    private fun putNewImage(laporanRuangan: LaporanRuangan, images: List<Uri>) {
+        val email = laporanRuangan.email
+        val tanggal = laporanRuangan.tanggal
+        val lokasi = laporanRuangan.lokasi
+        val nama = laporanRuangan.nama
+
+        images.forEachIndexed { index, uri ->
+            FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
+                .putFile(uri)
+                .addOnFailureListener{
+                    sendCrashlytics("Failed to Put new Dokumentasi Laporan Images", it)
+                }
+        }
+    }
+
     fun putLaporanRuanganOnCheck(laporanRuangan: LaporanRuangan, idLantai: String) {
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
+        val email = laporanRuangan.email
+        val tanggal = laporanRuangan.tanggal
         val lokasi = laporanRuangan.lokasi
         val nama = laporanRuangan.nama
 
@@ -257,7 +257,7 @@ class UserHomeViewModel: ViewModel() {
      * @return nothing.
      */
     private fun putLaporanRuangan(email: String, tanggal: String, lokasi: String, nama: String) {
-        val emptyLaporan = LaporanRuangan(nama, nama, lokasi, tanggal, status = NO_PROGRESS)
+        val emptyLaporan = LaporanRuangan(nama, nama, "admin@gmail.com", lokasi, tanggal, status = NO_PROGRESS)
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
                 .set(emptyLaporan)
     }

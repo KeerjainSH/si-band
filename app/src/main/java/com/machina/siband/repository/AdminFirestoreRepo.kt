@@ -9,7 +9,8 @@ import com.google.firebase.ktx.Firebase
 object AdminFirestoreRepo {
 
     fun getListLantaiRef(): CollectionReference {
-        return Firebase.firestore.collection("list-lantai")
+        return Firebase.firestore
+            .collection("list-lantai")
     }
 
     fun getLantaiRef(nama: String): DocumentReference {
@@ -31,6 +32,12 @@ object AdminFirestoreRepo {
             .document(id)
             .collection("col-ruangan")
             .document(lokasi)
+    }
+
+    fun getListLaporanBaseRef(): Query {
+        return Firebase.firestore
+            .collection("list-laporan")
+            .whereEqualTo("isSubmitted", true)
     }
 
 

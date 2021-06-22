@@ -5,29 +5,72 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.machina.siband.R
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListLaporanRuanganBinding
+import com.machina.siband.model.LaporanRuangan
+import com.machina.siband.user.recycler.ListLaporanUserAdapter
+import com.machina.siband.user.viewModel.UserHomeViewModel
 
 /**
  * A simple [Fragment] subclass.
  * Use the [AdminListLaporanRuanganFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class AdminListLaporanRuanganFragment : Fragment() {
+class AdminListLaporanRuanganFragment(private val position: Int) : Fragment() {
 
     private var _binding: FragmentAdminListLaporanRuanganBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: AdminViewModel by activityViewModels()
+
+    private lateinit var mAdapter: ListLaporanUserAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentAdminListLaporanRuanganBinding.inflate(layoutInflater)
+        _binding = FragmentAdminListLaporanRuanganBinding.inflate(layoutInflater, container, false)
 
+        setupRecycler()
+        setupObserver()
 
         return binding.root
     }
 
+    private fun setupObserver() {
+        when (position) {
+            0 -> {
+                viewModel.listLaporanNoProgressYet.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+            }
+            1 -> {
+                viewModel.listLaporanOnProgress.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+            }
+            2 -> {
+                viewModel.listLaporanDone.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+            }
+        }
+    }
+
+    private fun setupRecycler() {
+        mAdapter = ListLaporanUserAdapter(this::onItemLaporanClick)
+        val recyclerView = binding.fragmentAdminListLaporanRecycler
+        val mLinearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        recyclerView.apply {
+            adapter = mAdapter
+            layoutManager = mLinearLayoutManager
+        }
+    }
+
+    private fun onItemLaporanClick(data: LaporanRuangan) {
+        val action = AdminSwipeLaporanFragmentDirections
+            .actionAdminSwipeLaporanFragmentToAdminReviewLaporanRuanganFragment(data)
+
+        findNavController().navigate(action)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -35,19 +78,6 @@ class AdminListLaporanRuanganFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AdminListLaporanRuanganFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AdminListLaporanRuanganFragment().apply {
-
-            }
+        private const val TAG = "AdminListLaporanRuanganFragment"
     }
 }

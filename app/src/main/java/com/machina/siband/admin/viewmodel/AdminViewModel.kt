@@ -5,15 +5,25 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.machina.siband.repository.AdminFirestoreRepo
 import com.machina.siband.model.Lantai
 import com.machina.siband.model.Lantai.Companion.toLantai
+import com.machina.siband.model.LaporanBase
+import com.machina.siband.model.LaporanBase.Companion.toLaporanBase
+import com.machina.siband.model.LaporanRuangan
+import com.machina.siband.model.LaporanRuangan.Companion.toLaporanRuangan
 import com.machina.siband.model.Ruangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
 import com.machina.siband.repository.FirebaseStorageRepo
+import com.machina.siband.repository.UserFirestoreRepo
+import com.machina.siband.user.viewModel.UserHomeViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AdminViewModel: ViewModel() {
 
@@ -29,7 +39,100 @@ class AdminViewModel: ViewModel() {
     private var _selectedRuangan: Ruangan? = null
     val selectedRuangan get() = _selectedRuangan!!
 
+    private var _listLaporanBase = MutableLiveData<List<LaporanBase>>()
+    val listLaporanBase: LiveData<List<LaporanBase>> = _listLaporanBase
+
+    private var _listLaporanRuangan = MutableLiveData<List<LaporanRuangan>>()
+    val listLaporanRuangan: LiveData<List<LaporanRuangan>> = _listLaporanRuangan
+
+    private var _listLaporanNoProgressYet = MutableLiveData<List<LaporanRuangan>>()
+    val listLaporanNoProgressYet: LiveData<List<LaporanRuangan>> = _listLaporanNoProgressYet
+
+    private var _listLaporanOnProgress = MutableLiveData<List<LaporanRuangan>>()
+    val listLaporanOnProgress: LiveData<List<LaporanRuangan>> = _listLaporanOnProgress
+
+    private var _listLaporanDone = MutableLiveData<List<LaporanRuangan>>()
+    val listLaporanDone: LiveData<List<LaporanRuangan>> = _listLaporanDone
+
+    private val _imagesUri = mutableListOf<Uri>()
+
     var currentImageUri: Uri? = null
+
+
+    fun getListLaporanBase() {
+        AdminFirestoreRepo.getListLaporanBaseRef()
+            .get()
+            .addOnSuccessListener { snapShot ->
+                val tempList = snapShot.mapNotNull { it.toLaporanBase() }
+                _listLaporanBase.value = tempList
+                fetchListLaporanRuangan()
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Error when fetching ListLaporanBase", it)
+            }
+    }
+
+    private fun fetchListLaporanRuangan() {
+        val tempMutable = mutableListOf<LaporanRuangan>()
+        val laporanBase = listLaporanBase.value
+        if (laporanBase.isNullOrEmpty()) return
+
+        // Call data for each item in
+        for (item in laporanBase) {
+            UserFirestoreRepo.getListLaporanRuanganRef(item.email, item.tanggal, item.lokasi)
+                .get()
+                .addOnSuccessListener { coll ->
+                    var temp = coll.mapNotNull { it.toLaporanRuangan() }
+                    temp = temp.filter {
+                        it.tipe.isNotEmpty() && it.isChecked
+                    }
+                    tempMutable.addAll(temp)
+                    _listLaporanRuangan.value = tempMutable
+                    viewModelScope.launch(Dispatchers.Default) {
+                        filterListLaporan()
+                    }
+                }
+                .addOnFailureListener { error ->
+                    sendCrashlytic("Failed to fetch LaporanRuangan", error)
+                }
+        }
+    }
+
+    private suspend fun filterListLaporan() {
+        val listLaporan =  _listLaporanRuangan.value
+        println(Thread.currentThread().name)
+        if (listLaporan != null) {
+            var temp = listLaporan.filter { it.status == UserHomeViewModel.NO_PROGRESS }
+            setListLaporanNoProgressYet(temp)
+//            for (item in temp) Log.d(TAG, "item : ${item.nama}, status : ${item.status}")
+
+            temp = listLaporan.filter { it.status == UserHomeViewModel.ON_PROGRESS }
+            setListLaporanOnProgress(temp)
+//            for (item in temp) Log.d(TAG, "item : ${item.nama}, status : ${item.status}")
+
+            temp = listLaporan.filter { it.status == UserHomeViewModel.DONE }
+            setListLaporanDone(temp)
+//            for (item in temp) Log.d(TAG, "item : ${item.nama}, status : ${item.status}")
+        }
+    }
+
+    private suspend fun setListLaporanNoProgressYet(data: List<LaporanRuangan>) {
+        withContext(Dispatchers.Main) {
+            _listLaporanNoProgressYet.value = data
+        }
+    }
+
+    private suspend fun setListLaporanOnProgress(data: List<LaporanRuangan>) {
+        withContext(Dispatchers.Main) {
+            _listLaporanOnProgress.value = data
+        }
+    }
+
+    private suspend fun setListLaporanDone(data: List<LaporanRuangan>) {
+        withContext(Dispatchers.Main) {
+            _listLaporanDone.value = data
+        }
+    }
 
     fun getListLantai() {
         AdminFirestoreRepo.getListLantaiRef()
@@ -172,6 +275,50 @@ class AdminViewModel: ViewModel() {
             }
     }
 
+    fun putNewLaporanRuangan(laporanRuangan: LaporanRuangan,  images: List<Uri>) {
+        val email = laporanRuangan.email
+        val tanggal = laporanRuangan.tanggal
+        val lokasi = laporanRuangan.lokasi
+        val nama = laporanRuangan.nama
+
+        UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
+            .set(laporanRuangan)
+            .addOnSuccessListener {
+                putNewImage(laporanRuangan, images)
+            }
+            .addOnFailureListener { exception ->
+                sendCrashlytic("An error occured when trying to upload new laporan", exception)
+            }
+    }
+
+    private fun putNewImage(laporanRuangan: LaporanRuangan, images: List<Uri>) {
+        val email = laporanRuangan.email
+        val tanggal = laporanRuangan.tanggal
+        val lokasi = laporanRuangan.lokasi
+        val nama = laporanRuangan.nama
+
+        images.forEachIndexed { index, uri ->
+            FirebaseStorageRepo.getLaporanPerbaikanImageRef(email, tanggal, lokasi, "${nama}${index}")
+                .putFile(uri)
+                .addOnFailureListener{
+                    sendCrashlytic("Failed to Put new Dokumentasi Laporan Images", it)
+                }
+        }
+    }
+
+    fun clearImagesUri() {
+        while (_imagesUri.size > 0)
+            _imagesUri.removeLast()
+    }
+
+    fun getImagesUri(): MutableList<Uri> {
+        return _imagesUri
+    }
+
+    fun addImageToImagesUri(imageUri: Uri){
+        _imagesUri.add(imageUri)
+    }
+
     fun setSelectedRuangan(ruangan: Ruangan) {
         _selectedRuangan = ruangan
     }
@@ -193,5 +340,8 @@ class AdminViewModel: ViewModel() {
 
     companion object {
         private const val TAG = "AdminViewModel"
+        private const val NO_PROGRESS = "No Progress Yet"
+        private const val ON_PROGRESS = "On Progress"
+        private const val DONE = "Done"
     }
 }

@@ -10,6 +10,7 @@ import kotlinx.parcelize.Parcelize
 data class LaporanRuangan(
         val id: String,
         val nama: String,
+        val email: String = "",
         val lokasi: String,
         val tanggal: String,
         val tipe: String = "",
@@ -26,6 +27,7 @@ data class LaporanRuangan(
         fun DocumentSnapshot.toLaporanRuangan(): LaporanRuangan? {
             return try {
                 val nama = getString("nama")!!
+                val email = getString("email")!!
                 val lokasi = getString("lokasi")!!
                 val tanggal = getString("tanggal")!!
                 val tipe = getString("tipe")!!
@@ -34,8 +36,8 @@ data class LaporanRuangan(
                 val status = getString("status")!!
                 val dokumentasiPerbaikan = get("dokumentasiPerbaikan")!! as Long
                 val isChecked = getBoolean("isChecked")!!
-                Log.d(TAG, "Converted to LaporanRuangan")
-                LaporanRuangan(id, nama, lokasi, tanggal, tipe, dokumentasi.toInt(), keterangan, status, dokumentasiPerbaikan.toInt(), isChecked)
+                Log.d(TAG, "Converted to LaporanRuangan nama [$nama] lokasi [$lokasi]")
+                LaporanRuangan(id, nama, email, lokasi, tanggal, tipe, dokumentasi.toInt(), keterangan, status, dokumentasiPerbaikan.toInt(), isChecked)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting to LaporanRuangan", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")

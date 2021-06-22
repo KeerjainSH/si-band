@@ -5,4 +5,10 @@
         <item>Sedang</item>
         <item>Berat</item>
     </string-array>
+
+    <string-array name="status">
+        <item>No Progress Yet</item>
+        <item>On Progress</item>
+        <item>Done</item>
+    </string-array>
 </resources>

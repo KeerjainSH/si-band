@@ -48,7 +48,6 @@ class UserFormLaporanFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         resolveForm()
-
         val tipeKerusakan = resources.getStringArray(R.array.tipe)
         val mArrayAdapter = ArrayAdapter(requireContext(), R.layout.item_list_dropdown, tipeKerusakan)
         (binding.fragmentLaporanTipe.editText as? AutoCompleteTextView)?.setAdapter(mArrayAdapter)
@@ -73,7 +72,6 @@ class UserFormLaporanFragment : Fragment() {
             PICK_IMAGE_CODE
         )
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -111,6 +109,30 @@ class UserFormLaporanFragment : Fragment() {
         binding.fragmentLaporanDokumentasiContainer.removeAllViews()
     }
 
+    private fun onSubmitLaporan() {
+        val laporanRuangan = args.laporanRuangan
+        if (laporanRuangan != null) {
+            val newTipe = binding.fragmentLaporanTipe.editText?.text.toString()
+            val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
+            val images = viewModel.getImagesUri().toList()
+            val lastImages = laporanRuangan.dokumentasi
+            val count = if (images.isNotEmpty()) {
+                images.size
+            } else {
+                lastImages
+            }
+            val newLaporanRuangan = laporanRuangan.copy(
+                tipe = newTipe,
+                keterangan =  newKeterangan,
+                dokumentasi = count,
+                isChecked = true
+            )
+
+            viewModel.putNewLaporanRuangan(newLaporanRuangan, images)
+        }
+        findNavController().navigateUp()
+    }
+
     private fun loadImageLocally(imageUri: Uri, mLayoutParams: LinearLayout.LayoutParams) {
         val imageView = ImageView(context)
         imageView.apply {
@@ -140,34 +162,6 @@ class UserFormLaporanFragment : Fragment() {
                 .into(imageView)
         }
         binding.fragmentLaporanDokumentasiContainer.addView(imageView)
-    }
-
-
-    private fun onSubmitLaporan() {
-        val laporanRuangan = args.laporanRuangan
-        if (laporanRuangan != null) {
-            val nama = laporanRuangan.nama
-            val newTipe = binding.fragmentLaporanTipe.editText?.text.toString()
-            val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
-            val images = viewModel.getImagesUri().toList()
-            val lastImages = laporanRuangan.dokumentasi
-            val count: Int
-
-            if (images.isNotEmpty()) {
-                count = images.size
-            } else {
-                count = lastImages
-            }
-            val newLaporanRuangan = laporanRuangan.copy(
-                tipe = newTipe,
-                keterangan =  newKeterangan,
-                dokumentasi = count,
-                isChecked = true
-            )
-
-            viewModel.putNewLaporanRuangan(newLaporanRuangan, images)
-        }
-        findNavController().navigateUp()
     }
 
 

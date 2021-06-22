@@ -12,6 +12,18 @@ object FirebaseStorageRepo {
         return Firebase.storage.reference.child(path)
     }
 
+    fun getLaporanPerbaikanImageRef(
+        email: String,
+        tanggal: String,
+        lokasi: String,
+        item: String
+    ): StorageReference {
+        val path = "$email/$tanggal/$lokasi/perbaikan/$item"
+
+        return Firebase.storage.reference.child(path)
+    }
+
+
     fun getMapImageRef(namaLantai: String): StorageReference {
         val path = "map/$namaLantai"
 

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".user.view.UserReviewLaporanFragment">
+    tools:context=".admin.view.AdminReviewLaporanRuanganFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,7 +12,7 @@
         android:paddingHorizontal="12dp">
 
         <TextView
-            android:id="@+id/fragment_user_review_laporan_lokasi"
+            android:id="@+id/fragment_admin_review_laporan_lokasi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -28,7 +27,7 @@
             android:orientation="horizontal"
             android:layout_marginTop="12dp">
             <TextView
-                android:id="@+id/fragment_user_review_laporan_item"
+                android:id="@+id/fragment_admin_review_laporan_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
@@ -38,7 +37,7 @@
                 android:textSize="18sp"/>
 
             <TextView
-                android:id="@+id/fragment_user_review_laporan_tanggal"
+                android:id="@+id/fragment_admin_review_laporan_tanggal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -49,7 +48,7 @@
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/fragment_user_review_laporan_tipe"
+            android:id="@+id/fragment_admin_review_laporan_tipe"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -64,7 +63,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
-            android:id="@+id/fragment_user_review_laporan_dokumentasi_container"
+            android:id="@+id/fragment_admin_review_laporan_dokumentasi_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -72,7 +71,7 @@
             android:background="@drawable/bg_light_grey_rounded">
 
             <LinearLayout
-                android:id="@+id/fragment_user_review_laporan_dokumentasi_icon"
+                android:id="@+id/fragment_admin_review_laporan_dokumentasi_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="150dp"
                 android:layout_gravity="center">
@@ -85,7 +84,7 @@
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/fragment_user_review_laporan_keterangan"
+            android:id="@+id/fragment_admin_review_laporan_keterangan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -101,7 +100,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/fragment_user_review_laporan_status"
+            android:id="@+id/fragment_admin_review_laporan_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -110,22 +109,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Status"
-                android:enabled="false"
+                android:enabled="true"
                 android:textColor="@color/black"
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
-            android:id="@+id/fragment_user_review_laporan_dokumentasi_perbaikan_container"
+            android:id="@+id/fragment_admin_review_laporan_dokumentasi_perbaikan_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
             android:orientation="vertical"
             android:background="@drawable/bg_light_grey_rounded">
 
             <LinearLayout
-                android:id="@+id/fragment_user_review_laporan_dokumentasi_perbaikan_icon"
+                android:id="@+id/fragment_admin_review_laporan_dokumentasi_perbaikan_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="150dp"
                 android:layout_gravity="center"
@@ -138,5 +136,22 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fragment_admin_review_laporan_dokumentasi_pilih_foto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_gravity="center_horizontal"
+            android:text="pilih foto"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fragment_admin_review_laporan_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_gravity="center_horizontal"
+            android:text="update"/>
+
     </LinearLayout>
 </ScrollView>

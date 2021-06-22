@@ -42,7 +42,7 @@ class AdminActivity: AppCompatActivity() {
     }
 
     private fun initiateDrawerLayout() {
-        val topLevelDestination: Set<Int> = setOf(R.id.adminListLaporanRuanganFragment, R.id.adminListLantaiFragment, R.id.adminListUserFragment)
+        val topLevelDestination: Set<Int> = setOf(R.id.adminSwipeLaporanFragment, R.id.adminListLantaiFragment, R.id.adminListUserFragment)
         appBarConfiguration = AppBarConfiguration
             .Builder(topLevelDestination)
             .setOpenableLayout(drawerLayout)
@@ -50,7 +50,7 @@ class AdminActivity: AppCompatActivity() {
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
-        navigationView.setCheckedItem(R.id.adminListLaporanRuanganFragment)
+        navigationView.setCheckedItem(R.id.adminSwipeLaporanFragment)
         navigationView.setNavigationItemSelectedListener { dest ->
             when (dest.itemId) {
                 R.id.adminLogoutOption -> Log.d(TAG, "log out")

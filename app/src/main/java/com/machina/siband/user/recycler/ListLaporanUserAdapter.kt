@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemComplaintBinding
 import com.machina.siband.model.LaporanRuangan
 
-class ListComplaintAdapter(private val listener: (LaporanRuangan) -> Unit): RecyclerView.Adapter<ComplaintVh>() {
+class ListLaporanUserAdapter(private val listener: (LaporanRuangan) -> Unit): RecyclerView.Adapter<ComplaintVh>() {
 
     private var dataSet = listOf<LaporanRuangan>()
 

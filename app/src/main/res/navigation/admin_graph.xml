@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/admin_graph"
-    app:startDestination="@id/adminListLaporanRuanganFragment">
+    app:startDestination="@id/adminSwipeLaporanFragment">
 
     <fragment
         android:id="@+id/adminListLantaiFragment"
@@ -17,12 +17,6 @@
             android:id="@+id/action_adminListLantaiFragment_to_adminAddLantaiFragment"
             app:destination="@id/adminAddLantaiFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/adminListUserFragment"
-        android:name="com.machina.siband.admin.view.AdminListUserFragment"
-        android:label="List User"
-        tools:layout="@layout/fragment_admin_list_user" />
 
     <fragment
         android:id="@+id/adminListRuanganFragment"
@@ -53,16 +47,38 @@
     </fragment>
 
     <fragment
-        android:id="@+id/adminListLaporanRuanganFragment"
-        android:name="com.machina.siband.admin.view.AdminListLaporanRuanganFragment"
-        android:label="List Laporan"
-        tools:layout="@layout/fragment_admin_list_laporan_ruangan" />
-
-    <fragment
         android:id="@+id/adminAddLantaiFragment"
         android:name="com.machina.siband.admin.view.AdminAddLantaiFragment"
         android:label="Tambah Lantai"
         tools:layout="@layout/fragment_admin_add_lantai" />
 
+    <fragment
+        android:id="@+id/adminSwipeLaporanFragment"
+        android:name="com.machina.siband.admin.view.AdminSwipeLaporanFragment"
+        android:label="List Laporan" >
+        <action
+            android:id="@+id/action_adminSwipeLaporanFragment_to_adminReviewLaporanRuanganFragment"
+            app:destination="@id/adminReviewLaporanRuanganFragment" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/adminReviewLaporanRuanganFragment"
+        android:name="com.machina.siband.admin.view.AdminReviewLaporanRuanganFragment"
+        android:label="Laporan"
+        tools:layout="@layout/fragment_admin_review_laporan_ruangan" >
+        <argument
+            android:name="laporanRuangan"
+            app:argType="com.machina.siband.model.LaporanRuangan" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminListUserFragment"
+        android:name="com.machina.siband.admin.view.AdminListUserFragment"
+        android:label="List User"
+        tools:layout="@layout/fragment_admin_list_user" />
+    <fragment
+        android:id="@+id/adminListLaporanRuanganFragment"
+        android:name="com.machina.siband.admin.view.AdminListLaporanRuanganFragment"
+        android:label="fragment_admin_list_laporan_ruangan"
+        tools:layout="@layout/fragment_admin_list_laporan_ruangan" />
 </navigation>

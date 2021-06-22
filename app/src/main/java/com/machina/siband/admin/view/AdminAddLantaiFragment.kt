@@ -60,10 +60,6 @@ class AdminAddLantaiFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == PICK_IMAGE_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            val mLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                800
-            ).also { it.setMargins(0, 20, 0, 20) }
 
             if (data.data != null){
                 val imageUri = data.data

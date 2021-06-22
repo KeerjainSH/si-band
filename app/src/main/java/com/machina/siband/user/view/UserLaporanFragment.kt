@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.FragmentUserLaporanBinding
-import com.machina.siband.user.recycler.ListComplaintAdapter
+import com.machina.siband.user.recycler.ListLaporanUserAdapter
 import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
@@ -26,7 +26,7 @@ class UserLaporanFragment(private val position: Int) : Fragment() {
 
     private val viewModel: UserHomeViewModel by activityViewModels()
 
-    private lateinit var mAdapter: ListComplaintAdapter
+    private lateinit var mAdapter: ListLaporanUserAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +45,6 @@ class UserLaporanFragment(private val position: Int) : Fragment() {
         when (position) {
             0 -> {
                 viewModel.listLaporanNoProgressYet.observe(viewLifecycleOwner, { mAdapter.setData(it) })
-//                viewModel.listLaporanRuangan.observe(viewLifecycleOwner, { mAdapter.setData(it) })
             }
             1 -> {
                 viewModel.listLaporanOnProgress.observe(viewLifecycleOwner, { mAdapter.setData(it) })
@@ -57,7 +56,7 @@ class UserLaporanFragment(private val position: Int) : Fragment() {
     }
 
     private fun setupRecycler() {
-        mAdapter = ListComplaintAdapter(this::onItemLaporanClick)
+        mAdapter = ListLaporanUserAdapter(this::onItemLaporanClick)
         val recyclerView = binding.fragmentUserLaporanRecycler
         val mLinearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         recyclerView.apply {
