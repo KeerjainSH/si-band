@@ -5,17 +5,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.machina.siband.R
+import com.machina.siband.admin.dialog.DialogAddItem
 import com.machina.siband.admin.recycler.AdminListItemAdapter
-import com.machina.siband.admin.recycler.AdminListRuanganAdapter
 import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListItemBinding
 
-class AdminListItemFragment : Fragment() {
+class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
 
     private var _binding: FragmentAdminListItemBinding? = null
     private val binding get() = _binding!!
@@ -37,6 +37,17 @@ class AdminListItemFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.fragmentAdminListItemFab.setOnClickListener {
+            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener)
+            dialog.show(parentFragmentManager, "Add Item Dialog")
+        }
+    }
+
+    private fun onDeleteItem(itemName: String) {
+        viewModel.deleteItem(args.lantai, args.ruangan, itemName)
+    }
+
     private fun setupObserver() {
         viewModel.listItem.observe(viewLifecycleOwner) {
             mAdapter.setData(it)
@@ -44,16 +55,26 @@ class AdminListItemFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        mAdapter = AdminListItemAdapter()
+        mAdapter = AdminListItemAdapter(this::onDeleteItem)
 
         val recycler = binding.fragmentAdminListItemRecycler
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         viewModel.getListItem(args.lantai, args.ruangan)
+        viewModel.setSelectedRuangan(args.ruangan)
 
         recycler.apply {
             adapter = mAdapter
             layoutManager = mLayoutManager
         }
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String) {
+        viewModel.addItem(args.lantai, args.ruangan, itemName)
+        dialog.dismiss()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+        dialog.dismiss()
     }
 
     override fun onDestroy() {
@@ -78,4 +99,5 @@ class AdminListItemFragment : Fragment() {
 
             }
     }
+
 }

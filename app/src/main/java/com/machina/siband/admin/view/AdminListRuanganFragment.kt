@@ -55,7 +55,7 @@ class AdminListRuanganFragment : Fragment() {
 
         val recycler = binding.fragmentAdminListRuanganRecycler
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        viewModel.getListRuangan(args.lantai.nama)
+        viewModel.getListRuangan(args.lantai)
 
         recycler.apply {
             adapter = mAdapter

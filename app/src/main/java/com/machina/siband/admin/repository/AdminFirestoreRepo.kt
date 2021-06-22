@@ -25,12 +25,13 @@ object AdminFirestoreRepo {
             .collection("col-ruangan")
     }
 
-    fun getRuanganRef(id: String, namaRuangan: String): DocumentReference {
+    fun getRuanganRef(id: String, lokasi: String): DocumentReference {
         return Firebase.firestore
             .collection("list-lantai")
             .document(id)
             .collection("col-ruangan")
-            .document(namaRuangan)
-
+            .document(lokasi)
     }
+
+
 }

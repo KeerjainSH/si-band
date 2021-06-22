@@ -19,8 +19,11 @@ class AdminViewModel: ViewModel() {
     private val _listRuangan = MutableLiveData<List<Ruangan>>()
     val listRuangan: LiveData<List<Ruangan>> = _listRuangan
 
-    private val _listItem = MutableLiveData<List<String>>()
-    val listItem: LiveData<List<String>> = _listItem
+    private val _listItem = MutableLiveData<ArrayList<String>>()
+    val listItem: LiveData<ArrayList<String>> = _listItem
+
+    private var _selectedRuangan: Ruangan? = null
+    val selectedRuangan get() = _selectedRuangan!!
 
 
     fun getListLantai() {
@@ -42,25 +45,15 @@ class AdminViewModel: ViewModel() {
             }
     }
 
-    fun getListRuangan(nama: String) {
-        AdminFirestoreRepo.getLantaiRef(nama)
+    fun getListRuangan(lantai: Lantai) {
+        AdminFirestoreRepo.getListRuanganRef(lantai.id)
             .get()
-            .addOnSuccessListener { lantaiSnapshot ->
-                val document = lantaiSnapshot.documents.first()
-                if (document != null) {
-                    AdminFirestoreRepo.getListRuanganRef(document.id)
-                        .get()
-                        .addOnSuccessListener { ruanganSnapshot ->
-                            val temp = ruanganSnapshot.documents.mapNotNull { it.toRuangan() }
-                            _listRuangan.value = temp
-                        }
-                        .addOnFailureListener {
-                            sendCrashlytic("Failed to fetch List Ruangan", it)
-                        }
-                }
+            .addOnSuccessListener { snapshot ->
+                val temp = snapshot.mapNotNull { it.toRuangan() }
+                _listRuangan.value = temp
             }
             .addOnFailureListener {
-                sendCrashlytic("Failed to fetch Lantai", it)
+                sendCrashlytic("Failed to fetch List Ruangan", it)
             }
     }
 
@@ -68,16 +61,50 @@ class AdminViewModel: ViewModel() {
         AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
             .get()
             .addOnSuccessListener { snapshot ->
-                var tempArrayList = snapshot.get("list-keluhan")
-
-                if (tempArrayList is ArrayList<*>) {
-                    tempArrayList = tempArrayList.toList()
-                    _listItem.value = tempArrayList as List<String>
-                }
+                val tempArrayList = snapshot.get("listKeluhan")
+                _listItem.value = arrayListOf()
+                _listItem.value = tempArrayList as ArrayList<String>
             }
             .addOnFailureListener {
                 sendCrashlytic("Failed to fetch List Item in Admin", it)
             }
+    }
+
+    fun deleteItem(lantai: Lantai, ruangan: Ruangan, itemName: String) {
+        val newListItem = selectedRuangan.listKeluhan.filter {
+            it != itemName
+        }
+        val newRuangan = selectedRuangan.copy(listKeluhan = newListItem as ArrayList<String>)
+
+        AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
+            .set(newRuangan)
+            .addOnSuccessListener {
+                setSelectedRuangan(newRuangan)
+                getListItem(lantai, ruangan)
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Error when deleting item on admin", it)
+            }
+    }
+
+    fun addItem(lantai: Lantai, ruangan: Ruangan, itemName: String) {
+        val newListItem = selectedRuangan.listKeluhan
+        newListItem.add(itemName)
+        val newRuangan = selectedRuangan.copy(listKeluhan = newListItem)
+
+        AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
+            .set(newRuangan)
+            .addOnSuccessListener {
+                setSelectedRuangan(newRuangan)
+                getListItem(lantai, ruangan)
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Error when deleting item on admin", it)
+            }
+    }
+
+    fun setSelectedRuangan(ruangan: Ruangan) {
+        _selectedRuangan = ruangan
     }
 
 
@@ -86,7 +113,7 @@ class AdminViewModel: ViewModel() {
     }
 
     fun clearListItem() {
-        _listItem.value = listOf()
+        _listItem.value = arrayListOf()
     }
 
     private fun sendCrashlytic(message: String, error: Exception) {

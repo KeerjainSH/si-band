@@ -6,11 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemLantaiBinding
 
-class AdminListItemAdapter: RecyclerView.Adapter<ItemItem>() {
+class AdminListItemAdapter(private val listener: (String) -> Unit)
+    : RecyclerView.Adapter<ItemItem>() {
 
-    private var dataSet = listOf<String>()
+    private var dataSet = arrayListOf<String>()
 
-    fun setData(newData: List<String>){
+    fun setData(newData: ArrayList<String>){
         dataSet = newData
         notifyDataSetChanged()
     }
@@ -23,13 +24,12 @@ class AdminListItemAdapter: RecyclerView.Adapter<ItemItem>() {
     }
 
     override fun onBindViewHolder(holder: ItemItem, position: Int) {
-        holder.onBind(dataSet[position])
+        holder.onBind(dataSet[position], listener)
     }
 
     override fun getItemCount(): Int {
         return dataSet.size
     }
-
 
 }
 
@@ -40,10 +40,12 @@ class ItemItem(binding: ItemLantaiBinding): RecyclerView.ViewHolder(binding.root
     val detailButton = binding.itemLantaiDetail
     val hapusButton = binding.itemLantaiHapus
 
-    fun onBind(namaItem: String) {
+    fun onBind(namaItem: String, listener: (String) -> Unit) {
         detailButton.visibility = View.GONE
-
         nama.text = namaItem
+        hapusButton.setOnClickListener {
+            listener(namaItem)
+        }
     }
 
 }

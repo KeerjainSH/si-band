@@ -151,7 +151,7 @@ class UserFormLaporanFragment : Fragment() {
             val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
             val images = viewModel.getImagesUri().toList()
             val lastImages = laporanRuangan.dokumentasi
-            var count: Int
+            val count: Int
 
             if (images.isNotEmpty()) {
                 count = images.size

@@ -37,11 +37,15 @@ class AdminListLantaiFragment : Fragment() {
         setupRecycler()
         setupObserver()
 
+
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.fragmentAdminListLantaiFab.setOnClickListener {
 
         }
-
-        return binding.root
     }
 
     private fun setupRecycler() {

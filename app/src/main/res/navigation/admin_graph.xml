@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/admin_graph"
-    app:startDestination="@id/adminListLantaiFragment">
+    app:startDestination="@id/adminListLaporanRuanganFragment">
 
     <fragment
         android:id="@+id/adminListLantaiFragment"
@@ -48,6 +48,12 @@
             app:argType="com.machina.siband.model.Ruangan" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/adminListLaporanRuanganFragment"
+        android:name="com.machina.siband.admin.view.AdminListLaporanRuanganFragment"
+        android:label="List Laporan"
+        tools:layout="@layout/fragment_admin_list_laporan_ruangan" />
 
 
 </navigation>
