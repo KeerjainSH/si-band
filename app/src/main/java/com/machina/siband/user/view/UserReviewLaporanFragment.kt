@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.firebase.storage.StorageReference
 import com.machina.siband.databinding.FragmentUserReviewLaporanBinding
 import com.machina.siband.module.GlideApp
 import com.machina.siband.repository.FirebaseStorageRepo
@@ -45,6 +46,7 @@ class UserReviewLaporanFragment : Fragment() {
             800
         ).also { it.setMargins(0, 20, 0, 20) }
         val lokasi = mLaporanRuangan.lokasi
+        val email = mLaporanRuangan.email
         val nama = mLaporanRuangan.nama
         val tanggal = mLaporanRuangan.tanggal
         val tipe = mLaporanRuangan.tipe
@@ -64,36 +66,38 @@ class UserReviewLaporanFragment : Fragment() {
         if (dok > 0) {
             binding.fragmentUserReviewLaporanDokumentasiIcon.visibility = View.GONE
             repeat(dok) {
-                loadImageInternet(lokasi, nama, mLayoutParams, it)
+                val storageRef = FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}$it")
+                loadImageInternet(mLayoutParams, binding.fragmentUserReviewLaporanDokumentasiContainer, storageRef)
             }
         }
 
         if (dokPerbaikan > 0) {
             binding.fragmentUserReviewLaporanDokumentasiPerbaikanIcon.visibility = View.GONE
-            repeat(dokPerbaikan) {
-                loadImageInternet(lokasi, nama, mLayoutParams, it)
+            repeat(dok) {
+                val storageRef = FirebaseStorageRepo.getLaporanPerbaikanImageRef(email, tanggal, lokasi, "${nama}$it")
+                loadImageInternet(mLayoutParams, binding.fragmentUserReviewLaporanDokumentasiPerbaikanContainer, storageRef)
             }
         }
     }
 
-    private fun loadImageInternet(lokasi: String, nama: String, mLayoutParams: LinearLayout.LayoutParams, index: Int) {
+    private fun loadImageInternet(
+        mLayoutParams: LinearLayout.LayoutParams,
+        viewGroup: ViewGroup,
+        storageRef: StorageReference
+    ) {
         val imageView = ImageView(context)
         imageView.apply {
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             layoutParams = mLayoutParams
         }
-        val email = args.laporanRuangan.email
-        val tanggal = args.laporanRuangan.tanggal
-        val imageRef = FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}$index")
-
         context?.let {
             GlideApp.with(it)
-                .load(imageRef)
+                .load(storageRef)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(imageView)
         }
-        binding.fragmentUserReviewLaporanDokumentasiContainer.addView(imageView)
+        viewGroup.addView(imageView)
     }
 
     companion object {

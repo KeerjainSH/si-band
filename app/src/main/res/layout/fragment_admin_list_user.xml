@@ -5,10 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".admin.view.AdminListUserFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fragment_admin_list_user_recycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="List User" />
+        android:layout_height="match_parent"/>
 
 </FrameLayout>

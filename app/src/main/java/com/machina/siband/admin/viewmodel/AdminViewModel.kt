@@ -10,14 +10,12 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.machina.siband.model.*
+import com.machina.siband.model.Account.Companion.toAccount
 import com.machina.siband.repository.AdminFirestoreRepo
-import com.machina.siband.model.Lantai
 import com.machina.siband.model.Lantai.Companion.toLantai
-import com.machina.siband.model.LaporanBase
 import com.machina.siband.model.LaporanBase.Companion.toLaporanBase
-import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.model.LaporanRuangan.Companion.toLaporanRuangan
-import com.machina.siband.model.Ruangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
 import com.machina.siband.repository.FirebaseStorageRepo
 import com.machina.siband.repository.UserFirestoreRepo
@@ -36,6 +34,9 @@ class AdminViewModel: ViewModel() {
 
     private val _listItem = MutableLiveData<ArrayList<String>>()
     val listItem: LiveData<ArrayList<String>> = _listItem
+
+    private val _listAccount = MutableLiveData<List<Account>>()
+    val listAccount: LiveData<List<Account>> = _listAccount
 
     private var _selectedRuangan: Ruangan? = null
     val selectedRuangan get() = _selectedRuangan!!
@@ -305,6 +306,17 @@ class AdminViewModel: ViewModel() {
                     sendCrashlytic("Failed to Put new Dokumentasi Laporan Images", it)
                 }
         }
+    }
+
+    fun getListAccount() {
+        AdminFirestoreRepo.getListAccountRef()
+            .get()
+            .addOnSuccessListener { snapshot ->
+                _listAccount.value = snapshot.mapNotNull { it.toAccount() }
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to Get List Account on Admin", it)
+            }
     }
 
     fun clearImagesUri() {

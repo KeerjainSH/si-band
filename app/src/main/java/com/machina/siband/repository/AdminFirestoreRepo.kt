@@ -47,4 +47,9 @@ object AdminFirestoreRepo {
             .document(email)
     }
 
+    fun getListAccountRef(): CollectionReference {
+        return Firebase.firestore
+            .collection("user-info")
+    }
+
 }

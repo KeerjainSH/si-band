@@ -5,7 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.machina.siband.R
+import com.machina.siband.admin.recycler.AdminListUserAdapter
+import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListUserBinding
 
 /**
@@ -18,14 +22,37 @@ class AdminListUserFragment : Fragment() {
     private var _binding : FragmentAdminListUserBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: AdminViewModel by activityViewModels()
+    private lateinit var mAdapter: AdminListUserAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentAdminListUserBinding.inflate(inflater)
 
+        setupRecycler()
+        setupObserver()
 
         return binding.root
+    }
+
+    private fun setupObserver() {
+        viewModel.listAccount.observe(viewLifecycleOwner, {
+            mAdapter.setData(it)
+        })
+    }
+
+    private fun setupRecycler() {
+        mAdapter = AdminListUserAdapter()
+        val mLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val recycler = binding.fragmentAdminListUserRecycler
+        viewModel.getListAccount()
+
+        recycler.apply {
+            adapter = mAdapter
+            layoutManager = mLayoutManager
+        }
     }
 
     override fun onDestroy() {
