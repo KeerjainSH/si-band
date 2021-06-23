@@ -110,8 +110,8 @@ class UserFormPelaporanFragment : Fragment() {
 
 
     private fun onSubmit() {
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
+        val email = viewModel.getCurrentEmail()
+        val tanggal = viewModel.getCurrentDate()
         val lokasi = binding.fragmentPelaporanLokasi.editText?.text.toString()
         val dokumentasi = viewModel.getImagesUri().size
         val item = binding.fragmentPelaporanItem.editText?.text.toString()
@@ -147,23 +147,6 @@ class UserFormPelaporanFragment : Fragment() {
 
     companion object {
         private const val PICK_IMAGE_CODE = 200
-
         private const val TAG = "FormPelaporanFragment"
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FormPelaporanFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UserFormPelaporanFragment().apply {
-                arguments = Bundle().apply {
-
-                }
-            }
     }
 }

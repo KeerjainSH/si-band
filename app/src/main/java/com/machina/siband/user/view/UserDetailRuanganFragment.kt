@@ -1,7 +1,6 @@
 package com.machina.siband.user.view
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +14,6 @@ import com.machina.siband.databinding.FragmentUserDetailRuanganBinding
 import com.machina.siband.user.recycler.ListLaporanRuanganAdapter
 import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.user.viewModel.UserHomeViewModel
-import java.util.*
 
 class UserDetailRuanganFragment : Fragment() {
 
@@ -40,8 +38,8 @@ class UserDetailRuanganFragment : Fragment() {
             //    IMPORTANT!!!!
             //    CHANGE ON PRODUCTION
             */
-            val email = "admin@gmail.com"
-            val tanggal = "29-04-2021"
+            val email =  viewModel.getCurrentEmail()
+            val tanggal = viewModel.getCurrentDate()
             val lokasi = args.lokasi
 
             viewModel.putLaporanLantai(email, tanggal, lokasi)
@@ -49,11 +47,6 @@ class UserDetailRuanganFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    private fun postSomething() {
-        val cal = Calendar.getInstance()
-        Log.d(TAG, "curr date: ${cal.get(Calendar.DATE)}-${cal.get(Calendar.MONTH) + 1}-${cal.get(Calendar.YEAR)}")
     }
 
     private fun onItemLaporanClicked(data: LaporanRuangan) {
@@ -86,8 +79,8 @@ class UserDetailRuanganFragment : Fragment() {
 
         // On Production change this param into dynamic
         val idLantai = args.idLantai
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
+        val email = viewModel.getCurrentEmail()
+        val tanggal = viewModel.getCurrentDate()
         val lokasi = args.lokasi
 
         viewModel.getListLaporanRuangan(idLantai, email, tanggal, lokasi)

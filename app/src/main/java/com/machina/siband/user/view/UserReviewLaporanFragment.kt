@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.machina.siband.databinding.FragmentUserReviewLaporanBinding
 import com.machina.siband.module.GlideApp
 import com.machina.siband.repository.FirebaseStorageRepo
+import com.machina.siband.user.viewModel.UserHomeViewModel
 
 /**
  * A simple [Fragment] subclass.
@@ -65,6 +67,13 @@ class UserReviewLaporanFragment : Fragment() {
                 loadImageInternet(lokasi, nama, mLayoutParams, it)
             }
         }
+
+        if (dokPerbaikan > 0) {
+            binding.fragmentUserReviewLaporanDokumentasiPerbaikanIcon.visibility = View.GONE
+            repeat(dokPerbaikan) {
+                loadImageInternet(lokasi, nama, mLayoutParams, it)
+            }
+        }
     }
 
     private fun loadImageInternet(lokasi: String, nama: String, mLayoutParams: LinearLayout.LayoutParams, index: Int) {
@@ -73,8 +82,8 @@ class UserReviewLaporanFragment : Fragment() {
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             layoutParams = mLayoutParams
         }
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
+        val email = args.laporanRuangan.email
+        val tanggal = args.laporanRuangan.tanggal
         val imageRef = FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}$index")
 
         context?.let {
@@ -89,21 +98,5 @@ class UserReviewLaporanFragment : Fragment() {
 
     companion object {
         private const val TAG = "userReviewLaporanFragment"
-
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment UserReviewLaporanFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UserReviewLaporanFragment().apply {
-                arguments = Bundle().apply {
-                }
-            }
     }
 }

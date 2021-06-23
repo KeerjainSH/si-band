@@ -11,6 +11,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.machina.siband.R
 import com.machina.siband.databinding.ActivityAdminBinding
 
@@ -53,7 +55,7 @@ class AdminActivity: AppCompatActivity() {
         navigationView.setCheckedItem(R.id.adminSwipeLaporanFragment)
         navigationView.setNavigationItemSelectedListener { dest ->
             when (dest.itemId) {
-                R.id.adminLogoutOption -> Log.d(TAG, "log out")
+                R.id.adminLogoutOption -> { logOut() }
                 else -> {
                     NavigationUI.onNavDestinationSelected(dest, navController)
                     myCloseDrawer()
@@ -61,6 +63,12 @@ class AdminActivity: AppCompatActivity() {
             }
             true
         }
+    }
+
+    private fun logOut() {
+        Firebase.auth.signOut()
+        setResult(1000)
+        finish()
     }
 
 

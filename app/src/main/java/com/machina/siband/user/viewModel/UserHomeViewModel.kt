@@ -8,8 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.ktx.Firebase
 import com.machina.siband.model.Lantai
 import com.machina.siband.model.Lantai.Companion.toLantai
 import com.machina.siband.model.LaporanBase
@@ -22,6 +24,9 @@ import com.machina.siband.module.GlideApp
 import com.machina.siband.repository.FirebaseStorageRepo
 import com.machina.siband.repository.UserFirestoreRepo
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.ArrayList
+
 class UserHomeViewModel: ViewModel() {
 
     // List of Lantai Object
@@ -269,7 +274,7 @@ class UserHomeViewModel: ViewModel() {
      * @return nothing.
      */
     private fun putLaporanRuangan(email: String, tanggal: String, lokasi: String, nama: String) {
-        val emptyLaporan = LaporanRuangan(nama, nama, "admin@gmail.com", lokasi, tanggal, status = NO_PROGRESS)
+        val emptyLaporan = LaporanRuangan(nama, nama, getCurrentEmail(), lokasi, tanggal, status = NO_PROGRESS)
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
                 .set(emptyLaporan)
     }
@@ -360,6 +365,18 @@ class UserHomeViewModel: ViewModel() {
         Log.e(TAG, message, error)
         FirebaseCrashlytics.getInstance().log(message)
         FirebaseCrashlytics.getInstance().recordException(error)
+    }
+
+    fun getCurrentEmail(): String {
+        val currUser = Firebase.auth.currentUser
+        return currUser?.email ?: "-"
+    }
+
+    fun getCurrentDate(): String {
+        val cal = Calendar.getInstance()
+        val currentDate = "${cal.get(Calendar.DATE)}-${cal.get(Calendar.MONTH) + 1}-${cal.get(Calendar.YEAR)}"
+        Log.d(TAG, "curr date: $currentDate")
+        return currentDate
     }
 
     override fun onCleared() {

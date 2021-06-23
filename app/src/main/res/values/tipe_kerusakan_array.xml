@@ -11,4 +11,9 @@
         <item>On Progress</item>
         <item>Done</item>
     </string-array>
+
+    <string-array name="akun">
+        <item>Admin</item>
+        <item>User</item>
+    </string-array>
 </resources>

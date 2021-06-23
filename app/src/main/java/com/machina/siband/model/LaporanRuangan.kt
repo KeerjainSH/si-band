@@ -40,7 +40,7 @@ data class LaporanRuangan(
                 LaporanRuangan(id, nama, email, lokasi, tanggal, tipe, dokumentasi.toInt(), keterangan, status, dokumentasiPerbaikan.toInt(), isChecked)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting to LaporanRuangan", e)
-                FirebaseCrashlytics.getInstance().log("Error converting user profile")
+                FirebaseCrashlytics.getInstance().log("Error converting to LaporanRuangan")
                 FirebaseCrashlytics.getInstance().setCustomKey("userId", id)
                 FirebaseCrashlytics.getInstance().recordException(e)
                 null

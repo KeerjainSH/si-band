@@ -11,6 +11,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.machina.siband.R
 import com.machina.siband.databinding.ActivityUserBinding
 import com.machina.siband.user.view.UserHomeFragmentDirections
@@ -56,7 +58,7 @@ class UserActivity: AppCompatActivity() {
         navigationView.setCheckedItem(R.id.userHomeFragment)
         navigationView.setNavigationItemSelectedListener { dest ->
             when (dest.itemId) {
-                R.id.userLogoutOption -> Log.d(TAG, "logout")
+                R.id.userLogoutOption -> { logOut() }
                 else -> {
                     NavigationUI.onNavDestinationSelected(dest, navController)
                     myCloseDrawer()
@@ -64,6 +66,12 @@ class UserActivity: AppCompatActivity() {
             }
             true
         }
+    }
+
+    private fun logOut() {
+        Firebase.auth.signOut()
+        setResult(1000)
+        finish()
     }
 
     private fun myCloseDrawer() {

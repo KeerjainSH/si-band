@@ -45,7 +45,7 @@ class UserSwipeLaporanFragment: Fragment() {
             tab.text = tabTitleList[position]
         }.attach()
 
-        val email = "admin@gmail.com"
+        val email = viewModel.getCurrentEmail()
         viewModel.getListLaporanBase(email)
     }
 

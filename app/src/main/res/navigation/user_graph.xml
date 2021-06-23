@@ -71,9 +71,7 @@
             app:destination="@id/detailRuanganFragment" />
         <argument
             android:name="laporanRuangan"
-            app:argType="com.machina.siband.model.LaporanRuangan"
-            app:nullable="true"
-            android:defaultValue="@null" />
+            app:argType="com.machina.siband.model.LaporanRuangan" />
     </fragment>
 
     <fragment

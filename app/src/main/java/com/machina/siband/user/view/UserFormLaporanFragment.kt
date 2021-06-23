@@ -150,8 +150,8 @@ class UserFormLaporanFragment : Fragment() {
             layoutParams = mLayoutParams
         }
 
-        val email = "admin@gmail.com"
-        val tanggal = "29-04-2021"
+        val email = args.laporanRuangan.email
+        val tanggal = args.laporanRuangan.tanggal
         val imageRef = FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}$index")
 
         context?.let {
@@ -167,11 +167,11 @@ class UserFormLaporanFragment : Fragment() {
 
     // Fill the form if the selected item is already submitted within the same day
     private fun resolveForm() {
-        val lokasi = args.laporanRuangan?.lokasi.toString()
-        val nama = args.laporanRuangan?.nama.toString()
-        val tipeKerusakan = args.laporanRuangan?.tipe.toString()
-        val dokumentasi = args.laporanRuangan?.dokumentasi as Int
-        val keterangan = args.laporanRuangan?.keterangan.toString()
+        val lokasi = args.laporanRuangan.lokasi
+        val nama = args.laporanRuangan.nama
+        val tipeKerusakan = args.laporanRuangan.tipe
+        val dokumentasi = args.laporanRuangan.dokumentasi
+        val keterangan = args.laporanRuangan.keterangan
 
         binding.fragmentLaporanLokasi.text = lokasi
         binding.fragmentLaporanTipe.editText?.setText(tipeKerusakan)

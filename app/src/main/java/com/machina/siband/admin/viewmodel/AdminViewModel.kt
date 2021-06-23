@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -323,13 +324,17 @@ class AdminViewModel: ViewModel() {
         _selectedRuangan = ruangan
     }
 
-
     fun clearListRuangan() {
         _listRuangan.value = listOf()
     }
 
     fun clearListItem() {
         _listItem.value = arrayListOf()
+    }
+
+    fun getUserEmail(): String {
+        val currUser = Firebase.auth.currentUser
+        return currUser?.email ?: "-"
     }
 
     private fun sendCrashlytic(message: String, error: Exception) {

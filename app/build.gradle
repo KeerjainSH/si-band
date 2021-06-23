@@ -77,6 +77,9 @@ dependencies {
     // Declare the dependency for the Cloud Storage library
     implementation 'com.google.firebase:firebase-storage-ktx'
 
+    // Declare the dependency for the Firebase Authentication library
+    implementation 'com.google.firebase:firebase-auth-ktx'
+
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     // LiveData
