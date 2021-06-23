@@ -32,11 +32,6 @@ class UserHomeFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private lateinit var mAdapter: ListRuanganAdapter
     private lateinit var spinner: Spinner
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,20 +64,10 @@ class UserHomeFragment : Fragment(), AdapterView.OnItemSelectedListener {
     }
 
     private fun setupObserver() {
-        // Listening to listLantai change
-//        viewModel.listLantai.observe(viewLifecycleOwner, { listLantai ->
-//
-//
-//            for (lantai in listLantai) {
-//                Log.d(TAG, "nama: ${lantai.nama} | url: ${lantai.urlMap}")
-//                for (ruangan in lantai.listRuangan)
-//                    Log.d(TAG, "ruangan: $ruangan")
-//            }
-//        })
-
         // Listening to selectedLantai, update adapter dataset when selectedLantai changed
         viewModel.selectedLantai.observe(viewLifecycleOwner, {
             viewModel.updateLantaiListOnHome(it)
+            viewModel.loadMapImage(it, binding.fragmentUserHomeMap)
         })
 
         viewModel.listRuangan.observe(viewLifecycleOwner, {
@@ -119,8 +104,6 @@ class UserHomeFragment : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(parent: AdapterView<*>?) {
 
     }
-
-
 
     companion object {
         private val TAG = "UserHomeFragment"

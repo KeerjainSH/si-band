@@ -43,7 +43,7 @@
 
             <ImageView
                 android:id="@+id/fragment_user_home_map"
-                android:layout_width="700dp"
+                android:layout_width="wrap_content"
                 android:layout_height="300dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/plasceholder_lantai" />

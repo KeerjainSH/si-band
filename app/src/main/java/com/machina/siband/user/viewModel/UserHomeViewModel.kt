@@ -2,10 +2,12 @@ package com.machina.siband.user.viewModel
 
 import android.net.Uri
 import android.util.Log
+import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.ListenerRegistration
 import com.machina.siband.model.Lantai
@@ -16,6 +18,7 @@ import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.model.LaporanRuangan.Companion.toLaporanRuangan
 import com.machina.siband.model.Ruangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
+import com.machina.siband.module.GlideApp
 import com.machina.siband.repository.FirebaseStorageRepo
 import com.machina.siband.repository.UserFirestoreRepo
 import kotlinx.coroutines.*
@@ -64,6 +67,15 @@ class UserHomeViewModel: ViewModel() {
 
     init {
         attachLantaiListener()
+    }
+
+    fun loadMapImage(lantai: Lantai, imageView: ImageView) {
+        val storageRef = FirebaseStorageRepo.getMapImageRef(lantai.nama)
+
+        GlideApp.with(imageView)
+            .load(storageRef)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(imageView)
     }
 
     fun getListLaporanBase(email: String) {
