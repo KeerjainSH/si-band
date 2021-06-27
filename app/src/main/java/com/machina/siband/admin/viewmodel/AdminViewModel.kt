@@ -232,7 +232,7 @@ class AdminViewModel: ViewModel() {
     }
 
     fun addRuangan(lantai: Lantai, itemName: String) {
-        val newRuangan = Ruangan(arrayListOf(), itemName)
+        val newRuangan = Ruangan(arrayListOf(), arrayListOf(), itemName)
 
         AdminFirestoreRepo.getRuanganRef(lantai.id, itemName)
             .set(newRuangan)
@@ -245,15 +245,13 @@ class AdminViewModel: ViewModel() {
     }
 
     fun deleteItem(lantai: Lantai, ruangan: Ruangan, itemName: String) {
-        val newListItem = selectedRuangan.listKeluhan.filter {
-            it != itemName
-        }
-        val newRuangan = selectedRuangan.copy(listKeluhan = newListItem as ArrayList<String>)
+        val deleteIndex = selectedRuangan.listKeluhan.indexOf(itemName)
+        selectedRuangan.listKeluhan.remove(itemName)
+        selectedRuangan.listKelompok.removeAt(deleteIndex)
 
         AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
-            .set(newRuangan)
+            .set(selectedRuangan)
             .addOnSuccessListener {
-                setSelectedRuangan(newRuangan)
                 getListItem(lantai, ruangan)
             }
             .addOnFailureListener {
@@ -261,10 +259,12 @@ class AdminViewModel: ViewModel() {
             }
     }
 
-    fun addItem(lantai: Lantai, ruangan: Ruangan, itemName: String) {
-        val newListItem = selectedRuangan.listKeluhan
-        newListItem.add(itemName)
-        val newRuangan = selectedRuangan.copy(listKeluhan = newListItem)
+    fun addItem(lantai: Lantai, ruangan: Ruangan, itemName: String, kelompok: String) {
+        val listItem = selectedRuangan.listKeluhan
+        val listKelompok = selectedRuangan.listKelompok
+        listItem.add(itemName)
+        listKelompok.add(kelompok)
+        val newRuangan = selectedRuangan.copy(listKeluhan = listItem, listKelompok = listKelompok)
 
         AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
             .set(newRuangan)

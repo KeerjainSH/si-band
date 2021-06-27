@@ -48,7 +48,7 @@ class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.fragmentAdminListRuanganFab.setOnClickListener {
-            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Ruangan")
+            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Ruangan", "ruangan")
             dialog.show(parentFragmentManager, "AddRuanganDialog")
         }
     }
@@ -90,6 +90,15 @@ class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener
         viewModel.clearListRuangan()
     }
 
+    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String, kelompok: String) {
+        viewModel.addRuangan(args.lantai, itemName)
+        dialog.dismiss()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+        dialog.dismiss()
+    }
+
     companion object {
         private const val TAG = "AdminListRuanganFragment"
 
@@ -106,14 +115,5 @@ class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener
         fun newInstance(param1: String, param2: String) =
             AdminListRuanganFragment().apply {
             }
-    }
-
-    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String) {
-        viewModel.addRuangan(args.lantai, itemName)
-        dialog.dismiss()
-    }
-
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
-        dialog.dismiss()
     }
 }

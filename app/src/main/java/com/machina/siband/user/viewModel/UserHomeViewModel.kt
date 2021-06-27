@@ -159,12 +159,13 @@ class UserHomeViewModel: ViewModel() {
     }
 
 
-    fun putFormPelaporan(laporanBase: LaporanBase, laporanRuangan: LaporanRuangan) {
+    fun putFormPelaporan(laporanBase: LaporanBase, laporanRuangan: LaporanRuangan, images: List<Uri>) {
         val baseReference = UserFirestoreRepo.getLaporanBaseRef(laporanBase.email, laporanBase.tanggal, laporanBase.lokasi)
         val laporanReference = UserFirestoreRepo.getLaporanRuanganRef(laporanBase.email, laporanRuangan.tanggal, laporanRuangan.lokasi, laporanRuangan.nama)
 
         baseReference.set(laporanBase)
             .addOnSuccessListener {
+                putNewImage(laporanRuangan, images)
                 laporanReference.set(laporanRuangan)
                     .addOnFailureListener { exception ->
                         sendCrashlytics("Cannot put LaporanRuangan with Pelaporan", exception)
@@ -172,7 +173,7 @@ class UserHomeViewModel: ViewModel() {
             }
     }
 
-    fun putNewLaporanRuangan(laporanRuangan: LaporanRuangan,  images: List<Uri>) {
+    fun putNewLaporanRuangan(laporanRuangan: LaporanRuangan, images: List<Uri>) {
         val email = laporanRuangan.email
         val tanggal = laporanRuangan.tanggal
         val lokasi = laporanRuangan.lokasi
@@ -195,6 +196,7 @@ class UserHomeViewModel: ViewModel() {
         val nama = laporanRuangan.nama
 
         images.forEachIndexed { index, uri ->
+            Log.d(TAG, "image uri [$uri]")
             FirebaseStorageRepo.getLaporanImageRef(email, tanggal, lokasi, "${nama}${index}")
                 .putFile(uri)
                 .addOnFailureListener{
@@ -244,13 +246,14 @@ class UserHomeViewModel: ViewModel() {
                 .addOnSuccessListener {
                     listDetailRuanganRef.get()
                             .addOnSuccessListener { docs ->
-                                val arrayTemp = docs.get("listKeluhan")
-                                if (arrayTemp != null && arrayTemp is ArrayList<*>) {
-                                    val listTemp = arrayTemp.toList()
-                                    for (item in listTemp as List<String>) {
-                                        putLaporanRuangan(email, tanggal, lokasi, item)
+                                val arrayKeluhan = docs.get("listKeluhan")!!
+                                val arrayKelompok = docs.get("listKelompok")!!
+                                if (arrayKeluhan is ArrayList<*> && arrayKelompok is ArrayList<*>) {
+                                    val listKeluhan = arrayKeluhan.toList() as List<String>
+                                    val listKelompok = arrayKelompok.toList() as List<String>
+                                    listKeluhan.forEachIndexed { index, nama ->
+                                        putLaporanRuangan(idLantai, email, tanggal, lokasi, nama, listKelompok[index])
                                     }
-                                    getListLaporanRuangan(idLantai, email, tanggal, lokasi)
                                 }
                             }
                             .addOnFailureListener {
@@ -273,10 +276,12 @@ class UserHomeViewModel: ViewModel() {
      * @param nama item name.
      * @return nothing.
      */
-    private fun putLaporanRuangan(email: String, tanggal: String, lokasi: String, nama: String) {
-        val emptyLaporan = LaporanRuangan(nama, nama, getCurrentEmail(), lokasi, tanggal, status = NO_PROGRESS)
+    private fun putLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String, nama: String, kelompok: String) {
+        val emptyLaporan = LaporanRuangan(nama, nama, getCurrentEmail(), lokasi, tanggal, status = NO_PROGRESS, kelompok = kelompok)
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
                 .set(emptyLaporan)
+
+        getListLaporanRuangan(idLantai, email, tanggal, lokasi)
     }
 
     fun clearLaporanRuangan() {

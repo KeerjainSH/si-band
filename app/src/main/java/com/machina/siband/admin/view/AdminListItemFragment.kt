@@ -39,7 +39,7 @@ class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.fragmentAdminListItemFab.setOnClickListener {
-            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Item")
+            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Item", "item")
             dialog.show(parentFragmentManager, "AddItemDialog")
         }
     }
@@ -68,8 +68,13 @@ class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
         }
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String) {
-        viewModel.addItem(args.lantai, args.ruangan, itemName)
+    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String, kelompok: String) {
+        if (kelompok.isEmpty()) {
+            dialog.dismiss()
+            return
+        }
+
+        viewModel.addItem(args.lantai, args.ruangan, itemName, kelompok)
         dialog.dismiss()
     }
 

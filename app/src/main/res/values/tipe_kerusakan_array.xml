@@ -16,4 +16,10 @@
         <item>Admin</item>
         <item>User</item>
     </string-array>
+
+    <string-array name="kelompok">
+        <item>Arsitektur</item>
+        <item>Mekanikal</item>
+        <item>Struktur</item>
+    </string-array>
 </resources>

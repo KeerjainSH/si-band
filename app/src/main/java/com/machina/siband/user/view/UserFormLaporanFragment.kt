@@ -91,7 +91,6 @@ class UserFormLaporanFragment : Fragment() {
                     val imageUri = data.clipData!!.getItemAt(i).uri
                     loadImageLocally(imageUri, mLayoutParams)
                     viewModel.addImageToImagesUri(imageUri)
-
                     Log.d(TAG, "$imageUri")
                 }
             } else if (data.data != null){
@@ -199,21 +198,5 @@ class UserFormLaporanFragment : Fragment() {
     companion object {
         private const val PICK_IMAGE_CODE = 200
         private const val TAG = "userFormLaporanFragment"
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment LaporanFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UserFormLaporanFragment().apply {
-                arguments = Bundle().apply {
-
-                }
-            }
     }
 }

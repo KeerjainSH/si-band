@@ -40,14 +40,17 @@ class UserFormPelaporanFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val tipeKerusakan = resources.getStringArray(R.array.tipe)
+        val kelompok = resources.getStringArray(R.array.kelompok)
 
-        val mArrayAdapter = ArrayAdapter(requireContext(), R.layout.item_list_dropdown, tipeKerusakan)
-        (binding.fragmentPelaporanTipe.editText as? AutoCompleteTextView)?.setAdapter(mArrayAdapter)
+        val tipeAdapter = ArrayAdapter(requireContext(), R.layout.item_list_dropdown, tipeKerusakan)
+        (binding.fragmentPelaporanTipe.editText as? AutoCompleteTextView)?.setAdapter(tipeAdapter)
+
+        val kelompokAdapter = ArrayAdapter(requireContext(), R.layout.item_list_dropdown, kelompok)
+        (binding.fragmentPelaporanKelompok.editText as? AutoCompleteTextView)?.setAdapter(kelompokAdapter)
 
         binding.fragmentPelaporanSubmit.setOnClickListener { onSubmit() }
         binding.fragmentPelaporanDokumentasiPilihFoto.setOnClickListener { selectImage() }
     }
-
 
     private fun selectImage() {
         val intent = Intent()
@@ -80,7 +83,6 @@ class UserFormPelaporanFragment : Fragment() {
                     val imageUri = data.clipData!!.getItemAt(i).uri
                     loadImageLocally(imageUri, mLayoutParams)
                     viewModel.addImageToImagesUri(imageUri)
-
                     Log.d(TAG, "$imageUri")
                 }
             } else if (data.data != null){
@@ -113,13 +115,14 @@ class UserFormPelaporanFragment : Fragment() {
         val email = viewModel.getCurrentEmail()
         val tanggal = viewModel.getCurrentDate()
         val lokasi = binding.fragmentPelaporanLokasi.editText?.text.toString()
-        val dokumentasi = viewModel.getImagesUri().size
+        val dokumentasi = viewModel.getImagesUri().toList()
         val item = binding.fragmentPelaporanItem.editText?.text.toString()
         val tipe = binding.fragmentPelaporanTipe.editText?.text.toString()
         val keterangan = binding.fragmentPelaporanKeterangan.editText?.text.toString()
         val status = UserHomeViewModel.NO_PROGRESS
+        val kelompok = binding.fragmentPelaporanKelompok.editText?.text.toString()
 
-        if (lokasi.isNotBlank() || item.isNotBlank() || tipe.isNotBlank()) {
+        if (lokasi.isNotEmpty() || item.isNotEmpty() || tipe.isNotEmpty() || kelompok.isNotEmpty()) {
             val laporanBase = LaporanBase(lokasi, email, tanggal, true)
             val laporanRuangan = LaporanRuangan(
                 item,
@@ -128,14 +131,15 @@ class UserFormPelaporanFragment : Fragment() {
                 lokasi,
                 tanggal,
                 tipe,
-                dokumentasi,
+                dokumentasi.size,
                 keterangan,
                 status,
-                dokumentasiPerbaikan = 0,
-                true
+                0,
+                kelompok,
+                isChecked = true
             )
 
-            viewModel.putFormPelaporan(laporanBase, laporanRuangan)
+            viewModel.putFormPelaporan(laporanBase, laporanRuangan, dokumentasi)
         }
         findNavController().navigateUp()
     }
@@ -143,6 +147,7 @@ class UserFormPelaporanFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+        viewModel.clearImagesUri()
     }
 
     companion object {

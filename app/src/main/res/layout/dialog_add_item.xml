@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="12dp">
+    android:paddingHorizontal="12dp"
+    android:orientation="vertical">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/dialog_add_item_nama"
@@ -12,12 +13,25 @@
         android:layout_marginTop="12dp"
         android:hint="Nama"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/dialog_add_item_kelompok"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Kelompok"
+            android:enabled="false"
+            android:textColor="@color/black"
+            android:inputType="none" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
