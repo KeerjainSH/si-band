@@ -39,13 +39,11 @@ class AdminReviewLaporanRuanganFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentAdminReviewLaporanRuanganBinding.inflate(layoutInflater)
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         resolveForm()
-
         val status = resources.getStringArray(R.array.status)
         val mArrayAdapter = ArrayAdapter(requireContext(), R.layout.item_list_dropdown, status)
         (binding.fragmentAdminReviewLaporanStatus.editText as? AutoCompleteTextView)?.setAdapter(mArrayAdapter)
@@ -125,7 +123,7 @@ class AdminReviewLaporanRuanganFragment : Fragment() {
 
         if (dokPerbaikan > 0) {
             binding.fragmentAdminReviewLaporanDokumentasiPerbaikanIcon.visibility = View.GONE
-            repeat(dok) {
+            repeat(dokPerbaikan) {
                 val storageRef = FirebaseStorageRepo.getLaporanPerbaikanImageRef(email, tanggal, lokasi, "${nama}$it")
                 loadImageInternet(mLayoutParams, binding.fragmentAdminReviewLaporanDokumentasiPerbaikanContainer, storageRef)
             }

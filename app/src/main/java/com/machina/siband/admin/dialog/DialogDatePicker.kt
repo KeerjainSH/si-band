@@ -24,6 +24,7 @@ class DialogDatePicker(private val onDialogDateSet: (Calendar) -> Unit): DialogF
         // Do something with the date chosen by the user
         val calendar = Calendar.getInstance()
         calendar.set(year, month, day)
+        dismiss()
         onDialogDateSet(calendar)
     }
 }

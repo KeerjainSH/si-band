@@ -1,8 +1,10 @@
 package com.machina.siband.admin.view
 
+import android.icu.text.UnicodeSet
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
@@ -13,6 +15,7 @@ import com.machina.siband.admin.dialog.DialogDatePicker
 import com.machina.siband.admin.recycler.AdminSwipeViewAdapter
 import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminSwipeLaporanBinding
+import com.machina.siband.repository.FirebaseStorageRepo
 import com.opencsv.CSVWriter
 import java.io.File
 import java.io.FileWriter
@@ -57,27 +60,143 @@ class AdminSwipeLaporanFragment: Fragment() {
         viewModel.getListLaporanBase()
     }
 
-    private fun createCsvFile() {
-        val csv = File(context?.getExternalFilesDir(null), "report.csv") // Here csv file name is MyCsvFile.csv
+    private fun onDialogDateSet(calendar: Calendar) {
+        val tanggal = "${calendar.get(Calendar.DAY_OF_MONTH)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.YEAR)}"
+        createCsvFile(tanggal)
+    }
+
+    private fun createCsvFile(tanggal: String) {
+        val filteredLaporan = viewModel.getListLaporanByDate(tanggal)
+        val listNamaRuangan = viewModel.getListNamaRuangan()
+        val csv = File(context?.getExternalFilesDir(null), "${tanggal}.csv") // Here csv file name is MyCsvFile.csv
         Log.d(TAG, "csv [${csv.absolutePath}] nama [${csv.name}]")
+
+        if (filteredLaporan.isEmpty() || listNamaRuangan.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Tidak ada laporan pada $tanggal", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val safeLaporan = filteredLaporan.filter { it.tipe.isEmpty() }
+        val brokenLaporan = filteredLaporan.filter { it.tipe.isNotBlank() }
+
+        val laporanStruktur = safeLaporan.filter { it.kelompok == "Struktur" }
+        val laporanArsitektur = safeLaporan.filter { it.kelompok == "Arsitektur" }
+        val laporanMekanikal = safeLaporan.filter { it.kelompok == "Mekanikal" }
+
+        val namaLaporanStruktur = mutableSetOf<String>()
+        for (item in laporanStruktur) namaLaporanStruktur.add(item.nama)
+        val namaLaporanArsitektur = mutableSetOf<String>()
+        for (item in laporanArsitektur) namaLaporanArsitektur.add(item.nama)
+        val namaLaporanMekanikal = mutableSetOf<String>()
+        for (item in laporanMekanikal) namaLaporanMekanikal.add(item.nama)
 
         try {
             val writer = CSVWriter(FileWriter(csv))
             val data: MutableList<Array<String>> = ArrayList()
-            data.add(arrayOf("Country", "Capital", ""))
-            data.add(arrayOf("India", "New Delhi", ""))
-            data.add(arrayOf("United States", "Washington D.C", "ini kosong"))
-            data.add(arrayOf("Germany", "Berlin", "ini kosong juga"))
-            Log.d(TAG, "writer [$writer]")
+            var pos: Int
+            var temp = mutableListOf("No.", "Fasilitas")
+            temp.addAll(listNamaRuangan)
+            data.add(temp.toTypedArray())
+            data.add(arrayOf("1.", "STRUKTUR"))
+            for (nama in namaLaporanStruktur) {
+                temp = MutableList(listNamaRuangan.size + 2) { "" }
+                temp.add(1, nama)
+                for (item in laporanStruktur) {
+                    if (nama == item.nama) {
+                        pos = listNamaRuangan.indexOf(item.lokasi)
+                        if (pos != -1) {
+                            temp[pos + 2] = "x"
+                        }
+                    }
+                }
+                data.add(temp.toTypedArray())
+            }
+
+            data.add(arrayOf("2.", "ARSITEKTUR"))
+            for (nama in namaLaporanArsitektur) {
+                temp = MutableList(listNamaRuangan.size + 2) { "" }
+                temp.add(1, nama)
+                for (item in laporanArsitektur) {
+                    if (nama == item.nama) {
+                        pos = listNamaRuangan.indexOf(item.lokasi)
+                        if (pos != -1) {
+                            temp[pos + 2] = "x"
+                        }
+                    }
+                }
+                data.add(temp.toTypedArray())
+            }
+
+            data.add(arrayOf("3.", "MEKANIKAL"))
+            for (nama in namaLaporanMekanikal) {
+                temp = MutableList(listNamaRuangan.size + 2) { "" }
+                temp.add(1, nama)
+                for (item in laporanMekanikal) {
+                    if (nama == item.nama) {
+                        pos = listNamaRuangan.indexOf(item.lokasi)
+                        if (pos != -1) {
+                            temp[pos + 2] = "x"
+                        }
+                    }
+                }
+                data.add(temp.toTypedArray())
+            }
+
+            data.add(arrayOf(""))
+            data.add(arrayOf(""))
+            data.add(arrayOf("Kerusakan: "))
+            data.add(arrayOf("No.", "Lokasi", "Tipe Kerusakan", "Dokumentasi Kerusakan Sebelum Perbaikan", "Dokumentasi Seletah Perbaikan", "Keterangan"))
+
+            brokenLaporan.forEachIndexed { index, item ->
+                val tempInternal = MutableList(8) { "" }
+                tempInternal[0] = "${index + 1}"
+                tempInternal[1] = item.lokasi
+                tempInternal[2] = item.tipe
+                tempInternal[5] = item.keterangan
+                val dok = item.dokumentasi
+                val dokPerbaikan = item.dokumentasiPerbaikan
+
+                if (dok > 0) {
+                    var dokText = ""
+                    repeat(dok) {
+                        val ref = FirebaseStorageRepo.getLaporanImageRef(item.email, tanggal, item.lokasi, "${item.nama}$it")
+                            .downloadUrl
+                        while (!ref.isComplete) {
+                            Thread.sleep(100)
+                        }
+                        if (ref.isSuccessful) {
+                            dokText = "$dokText \n${ref.result}"
+                            tempInternal[3] = dokText
+                        }
+                    }
+                }
+                if (dokPerbaikan > 0) {
+                    var dokText = ""
+                    repeat(dok) {
+                        val ref = FirebaseStorageRepo.getLaporanPerbaikanImageRef(item.email, tanggal, item.lokasi, "${item.nama}$it")
+                            .downloadUrl
+                        while (!ref.isComplete) {
+                            Thread.sleep(100)
+                        }
+                        if (ref.isSuccessful) {
+                            dokText = "$dokText \n${ref.result}"
+                            tempInternal[4] = dokText
+                        }
+                    }
+                }
+
+                Log.d(TAG, "dok ${tempInternal[3]}")
+                Log.d(TAG, "perbaikan ${tempInternal[4]}")
+                data.add(tempInternal.toTypedArray())
+            }
+
+//            data.add(temp.toTypedArray())
             writer.writeAll(data) // data is adding to csv
             writer.close()
+            Toast.makeText(requireContext(), "Rekap Laporan Berhasil Dibuat\n${csv.absolutePath}", Toast.LENGTH_LONG).show()
         } catch (e: IOException) {
             e.printStackTrace()
         }
-    }
-
-    private fun onDialogDateSet(calendar: Calendar) {
-        Log.d(TAG, "Current date ${calendar.get(Calendar.DAY_OF_MONTH)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.YEAR)}")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

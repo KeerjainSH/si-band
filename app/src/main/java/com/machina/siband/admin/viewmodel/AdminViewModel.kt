@@ -56,10 +56,30 @@ class AdminViewModel: ViewModel() {
     private var _listLaporanDone = MutableLiveData<List<LaporanRuangan>>()
     val listLaporanDone: LiveData<List<LaporanRuangan>> = _listLaporanDone
 
+    private var _listLaporanResult = listOf<LaporanRuangan>()
+    private var _listLaporanSafe = listOf<LaporanRuangan>()
+
+
     private val _imagesUri = mutableListOf<Uri>()
 
     var currentImageUri: Uri? = null
 
+
+    fun getListLaporanByDate(tanggal: String): List<LaporanRuangan> {
+        val listLaporan = _listLaporanResult
+        return listLaporan.filter { it.tanggal == tanggal }
+    }
+
+    fun getListNamaRuangan(): Set<String> {
+        val tempLaporanBase = _listLaporanBase.value
+        if (tempLaporanBase == null) {
+            return setOf()
+        } else {
+            val listNamaRuangan = mutableSetOf<String>()
+            for (item in tempLaporanBase) listNamaRuangan.add(item.lokasi)
+            return listNamaRuangan
+        }
+    }
 
     fun getListLaporanBase() {
         AdminFirestoreRepo.getListLaporanBaseRef()
@@ -76,6 +96,7 @@ class AdminViewModel: ViewModel() {
 
     private fun fetchListLaporanRuangan() {
         val tempMutable = mutableListOf<LaporanRuangan>()
+        val resTemp = mutableListOf<LaporanRuangan>()
         val laporanBase = listLaporanBase.value
         if (laporanBase.isNullOrEmpty()) return
 
@@ -85,14 +106,17 @@ class AdminViewModel: ViewModel() {
                 .get()
                 .addOnSuccessListener { coll ->
                     var temp = coll.mapNotNull { it.toLaporanRuangan() }
-                    temp = temp.filter {
-                        it.tipe.isNotEmpty() && it.isChecked
-                    }
+                    temp = temp.filter { it.isChecked }
+                    resTemp.addAll(temp)
+                    _listLaporanResult = resTemp
+
+                    temp = temp.filter { it.tipe.isNotEmpty() }
                     tempMutable.addAll(temp)
                     _listLaporanRuangan.value = tempMutable
                     viewModelScope.launch(Dispatchers.Default) {
                         filterListLaporan()
                     }
+
                 }
                 .addOnFailureListener { error ->
                     sendCrashlytic("Failed to fetch LaporanRuangan", error)

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.machina.siband.admin.AdminActivity
@@ -58,15 +59,17 @@ class MainActivity : AppCompatActivity() {
         val password = binding.mainPassword.editText?.text.toString()
         val auth = Firebase.auth
 
-        Log.d(TAG, "email [$email] password [$password]")
-
+        if (email.isBlank() || password.isBlank()) {
+            Toast.makeText(this, "Please fill the email and password", Toast.LENGTH_SHORT).show()
+            return
+        }
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     resolveTipeAkun(email)
                 } else {
                     Log.d(TAG, "${task.exception}")
-                    Toast.makeText(this, "${task.exception}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show()
                 }
             }
     }
