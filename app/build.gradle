@@ -101,4 +101,8 @@ dependencies {
 
     // FirebaseUI Storage only
     implementation 'com.firebaseui:firebase-ui-storage:6.4.0'
+
+    // https://mvnrepository.com/artifact/com.opencsv/opencsv
+    implementation group: 'com.opencsv', name: 'opencsv', version: '4.6'
+
 }

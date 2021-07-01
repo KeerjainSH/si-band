@@ -373,8 +373,7 @@ class UserHomeViewModel: ViewModel() {
     }
 
     fun getCurrentEmail(): String {
-        val currUser = Firebase.auth.currentUser
-        return currUser?.email ?: "-"
+        return "-"
     }
 
     fun getCurrentDate(): String {

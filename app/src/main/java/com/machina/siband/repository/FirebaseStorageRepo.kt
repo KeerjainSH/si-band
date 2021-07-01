@@ -7,7 +7,7 @@ import com.google.firebase.storage.ktx.storage
 object FirebaseStorageRepo {
 
     fun getLaporanImageRef(email: String, tanggal: String, lokasi: String, item: String): StorageReference {
-        val path = "$email/$tanggal/$lokasi/$item"
+        val path = "$tanggal/$lokasi/$item"
 
         return Firebase.storage.reference.child(path)
     }
@@ -18,7 +18,7 @@ object FirebaseStorageRepo {
         lokasi: String,
         item: String
     ): StorageReference {
-        val path = "$email/$tanggal/$lokasi/perbaikan/$item"
+        val path = "$tanggal/$lokasi/perbaikan/$item"
 
         return Firebase.storage.reference.child(path)
     }

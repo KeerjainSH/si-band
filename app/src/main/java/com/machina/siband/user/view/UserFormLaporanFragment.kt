@@ -110,25 +110,23 @@ class UserFormLaporanFragment : Fragment() {
 
     private fun onSubmitLaporan() {
         val laporanRuangan = args.laporanRuangan
-        if (laporanRuangan != null) {
-            val newTipe = binding.fragmentLaporanTipe.editText?.text.toString()
-            val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
-            val images = viewModel.getImagesUri().toList()
-            val lastImages = laporanRuangan.dokumentasi
-            val count = if (images.isNotEmpty()) {
-                images.size
-            } else {
-                lastImages
-            }
-            val newLaporanRuangan = laporanRuangan.copy(
-                tipe = newTipe,
-                keterangan =  newKeterangan,
-                dokumentasi = count,
-                isChecked = true
-            )
-
-            viewModel.putNewLaporanRuangan(newLaporanRuangan, images)
+        val newTipe = binding.fragmentLaporanTipe.editText?.text.toString()
+        val newKeterangan = binding.fragmentLaporanKeterangan.editText?.text.toString()
+        val images = viewModel.getImagesUri().toList()
+        val lastImages = laporanRuangan.dokumentasi
+        val count = if (images.isNotEmpty()) {
+            images.size
+        } else {
+            lastImages
         }
+        val newLaporanRuangan = laporanRuangan.copy(
+            tipe = newTipe,
+            keterangan =  newKeterangan,
+            dokumentasi = count,
+            isChecked = true
+        )
+
+        viewModel.putNewLaporanRuangan(newLaporanRuangan, images)
         findNavController().navigateUp()
     }
 

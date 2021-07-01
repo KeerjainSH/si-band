@@ -15,11 +15,6 @@ import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.user.recycler.ListLaporanUserAdapter
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
-/**
- * A simple [Fragment] subclass.
- * Use the [AdminListLaporanRuanganFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AdminListLaporanRuanganFragment(private val position: Int) : Fragment() {
 
     private var _binding: FragmentAdminListLaporanRuanganBinding? = null

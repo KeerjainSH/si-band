@@ -13,7 +13,7 @@ object UserFirestoreRepo {
     private const val COL_LAPORAN = "list-laporan"
 
     fun getLaporanBaseRef(email: String, tanggal: String, lokasi: String): DocumentReference {
-        val path = "${email}_${tanggal}_${lokasi}"
+        val path = "-_${tanggal}_${lokasi}"
         return Firebase.firestore
                 .collection(COL_LAPORAN)
                 .document(path)
