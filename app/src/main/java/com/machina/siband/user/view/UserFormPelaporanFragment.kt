@@ -121,8 +121,6 @@ class UserFormPelaporanFragment : Fragment() {
     }
 
     private fun captureImage() {
-//        val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        startActivityForResult(takePicture, CAPTURE_IMAGE_CODE)
         val packageManager = activity?.packageManager ?: return
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_DENIED) {
@@ -135,7 +133,7 @@ class UserFormPelaporanFragment : Fragment() {
         }
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
-            takePictureIntent.resolveActivity(packageManager)?.also {
+            takePictureIntent.resolveActivity(packageManager)?.also { component ->
                 // Create the File where the photo should go
                 val photoFile: File? = try {
                     createImageFile()
@@ -159,37 +157,46 @@ class UserFormPelaporanFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        val mLayoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            800
+        ).also { it.setMargins(0, 20, 0, 20) }
 
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            val mLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                800
-            ).also { it.setMargins(0, 20, 0, 20) }
+        if (resultCode == Activity.RESULT_OK && data != null && requestCode == PICK_IMAGE_CODE) {
             removeExistImage()
             viewModel.clearImagesUri()
             binding.fragmentPelaporanDokumentasiIconContainer.visibility = View.GONE
-
-            if (requestCode == PICK_IMAGE_CODE) {
-                if (data.clipData != null) {
-                    val count = data.clipData!!.itemCount
-                    for (i in 0 until count) {
-                        val imageUri = data.clipData!!.getItemAt(i).uri
-                        loadImageLocally(imageUri, mLayoutParams)
-                        viewModel.addImageToImagesUri(imageUri)
-                        Log.d(TAG, "$imageUri")
-                    }
-                } else if (data.data != null) {
-                    val imageUri = data.data
-                    if (imageUri != null) {
-                        loadImageLocally(imageUri, mLayoutParams)
-                        viewModel.addImageToImagesUri(imageUri)
-                    }
+            if (data.clipData != null) {
+                val count = data.clipData!!.itemCount
+                for (i in 0 until count) {
+                    val imageUri = data.clipData!!.getItemAt(i).uri
+                    loadImageLocally(imageUri, mLayoutParams)
+                    viewModel.addImageToImagesUri(imageUri)
+                    Log.d(TAG, "$imageUri")
                 }
-            } else if (requestCode == CAPTURE_IMAGE_CODE) {
-                val imageUri = Uri.fromFile(File(currentPhotoPath))
-                loadImageLocally(imageUri, mLayoutParams)
-                viewModel.addImageToImagesUri(imageUri)
+            } else if (data.data != null) {
+                val imageUri = data.data
+                if (imageUri != null) {
+                    loadImageLocally(imageUri, mLayoutParams)
+                    viewModel.addImageToImagesUri(imageUri)
+                }
             }
+        } else if (resultCode == Activity.RESULT_OK && requestCode == CAPTURE_IMAGE_CODE) {
+            removeExistImage()
+            viewModel.clearImagesUri()
+            binding.fragmentPelaporanDokumentasiIconContainer.visibility = View.GONE
+            Log.d(TAG, "Entering capture image")
+            val imageUri = Uri.fromFile(File(currentPhotoPath))
+            loadImageLocally(imageUri, mLayoutParams)
+            Log.d(TAG, "image uri [$imageUri]")
+            viewModel.addImageToImagesUri(imageUri)
+        }
+
+        if (resultCode != Activity.RESULT_OK) {
+            Log.d(TAG, "Result code not ok")
+        }
+        if (data == null) {
+            Log.d(TAG, "data from intent is null")
         }
     }
 
