@@ -1,9 +1,15 @@
 package com.machina.siband.user.view
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -11,7 +17,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.widget.addTextChangedListener
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -22,7 +30,8 @@ import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
 import com.machina.siband.repository.AdminFirestoreRepo
 import com.machina.siband.user.viewModel.UserHomeViewModel
-import org.w3c.dom.Text
+import java.io.File
+import java.io.IOException
 
 
 class UserFormPelaporanFragment : Fragment() {
@@ -95,6 +104,7 @@ class UserFormPelaporanFragment : Fragment() {
 
         binding.fragmentPelaporanSubmit.setOnClickListener { onSubmit() }
         binding.fragmentPelaporanDokumentasiPilihFoto.setOnClickListener { selectImage() }
+        binding.fragmentPelaporanDokumentasiAmbilFoto.setOnClickListener { captureImage() }
     }
 
     private fun selectImage() {
@@ -110,34 +120,92 @@ class UserFormPelaporanFragment : Fragment() {
         )
     }
 
+    private fun captureImage() {
+//        val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//        startActivityForResult(takePicture, CAPTURE_IMAGE_CODE)
+        val packageManager = activity?.packageManager ?: return
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                listOf(Manifest.permission.CAMERA).toTypedArray(),
+                REQ_CAMERA_PERMISSION
+            )
+            return
+        }
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            // Ensure that there's a camera activity to handle the intent
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                // Create the File where the photo should go
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    null
+                }
+                // Continue only if the File was successfully created
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "com.machina.siband",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, CAPTURE_IMAGE_CODE)
+                }
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == PICK_IMAGE_CODE && resultCode == Activity.RESULT_OK && data != null) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
             val mLayoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 800
             ).also { it.setMargins(0, 20, 0, 20) }
-
             removeExistImage()
             viewModel.clearImagesUri()
-
-            if (data.clipData != null) {
-                val count = data.clipData!!.itemCount
-                for (i in 0 until count) {
-                    val imageUri = data.clipData!!.getItemAt(i).uri
-                    loadImageLocally(imageUri, mLayoutParams)
-                    viewModel.addImageToImagesUri(imageUri)
-                    Log.d(TAG, "$imageUri")
-                }
-            } else if (data.data != null){
-                val imageUri = data.data
-                if (imageUri != null) {
-                    loadImageLocally(imageUri, mLayoutParams)
-                    viewModel.addImageToImagesUri(imageUri)
-                }
-            }
             binding.fragmentPelaporanDokumentasiIconContainer.visibility = View.GONE
+
+            if (requestCode == PICK_IMAGE_CODE) {
+                if (data.clipData != null) {
+                    val count = data.clipData!!.itemCount
+                    for (i in 0 until count) {
+                        val imageUri = data.clipData!!.getItemAt(i).uri
+                        loadImageLocally(imageUri, mLayoutParams)
+                        viewModel.addImageToImagesUri(imageUri)
+                        Log.d(TAG, "$imageUri")
+                    }
+                } else if (data.data != null) {
+                    val imageUri = data.data
+                    if (imageUri != null) {
+                        loadImageLocally(imageUri, mLayoutParams)
+                        viewModel.addImageToImagesUri(imageUri)
+                    }
+                }
+            } else if (requestCode == CAPTURE_IMAGE_CODE) {
+                val imageUri = Uri.fromFile(File(currentPhotoPath))
+                loadImageLocally(imageUri, mLayoutParams)
+                viewModel.addImageToImagesUri(imageUri)
+            }
+        }
+    }
+
+    lateinit var currentPhotoPath: String
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val storageDir = activity?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "temp", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            currentPhotoPath = absolutePath
         }
     }
 
@@ -170,7 +238,7 @@ class UserFormPelaporanFragment : Fragment() {
         val index = arrayItem.indexOf(item)
         val kelompok = resources.getStringArray(R.array.kelompok)[index]
 
-        if (lokasi.isNotEmpty() || item.isNotEmpty() || tipe.isNotEmpty() ) {
+        if (lokasi.isNotEmpty() || item.isNotEmpty() || tipe.isNotEmpty() || kelompok.isNotEmpty()) {
             val laporanBase = LaporanBase(lokasi, email, tanggal, true)
             val laporanRuangan = LaporanRuangan(
                 item,
@@ -201,6 +269,8 @@ class UserFormPelaporanFragment : Fragment() {
 
     companion object {
         private const val PICK_IMAGE_CODE = 200
+        private const val CAPTURE_IMAGE_CODE = 204
+        private const val REQ_CAMERA_PERMISSION = 122
         private const val TAG = "FormPelaporanFragment"
     }
 }
