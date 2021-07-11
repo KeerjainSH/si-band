@@ -5,23 +5,25 @@ import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.parcelize.Parcelize
-import java.lang.Exception
 
 @Parcelize
-data class Lantai(
-    val nama: String
-) : Parcelable {
+data class AreaRuangan(
+    val nama: String,
+    val warna: String
+): Parcelable {
 
     companion object {
-        private const val TAG = "Lantai"
+        private const val TAG = "AreaRuangan"
 
-        fun DocumentSnapshot.toLantai(): Lantai? {
+        fun DocumentSnapshot.toAreaRuangan(): AreaRuangan? {
             return try {
                 val nama = getString("nama")!!
-                Lantai(nama)
+                val warna = getString("warna")!!
+
+                AreaRuangan(nama, warna)
             } catch (e: Exception) {
-                Log.e(TAG, "Error converting lantai data", e)
-                FirebaseCrashlytics.getInstance().log("Error converting user profile")
+                Log.e(TAG, "Error converting ruangan data", e)
+                FirebaseCrashlytics.getInstance().log("Error converting to AreaRuangan")
                 FirebaseCrashlytics.getInstance().setCustomKey("userId", id)
                 FirebaseCrashlytics.getInstance().recordException(e)
                 null

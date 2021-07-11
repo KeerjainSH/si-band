@@ -1,13 +1,13 @@
 package com.machina.siband.admin.recycler
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemLantaiBinding
 import com.machina.siband.model.Ruangan
 
 class AdminListRuanganAdapter(
-    private val onItemClick: (Ruangan) -> Unit,
     private val onItemDelete: (Ruangan) -> Unit
 ): RecyclerView.Adapter<ItemRuangan>() {
 
@@ -26,7 +26,7 @@ class AdminListRuanganAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemRuangan, position: Int) {
-        holder.onBind(dataSet[position], onItemClick, onItemDelete)
+        holder.onBind(dataSet[position], onItemDelete)
     }
 
     override fun getItemCount(): Int {
@@ -43,13 +43,12 @@ class ItemRuangan(binding: ItemLantaiBinding): RecyclerView.ViewHolder(binding.r
 
     fun onBind(
         ruangan: Ruangan,
-        onItemClick: (Ruangan) -> Unit,
         onItemDelete: (Ruangan) -> Unit
     ) {
         nama.text = ruangan.nama
 
-        detailButton.setOnClickListener { onItemClick(ruangan) }
         hapusButton.setOnClickListener { onItemDelete(ruangan) }
+        detailButton.visibility = View.GONE
     }
 
 }

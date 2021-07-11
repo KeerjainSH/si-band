@@ -33,8 +33,6 @@ class ListLaporanRuanganAdapter(
     override fun getItemCount(): Int {
         return dataSet.size
     }
-
-
 }
 
 

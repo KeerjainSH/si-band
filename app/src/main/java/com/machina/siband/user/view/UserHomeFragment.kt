@@ -85,7 +85,7 @@ class UserHomeFragment : Fragment(), AdapterView.OnItemSelectedListener {
     }
 
     private fun onItemRuanganClicked(name: String) {
-        val id = viewModel.selectedLantai.value?.id
+        val id = viewModel.selectedLantai.value?.nama
         if (!id.isNullOrEmpty()) {
             val action = UserHomeFragmentDirections.actionUserHomeFragmentToDetailRuanganFragment(id, name)
             findNavController().navigate(action)

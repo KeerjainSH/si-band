@@ -1,30 +1,24 @@
 package com.machina.siband.admin.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.R
-import com.machina.siband.admin.dialog.DialogAddItem
+import com.machina.siband.admin.dialog.DialogAddRuangan
 import com.machina.siband.admin.recycler.AdminListRuanganAdapter
 import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminListRuanganBinding
 import com.machina.siband.model.Lantai
 import com.machina.siband.model.Ruangan
-
-/**
- * A simple [Fragment] subclass.
- * Use the [AdminListRuanganFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener {
+class AdminListRuanganFragment : Fragment(), DialogAddRuangan.DialogAddItemListener {
 
     private var _binding : FragmentAdminListRuanganBinding? = null
     private val binding get() = _binding!!
@@ -48,7 +42,22 @@ class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.fragmentAdminListRuanganFab.setOnClickListener {
-            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Ruangan", "ruangan")
+            val listAreaRuangan = viewModel.listAreaRuangan.value
+            val temp = mutableListOf<String>()
+            if (listAreaRuangan != null) {
+                for (areaRuangan in listAreaRuangan) {
+                    temp.add(areaRuangan.nama)
+                    Log.d(TAG, "nama [${areaRuangan.nama}")
+                }
+            }
+
+            val arrayListAreaRuangan = temp.toTypedArray()
+
+            val dialog = DialogAddRuangan(
+                this as DialogAddRuangan.DialogAddItemListener,
+                "Tambah Ruangan",
+                arrayListAreaRuangan
+            )
             dialog.show(parentFragmentManager, "AddRuanganDialog")
         }
     }
@@ -60,11 +69,12 @@ class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener
     }
 
     private fun setupRecycler() {
-        mAdapter = AdminListRuanganAdapter(this::onItemClick, this::onItemDelete)
+        mAdapter = AdminListRuanganAdapter(this::onItemDelete)
 
         val recycler = binding.fragmentAdminListRuanganRecycler
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         viewModel.getListRuangan(args.lantai)
+        viewModel.getListAreaRuangan()
 
         recycler.apply {
             adapter = mAdapter
@@ -76,12 +86,18 @@ class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener
         viewModel.deleteRuangan(args.lantai, ruangan.nama)
     }
 
-    private fun onItemClick(ruangan: Ruangan) {
-        val lantai = args.lantai
-        val action = AdminListRuanganFragmentDirections
-            .actionAdminListRuanganFragmentToAdminListItemFragment(lantai, ruangan)
+    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String, area: String) {
+        val listItem = arrayListOf<String>()
+        val listKelompok = arrayListOf<String>()
+        resources.getStringArray(R.array.item).toCollection(listItem)
+        resources.getStringArray(R.array.kelompok).toCollection(listKelompok)
 
-        findNavController().navigate(action)
+        viewModel.addRuangan(args.lantai, itemName, area, listItem, listKelompok)
+        dialog.dismiss()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+        dialog.dismiss()
     }
 
     override fun onDestroy() {
@@ -90,30 +106,7 @@ class AdminListRuanganFragment : Fragment(), DialogAddItem.DialogAddItemListener
         viewModel.clearListRuangan()
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String, kelompok: String) {
-        viewModel.addRuangan(args.lantai, itemName)
-        dialog.dismiss()
-    }
-
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
-        dialog.dismiss()
-    }
-
     companion object {
-        private const val TAG = "AdminListRuanganFragment"
-
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AdminListRuanganFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AdminListRuanganFragment().apply {
-            }
+        private const val TAG = "AdminListRuangan"
     }
 }

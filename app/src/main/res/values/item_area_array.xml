@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="kelompok">
+        <item>Struktur</item>
+        <item>Struktur</item>
+        <item>Struktur</item>
+        <item>Struktur</item>
+        <item>Arsitektur</item>
+        <item>Arsitektur</item>
+        <item>Arsitektur</item>
+        <item>Arsitektur</item>
+        <item>Arsitektur</item>
+        <item>Arsitektur</item>
+        <item>Mekanikal</item>
+        <item>Mekanikal</item>
+        <item>Mekanikal</item>
+        <item>Mekanikal</item>
+        <item>Mekanikal</item>
+    </string-array>
+
+    <string-array name="item">
+        <item>Lantai</item>
+        <item>Plafond</item>
+        <item>Dinding</item>
+        <item>Atap</item>
+        <item>Jendela</item>
+        <item>Pintu</item>
+        <item>Kaca</item>
+        <item>Kusen</item>
+        <item>Signage</item>
+        <item>Aksesoris</item>
+        <item>Closet</item>
+        <item>Urinoir</item>
+        <item>Wastafel</item>
+        <item>Jet Shower</item>
+        <item>Kran Air</item>
+    </string-array>
+</resources>

@@ -78,7 +78,7 @@ class AdminAddLantaiFragment : Fragment() {
 
     private fun onSubmit() {
         val nama = binding.fragmentAdminAddLantaiNama.editText?.text.toString()
-        val newLantai = Lantai(nama, nama)
+        val newLantai = Lantai(nama)
         val imageUri = viewModel.currentImageUri
 
         if (nama.isNotEmpty() && imageUri != null) {

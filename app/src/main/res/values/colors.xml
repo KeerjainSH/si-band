@@ -16,4 +16,10 @@
 
     <color name="white_darker">#F5F5F5</color>
 
+    <color name="area_red">#ff99a5</color>
+    <color name="area_hijau">#99ffb4</color>
+    <color name="area_kuning">#fff599</color>
+    <color name="area_biru">#99fff3</color>
+    <color name="area_ungu">#e6a8ff</color>
+    <color name="area_oren">#ffc1a8</color>
 </resources>

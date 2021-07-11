@@ -8,7 +8,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 
 object AdminFirestoreRepo {
-
     fun getListLantaiRef(): CollectionReference {
         return Firebase.firestore
             .collection("list-lantai")
@@ -52,4 +51,14 @@ object AdminFirestoreRepo {
             .collection("user-info")
     }
 
+    fun getListAreaRuanganRef(): CollectionReference {
+        return Firebase.firestore
+            .collection("list-letak-ruangan")
+    }
+
+    fun getAreaRuanganRef(nama: String): DocumentReference {
+        return Firebase.firestore
+            .collection("list-letak-ruangan")
+            .document(nama)
+    }
 }

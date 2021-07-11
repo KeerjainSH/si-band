@@ -11,6 +11,9 @@
             android:id="@+id/adminListLantaiFragment"
             android:title="List Lantai"/>
 
+        <item android:id="@+id/adminListAreaRuanganFragment"
+            android:title="List Letak Ruangan"/>
+
         <item
             android:id="@+id/adminListUserFragment"
             android:title="List User"/>

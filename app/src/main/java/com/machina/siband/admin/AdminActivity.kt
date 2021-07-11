@@ -44,7 +44,14 @@ class AdminActivity: AppCompatActivity() {
     }
 
     private fun initiateDrawerLayout() {
-        val topLevelDestination: Set<Int> = setOf(R.id.adminSwipeLaporanFragment, R.id.adminListLantaiFragment, R.id.adminListUserFragment)
+        val topLevelDestination: Set<Int> =
+            setOf(
+                R.id.adminSwipeLaporanFragment,
+                R.id.adminListLantaiFragment,
+                R.id.adminListAreaRuanganFragment,
+                R.id.adminListUserFragment
+            )
+
         appBarConfiguration = AppBarConfiguration
             .Builder(topLevelDestination)
             .setOpenableLayout(drawerLayout)

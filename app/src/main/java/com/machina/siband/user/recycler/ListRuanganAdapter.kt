@@ -1,5 +1,6 @@
 package com.machina.siband.user.recycler
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +25,7 @@ class ListRuanganAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemRuangan, position: Int) {
-        holder.onBind(dataSet[position], position + 1, onItemRuanganClicked)
+        holder.onBind(dataSet[position], onItemRuanganClicked)
     }
 
     override fun getItemCount(): Int {
@@ -34,13 +35,14 @@ class ListRuanganAdapter(
 
 
 class ItemRuangan(binding: ItemRuanganBinding): RecyclerView.ViewHolder(binding.root) {
-
     private val textView = binding.itemRuanganName
     private val container = binding.itemRuanganContainer
+    private val linearLayout = binding.itemRuanganLinearLayout
 
-    fun onBind(ruangan: Ruangan, position: Int, listener: (String) -> (Unit)) {
-        val text = "$position. ${ruangan.nama}"
+    fun onBind(ruangan: Ruangan, listener: (String) -> (Unit)) {
+        val text = ruangan.nama
         textView.text = text
+        linearLayout.setBackgroundColor(Color.parseColor(ruangan.warna))
         container.setOnClickListener {
             listener(ruangan.nama)
         }

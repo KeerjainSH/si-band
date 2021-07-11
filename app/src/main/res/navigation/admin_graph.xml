@@ -26,24 +26,6 @@
         <argument
             android:name="lantai"
             app:argType="com.machina.siband.model.Lantai" />
-        <action
-            android:id="@+id/action_adminListRuanganFragment_to_adminListItemFragment"
-            app:destination="@id/adminListItemFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/adminListItemFragment"
-        android:name="com.machina.siband.admin.view.AdminListItemFragment"
-        android:label="List Item"
-        tools:layout="@layout/fragment_admin_list_item" >
-
-        <argument
-            android:name="lantai"
-            app:argType="com.machina.siband.model.Lantai" />
-        <argument
-            android:name="ruangan"
-            app:argType="com.machina.siband.model.Ruangan" />
-
     </fragment>
 
     <fragment
@@ -81,4 +63,19 @@
         android:name="com.machina.siband.admin.view.AdminListLaporanRuanganFragment"
         android:label="fragment_admin_list_laporan_ruangan"
         tools:layout="@layout/fragment_admin_list_laporan_ruangan" />
+    <fragment
+        android:id="@+id/adminListAreaRuanganFragment"
+        android:name="com.machina.siband.admin.view.AdminListAreaRuanganFragment"
+        android:label="List Letak Ruangan"
+        tools:layout="@layout/fragment_admin_list_area_ruangan" >
+        <action
+            android:id="@+id/action_adminListLetakRuanganFragment_to_adminTambahAreaRuanganFragment"
+            app:destination="@id/adminTambahAreaRuanganFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminTambahAreaRuanganFragment"
+        android:name="com.machina.siband.admin.view.AdminTambahAreaRuanganFragment"
+        android:label="Tambah Letak Ruangan"
+        tools:layout="@layout/fragment_admin_tambah_area_ruangan" />
 </navigation>

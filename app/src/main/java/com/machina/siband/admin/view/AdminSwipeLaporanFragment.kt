@@ -58,6 +58,7 @@ class AdminSwipeLaporanFragment: Fragment() {
         }.attach()
 
         viewModel.getListLaporanBase()
+        viewModel.getListAreaRuangan()
     }
 
     private fun onDialogDateSet(calendar: Calendar) {
@@ -184,7 +185,6 @@ class AdminSwipeLaporanFragment: Fragment() {
                         }
                     }
                 }
-
                 Log.d(TAG, "dok ${tempInternal[3]}")
                 Log.d(TAG, "perbaikan ${tempInternal[4]}")
                 data.add(tempInternal.toTypedArray())

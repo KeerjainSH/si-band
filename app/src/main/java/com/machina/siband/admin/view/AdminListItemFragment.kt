@@ -20,7 +20,7 @@ class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
     private var _binding: FragmentAdminListItemBinding? = null
     private val binding get() = _binding!!
 
-    private val args: AdminListItemFragmentArgs by navArgs()
+//    private val args: AdminListItemFragmentArgs by navArgs()
     private val viewModel: AdminViewModel by activityViewModels()
 
     private lateinit var mAdapter: AdminListItemAdapter
@@ -45,26 +45,26 @@ class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
     }
 
     private fun onDeleteItem(itemName: String) {
-        viewModel.deleteItem(args.lantai, args.ruangan, itemName)
+//        viewModel.deleteItem(args.lantai, args.ruangan, itemName)
+    }
+
+    private fun setupRecycler() {
+//        mAdapter = AdminListItemAdapter(this::onDeleteItem)
+
+//        val recycler = binding.fragmentAdminListItemRecycler
+//        val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+//        viewModel.getListItem(args.lantai, args.ruangan)
+//        viewModel.setSelectedRuangan(args.ruangan)
+//
+//        recycler.apply {
+//            adapter = mAdapter
+//            layoutManager = mLayoutManager
+//        }
     }
 
     private fun setupObserver() {
         viewModel.listItem.observe(viewLifecycleOwner) {
             mAdapter.setData(it)
-        }
-    }
-
-    private fun setupRecycler() {
-        mAdapter = AdminListItemAdapter(this::onDeleteItem)
-
-        val recycler = binding.fragmentAdminListItemRecycler
-        val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        viewModel.getListItem(args.lantai, args.ruangan)
-        viewModel.setSelectedRuangan(args.ruangan)
-
-        recycler.apply {
-            adapter = mAdapter
-            layoutManager = mLayoutManager
         }
     }
 
@@ -74,7 +74,7 @@ class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
             return
         }
 
-        viewModel.addItem(args.lantai, args.ruangan, itemName, kelompok)
+//        viewModel.addItem(args.lantai, args.ruangan, itemName, kelompok)
         dialog.dismiss()
     }
 

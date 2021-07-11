@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".admin.view.AdminTambahAreaRuanganFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fragment_admin_tambah_area_ruangan_nama"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Nama"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Warna"
+            style="@style/TextAppearance.AppCompat.Subhead"/>
+        <RadioGroup
+            android:id="@+id/fragment_admin_tambah_area_ruangan_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <RadioButton
+                android:id="@+id/fragment_admin_tambah_area_ruangan_merah"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/area_red"/>
+            <RadioButton
+                android:id="@+id/fragment_admin_tambah_area_ruangan_hijau"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/area_hijau"/>
+            <RadioButton
+                android:id="@+id/fragment_admin_tambah_area_ruangan_kuning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/area_kuning"/>
+            <RadioButton
+                android:id="@+id/fragment_admin_tambah_area_ruangan_biru"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/area_biru"/>
+            <RadioButton
+                android:id="@+id/fragment_admin_tambah_area_ruangan_ungu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/area_ungu"/>
+            <RadioButton
+                android:id="@+id/fragment_admin_tambah_area_ruangan_oren"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/area_oren"/>
+
+        </RadioGroup>
+
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fragment_admin_tambah_area_ruangan_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_gravity="center_horizontal"
+            android:text="tambah"/>
+
+    </LinearLayout>
+</ScrollView>

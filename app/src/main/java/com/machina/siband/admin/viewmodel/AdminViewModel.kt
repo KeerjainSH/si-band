@@ -12,6 +12,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.machina.siband.model.*
 import com.machina.siband.model.Account.Companion.toAccount
+import com.machina.siband.model.AreaRuangan.Companion.toAreaRuangan
 import com.machina.siband.repository.AdminFirestoreRepo
 import com.machina.siband.model.Lantai.Companion.toLantai
 import com.machina.siband.model.LaporanBase.Companion.toLaporanBase
@@ -34,6 +35,9 @@ class AdminViewModel: ViewModel() {
 
     private val _listItem = MutableLiveData<ArrayList<String>>()
     val listItem: LiveData<ArrayList<String>> = _listItem
+
+    private val _listAreaRuangan = MutableLiveData<List<AreaRuangan>>()
+    val listAreaRuangan: LiveData<List<AreaRuangan>> = _listAreaRuangan
 
     private val _listAccount = MutableLiveData<List<Account>>()
     val listAccount: LiveData<List<Account>> = _listAccount
@@ -59,10 +63,10 @@ class AdminViewModel: ViewModel() {
     private var _listLaporanResult = listOf<LaporanRuangan>()
     private var _listLaporanSafe = listOf<LaporanRuangan>()
 
-
     private val _imagesUri = mutableListOf<Uri>()
 
     var currentImageUri: Uri? = null
+    var tempArrayList: ArrayList<String> = arrayListOf()
 
 
     fun getListLaporanByDate(tanggal: String): List<LaporanRuangan> {
@@ -172,7 +176,7 @@ class AdminViewModel: ViewModel() {
     }
 
     fun getListRuangan(lantai: Lantai) {
-        AdminFirestoreRepo.getListRuanganRef(lantai.id)
+        AdminFirestoreRepo.getListRuanganRef(lantai.nama)
             .get()
             .addOnSuccessListener { snapshot ->
                 val temp = snapshot.mapNotNull { it.toRuangan() }
@@ -184,7 +188,7 @@ class AdminViewModel: ViewModel() {
     }
 
     fun getListItem(lantai: Lantai, ruangan: Ruangan) {
-        AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
+        AdminFirestoreRepo.getRuanganRef(lantai.nama, ruangan.nama)
             .get()
             .addOnSuccessListener { snapshot ->
                 val tempArrayList = snapshot.get("listKeluhan")
@@ -203,7 +207,7 @@ class AdminViewModel: ViewModel() {
                 val listRuanganRef = snapshot.mapNotNull { it.toRuangan() }
                 Firebase.firestore.runBatch { batch ->
                     for (item in listRuanganRef) {
-                        val ref = AdminFirestoreRepo.getRuanganRef(lantai.id, item.nama)
+                        val ref = AdminFirestoreRepo.getRuanganRef(lantai.nama, item.nama)
                         batch.delete(ref)
                     }
                 }
@@ -245,7 +249,7 @@ class AdminViewModel: ViewModel() {
     }
 
     fun deleteRuangan(lantai: Lantai, itemName: String) {
-        AdminFirestoreRepo.getRuanganRef(lantai.id, itemName)
+        AdminFirestoreRepo.getRuanganRef(lantai.nama, itemName)
             .delete()
             .addOnSuccessListener {
                 getListRuangan(lantai)
@@ -255,25 +259,34 @@ class AdminViewModel: ViewModel() {
             }
     }
 
-    fun addRuangan(lantai: Lantai, itemName: String) {
-        val newRuangan = Ruangan(arrayListOf(), arrayListOf(), itemName)
-
-        AdminFirestoreRepo.getRuanganRef(lantai.id, itemName)
-            .set(newRuangan)
+    fun addRuangan(lantai: Lantai, itemName: String, area: String, listItem: ArrayList<String>, listKelompok: ArrayList<String>) {
+        AdminFirestoreRepo.getAreaRuanganRef(area)
+            .get()
             .addOnSuccessListener {
-                getListRuangan(lantai)
+                val warna = it.toAreaRuangan()?.warna
+                if (warna.isNullOrBlank()) return@addOnSuccessListener
+
+                val newRuangan = Ruangan(listItem, listKelompok, itemName, area, warna, lantai.nama)
+                AdminFirestoreRepo.getRuanganRef(lantai.nama, itemName)
+                    .set(newRuangan)
+                    .addOnSuccessListener {
+                        getListRuangan(lantai)
+                    }
+                    .addOnFailureListener {
+                        sendCrashlytic("Failed to add Ruangan on admin", it)
+                    }
             }
             .addOnFailureListener {
-                sendCrashlytic("Failed to add Ruangan on admin", it)
+                sendCrashlytic("Failed to retrieve warna from Area Ruangan on admin", it)
             }
     }
 
     fun deleteItem(lantai: Lantai, ruangan: Ruangan, itemName: String) {
-        val deleteIndex = selectedRuangan.listKeluhan.indexOf(itemName)
-        selectedRuangan.listKeluhan.remove(itemName)
+        val deleteIndex = selectedRuangan.listItem.indexOf(itemName)
+        selectedRuangan.listItem.remove(itemName)
         selectedRuangan.listKelompok.removeAt(deleteIndex)
 
-        AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
+        AdminFirestoreRepo.getRuanganRef(lantai.nama, ruangan.nama)
             .set(selectedRuangan)
             .addOnSuccessListener {
                 getListItem(lantai, ruangan)
@@ -284,13 +297,13 @@ class AdminViewModel: ViewModel() {
     }
 
     fun addItem(lantai: Lantai, ruangan: Ruangan, itemName: String, kelompok: String) {
-        val listItem = selectedRuangan.listKeluhan
+        val listItem = selectedRuangan.listItem
         val listKelompok = selectedRuangan.listKelompok
         listItem.add(itemName)
         listKelompok.add(kelompok)
-        val newRuangan = selectedRuangan.copy(listKeluhan = listItem, listKelompok = listKelompok)
+        val newRuangan = selectedRuangan.copy(listItem = listItem, listKelompok = listKelompok)
 
-        AdminFirestoreRepo.getRuanganRef(lantai.id, ruangan.nama)
+        AdminFirestoreRepo.getRuanganRef(lantai.nama, ruangan.nama)
             .set(newRuangan)
             .addOnSuccessListener {
                 setSelectedRuangan(newRuangan)
@@ -330,6 +343,39 @@ class AdminViewModel: ViewModel() {
                     sendCrashlytic("Failed to Put new Dokumentasi Laporan Images", it)
                 }
         }
+    }
+
+    fun getListAreaRuangan() {
+        AdminFirestoreRepo.getListAreaRuanganRef()
+            .get()
+            .addOnSuccessListener { snapshot ->
+                _listAreaRuangan.value = snapshot.mapNotNull { it.toAreaRuangan() }
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to get List Area Ruangan on Admin", it)
+            }
+    }
+
+    fun addAreaRuangan(areaRuangan: AreaRuangan) {
+        AdminFirestoreRepo.getAreaRuanganRef(areaRuangan.nama)
+            .set(areaRuangan)
+            .addOnSuccessListener {
+                getListAreaRuangan()
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to add Area Ruangan", it)
+            }
+    }
+
+    fun deleteAreaRuangan(areaRuangan: AreaRuangan) {
+        AdminFirestoreRepo.getAreaRuanganRef(areaRuangan.nama)
+            .delete()
+            .addOnSuccessListener {
+                getListAreaRuangan()
+            }
+            .addOnFailureListener {
+                sendCrashlytic("Failed to Delete Area Ruangan", it)
+            }
     }
 
     fun getListAccount() {

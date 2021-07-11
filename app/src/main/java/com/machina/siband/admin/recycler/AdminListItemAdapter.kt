@@ -17,9 +17,9 @@ class AdminListItemAdapter(private val listener: (String) -> Unit)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemItem {
-        val layoutInflater = LayoutInflater.from(parent.context)
+        val inflater = LayoutInflater.from(parent.context)
 
-        val binding = ItemLantaiBinding.inflate(layoutInflater, parent, false)
+        val binding = ItemLantaiBinding.inflate(inflater, parent, false)
         return ItemItem(binding)
     }
 

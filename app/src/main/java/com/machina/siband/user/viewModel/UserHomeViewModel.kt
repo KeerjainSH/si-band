@@ -237,7 +237,7 @@ class UserHomeViewModel: ViewModel() {
 
     // this function only called one time in one day, when user open ListLaporan for the first time
     // Generate dummy laporan in appropriate path
-    private fun setListLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String) {
+    private fun setListLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String, laporanExists: List<LaporanRuangan>) {
         val laporanBaseRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
         val laporanBase = LaporanBase(lokasi, email, tanggal,false)
         val listDetailRuanganRef = UserFirestoreRepo.getListDetailRuanganRef(idLantai, lokasi)
@@ -246,13 +246,25 @@ class UserHomeViewModel: ViewModel() {
                 .addOnSuccessListener {
                     listDetailRuanganRef.get()
                             .addOnSuccessListener { docs ->
-                                val arrayKeluhan = docs.get("listKeluhan")!!
+                                val arrayKeluhan = docs.get("listItem")!!
                                 val arrayKelompok = docs.get("listKelompok")!!
                                 if (arrayKeluhan is ArrayList<*> && arrayKelompok is ArrayList<*>) {
                                     val listKeluhan = arrayKeluhan.toList() as List<String>
                                     val listKelompok = arrayKelompok.toList() as List<String>
                                     listKeluhan.forEachIndexed { index, nama ->
-                                        putLaporanRuangan(idLantai, email, tanggal, lokasi, nama, listKelompok[index])
+                                        val flag = laporanExists.find {
+                                            it.nama == nama
+                                        }
+                                        if (flag == null) {
+                                            putLaporanRuangan(
+                                                idLantai,
+                                                email,
+                                                tanggal,
+                                                lokasi,
+                                                nama,
+                                                listKelompok[index]
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -277,7 +289,7 @@ class UserHomeViewModel: ViewModel() {
      * @return nothing.
      */
     private fun putLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String, nama: String, kelompok: String) {
-        val emptyLaporan = LaporanRuangan(nama, nama, getCurrentEmail(), lokasi, tanggal, status = NO_PROGRESS, kelompok = kelompok)
+        val emptyLaporan = LaporanRuangan(nama, nama, getCurrentEmail(), lokasi, tanggal, status = NO_PROGRESS, kelompok = kelompok, lantai = idLantai)
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
                 .set(emptyLaporan)
 
@@ -296,8 +308,10 @@ class UserHomeViewModel: ViewModel() {
         UserFirestoreRepo.getListLaporanRuanganRef(email, tanggal, lokasi)
                 .get()
                 .addOnSuccessListener { coll ->
-                    if (coll.isEmpty) {
-                        setListLaporanRuangan(idLantai, email, tanggal, lokasi)
+//                    12 ini jumlah item yang statis
+                    if (coll.size() < 12) {
+                        val laporanExists = coll.mapNotNull { it.toLaporanRuangan() }
+                        setListLaporanRuangan(idLantai, email, tanggal, lokasi, laporanExists)
                     } else {
                         _listLaporanRuangan.value = coll.mapNotNull { it.toLaporanRuangan() }
                     }
