@@ -27,17 +27,12 @@ class UserDetailRuanganFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         _binding = FragmentUserDetailRuanganBinding.inflate(inflater, container, false)
 
         setupObserver()
         setupRecycler()
 
         binding.fragmentDetailRuanganSubmit.setOnClickListener {
-            /*
-            //    IMPORTANT!!!!
-            //    CHANGE ON PRODUCTION
-            */
             val email =  viewModel.getCurrentEmail()
             val tanggal = viewModel.getCurrentDate()
             val lokasi = args.lokasi

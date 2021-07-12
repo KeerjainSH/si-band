@@ -4,8 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -121,6 +119,7 @@ class UserFormPelaporanFragment : Fragment() {
     }
 
     private fun captureImage() {
+        // Ask Camera use permission to user
         val packageManager = activity?.packageManager ?: return
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_DENIED) {
@@ -131,6 +130,8 @@ class UserFormPelaporanFragment : Fragment() {
             )
             return
         }
+
+        // Create intent to launch camera app
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(packageManager)?.also { component ->
@@ -185,23 +186,13 @@ class UserFormPelaporanFragment : Fragment() {
             removeExistImage()
             viewModel.clearImagesUri()
             binding.fragmentPelaporanDokumentasiIconContainer.visibility = View.GONE
-            Log.d(TAG, "Entering capture image")
             val imageUri = Uri.fromFile(File(currentPhotoPath))
             loadImageLocally(imageUri, mLayoutParams)
-            Log.d(TAG, "image uri [$imageUri]")
             viewModel.addImageToImagesUri(imageUri)
-        }
-
-        if (resultCode != Activity.RESULT_OK) {
-            Log.d(TAG, "Result code not ok")
-        }
-        if (data == null) {
-            Log.d(TAG, "data from intent is null")
         }
     }
 
     lateinit var currentPhotoPath: String
-
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -272,6 +263,29 @@ class UserFormPelaporanFragment : Fragment() {
         super.onDestroy()
         _binding = null
         viewModel.clearImagesUri()
+//        if (!requireActivity().isChangingConfigurations) {
+//            deleteTempFiles(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES))
+//        }
+    }
+
+    private fun deleteTempFiles(externalFilesDir: File?) {
+        if (externalFilesDir == null)
+            return
+
+        try {
+            val files = externalFilesDir.listFiles()
+            for (file in files) {
+                if (file.isDirectory) {
+                    deleteTempFiles(file)
+                } else {
+                    file.delete()
+                }
+            }
+        } catch (exception: FileSystemException) {
+            Log.e(TAG, "An error occured when attempting to delete TempFiles", exception)
+        }
+
+        externalFilesDir.delete()
     }
 
     companion object {

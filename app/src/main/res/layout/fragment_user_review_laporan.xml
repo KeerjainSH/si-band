@@ -63,11 +63,19 @@
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Dokumentasi"
+            android:textColor="@color/black"
+            android:textSize="15sp"/>
+
         <LinearLayout
             android:id="@+id/fragment_user_review_laporan_dokumentasi_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="4dp"
             android:orientation="vertical"
             android:background="@drawable/bg_light_grey_rounded">
 
@@ -114,6 +122,14 @@
                 android:textColor="@color/black"
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Dokumentasi Perbaikan"
+            android:textColor="@color/black"
+            android:textSize="15sp"/>
 
         <LinearLayout
             android:id="@+id/fragment_user_review_laporan_dokumentasi_perbaikan_container"

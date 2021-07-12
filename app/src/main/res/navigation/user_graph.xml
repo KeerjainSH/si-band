@@ -41,7 +41,7 @@
     <fragment
         android:id="@+id/detailRuanganFragment"
         android:name="com.machina.siband.user.view.UserDetailRuanganFragment"
-        android:label="Detail Ruangan"
+        android:label="{lokasi}"
         tools:layout="@layout/fragment_user_detail_ruangan" >
         <argument
             android:name="idLantai"
@@ -49,8 +49,7 @@
             android:defaultValue=" "/>
         <argument
             android:name="lokasi"
-            app:argType="string"
-            android:defaultValue=" "/>
+            app:argType="string"/>
 
         <action
             android:id="@+id/action_detailRuanganFragment_to_userHomeFragment"
