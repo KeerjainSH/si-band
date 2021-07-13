@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.machina.siband.model.*
@@ -24,6 +25,8 @@ import com.machina.siband.user.viewModel.UserHomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AdminViewModel: ViewModel() {
 
@@ -60,13 +63,14 @@ class AdminViewModel: ViewModel() {
     private var _listLaporanDone = MutableLiveData<List<LaporanRuangan>>()
     val listLaporanDone: LiveData<List<LaporanRuangan>> = _listLaporanDone
 
+    private lateinit var _laporanListener: ListenerRegistration
+
     private var _listLaporanResult = listOf<LaporanRuangan>()
     private var _listLaporanSafe = listOf<LaporanRuangan>()
 
     private val _imagesUri = mutableListOf<Uri>()
 
     var currentImageUri: Uri? = null
-    var tempArrayList: ArrayList<String> = arrayListOf()
 
 
     fun getListLaporanByDate(tanggal: String): List<LaporanRuangan> {
@@ -110,7 +114,6 @@ class AdminViewModel: ViewModel() {
                 .get()
                 .addOnSuccessListener { coll ->
                     var temp = coll.mapNotNull { it.toLaporanRuangan() }
-                    temp = temp.filter { it.isChecked }
                     resTemp.addAll(temp)
                     _listLaporanResult = resTemp
 
@@ -323,6 +326,9 @@ class AdminViewModel: ViewModel() {
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
             .set(laporanRuangan)
             .addOnSuccessListener {
+                val newTime = Calendar.getInstance().timeInMillis.toString()
+                UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
+                    .update("lastUpdated", newTime)
                 putNewImage(laporanRuangan, images)
             }
             .addOnFailureListener { exception ->
@@ -417,6 +423,27 @@ class AdminViewModel: ViewModel() {
     fun getUserEmail(): String {
         val currUser = Firebase.auth.currentUser
         return currUser?.email ?: "-"
+    }
+
+    fun setLaporanChangeListener() {
+        _laporanListener = Firebase.firestore.collection("list-laporan")
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    Log.w(TAG, "Failed to listen to LaporanRuangan change", error)
+                    sendCrashlytic("Failed to listen to LaporanRuangan change", error)
+                    return@addSnapshotListener
+                }
+
+                val laporans = mutableListOf<LaporanBase>()
+                if (value != null) {
+                    for (laporan in value) {
+                        laporan.toLaporanBase()?.let {
+                            laporans.add(it)
+                            Log.d(TAG, "Laporan Ruangan $it")
+                        }
+                    }
+                }
+            }
     }
 
     private fun sendCrashlytic(message: String, error: Exception) {

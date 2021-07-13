@@ -25,17 +25,20 @@ import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserFormPelaporanBinding
 import com.machina.siband.model.LaporanBase
 import com.machina.siband.model.LaporanRuangan
+import com.machina.siband.model.Ruangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
 import com.machina.siband.repository.AdminFirestoreRepo
 import com.machina.siband.user.viewModel.UserHomeViewModel
 import java.io.File
 import java.io.IOException
+import java.util.*
 
 
 class UserFormPelaporanFragment : Fragment() {
 
     private var _binding: FragmentUserFormPelaporanBinding? = null
     private val binding get() = _binding!!
+    private var listRuangan = listOf<Ruangan>()
 
     private val viewModel: UserHomeViewModel by activityViewModels()
 
@@ -49,6 +52,7 @@ class UserFormPelaporanFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         val arrayLantai = viewModel.arrayListLantai.value
         val tipeKerusakan = resources.getStringArray(R.array.tipe)
         val arrayItem = resources.getStringArray(R.array.item)
@@ -81,7 +85,7 @@ class UserFormPelaporanFragment : Fragment() {
                 AdminFirestoreRepo.getListRuanganRef(s.toString())
                     .get()
                     .addOnSuccessListener { snapshot ->
-                        val listRuangan = snapshot.mapNotNull { it.toRuangan() }
+                        listRuangan = snapshot.mapNotNull { it.toRuangan() }
                         val arrayRuangan = listRuangan.map { it.nama }
 
                         val ruanganAdapter = ArrayAdapter(requireContext(), R.layout.item_list_dropdown, arrayRuangan)
@@ -235,9 +239,16 @@ class UserFormPelaporanFragment : Fragment() {
         val arrayItem = resources.getStringArray(R.array.item)
         val index = arrayItem.indexOf(item)
         val kelompok = resources.getStringArray(R.array.kelompok)[index]
+        if (lokasi.isEmpty()) {
+            return
+        }
+        val area = listRuangan.find { it.nama == lokasi }?.area
 
-        if (lokasi.isNotEmpty() || item.isNotEmpty() || tipe.isNotEmpty() || kelompok.isNotEmpty()) {
-            val laporanBase = LaporanBase(lokasi, email, tanggal, true)
+
+
+        if (lokasi.isNotEmpty() && item.isNotEmpty() && tipe.isNotEmpty() && kelompok.isNotEmpty() && !area.isNullOrEmpty()) {
+            val newTime = Calendar.getInstance().timeInMillis.toString()
+            val laporanBase = LaporanBase(lokasi, email, tanggal, newTime,true)
             val laporanRuangan = LaporanRuangan(
                 item,
                 item,
@@ -251,6 +262,7 @@ class UserFormPelaporanFragment : Fragment() {
                 0,
                 kelompok,
                 lantai,
+                area,
                 isChecked = true
             )
 

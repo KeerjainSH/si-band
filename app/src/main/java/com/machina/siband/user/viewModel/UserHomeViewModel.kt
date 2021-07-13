@@ -74,15 +74,6 @@ class UserHomeViewModel: ViewModel() {
         attachLantaiListener()
     }
 
-    fun loadMapImage(lantai: Lantai, imageView: ImageView) {
-        val storageRef = FirebaseStorageRepo.getMapImageRef(lantai.nama)
-
-        GlideApp.with(imageView)
-            .load(storageRef)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .into(imageView)
-    }
-
     fun getListLaporanBase(email: String) {
         UserFirestoreRepo.getUserListLaporanRuanganRef(email)
             .get()
@@ -162,8 +153,8 @@ class UserHomeViewModel: ViewModel() {
     fun putFormPelaporan(laporanBase: LaporanBase, laporanRuangan: LaporanRuangan, images: List<Uri>) {
         val baseReference = UserFirestoreRepo.getLaporanBaseRef(laporanBase.email, laporanBase.tanggal, laporanBase.lokasi)
         val laporanReference = UserFirestoreRepo.getLaporanRuanganRef(laporanBase.email, laporanRuangan.tanggal, laporanRuangan.lokasi, laporanRuangan.nama)
-
-        baseReference.set(laporanBase)
+        val newBase = laporanBase.copy(lastUpdated = Calendar.getInstance().timeInMillis.toString())
+        baseReference.set(newBase)
             .addOnSuccessListener {
                 putNewImage(laporanRuangan, images)
                 laporanReference.set(laporanRuangan)
@@ -182,6 +173,9 @@ class UserHomeViewModel: ViewModel() {
         UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
             .set(laporanRuangan)
             .addOnSuccessListener {
+                val newTime = Calendar.getInstance().timeInMillis.toString()
+                UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
+                    .update("lastUpdated", newTime)
                 putNewImage(laporanRuangan, images)
             }
             .addOnFailureListener { exception ->
@@ -231,15 +225,15 @@ class UserHomeViewModel: ViewModel() {
      * @param lokasi
      */
     fun putLaporanLantai(email: String, tanggal: String, lokasi: String) {
-        val baseLaporanRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
-        baseLaporanRef.update("isSubmitted", true)
+        UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
+            .update("isSubmitted", true)
     }
 
     // this function only called one time in one day, when user open ListLaporan for the first time
     // Generate dummy laporan in appropriate path
     private fun setListLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String, laporanExists: List<LaporanRuangan>) {
         val laporanBaseRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
-        val laporanBase = LaporanBase(lokasi, email, tanggal,false)
+        val laporanBase = LaporanBase(lokasi, email, tanggal, Calendar.getInstance().timeInMillis.toString(),false)
         val listDetailRuanganRef = UserFirestoreRepo.getListDetailRuanganRef(idLantai, lokasi)
 
         laporanBaseRef.set(laporanBase)
@@ -248,6 +242,7 @@ class UserHomeViewModel: ViewModel() {
                             .addOnSuccessListener { docs ->
                                 val arrayKeluhan = docs.get("listItem")!!
                                 val arrayKelompok = docs.get("listKelompok")!!
+                                val area = docs.getString("area")!!
                                 if (arrayKeluhan is ArrayList<*> && arrayKelompok is ArrayList<*>) {
                                     val listKeluhan = arrayKeluhan.toList() as List<String>
                                     val listKelompok = arrayKelompok.toList() as List<String>
@@ -256,14 +251,18 @@ class UserHomeViewModel: ViewModel() {
                                             it.nama == nama
                                         }
                                         if (flag == null) {
-                                            putLaporanRuangan(
-                                                idLantai,
-                                                email,
-                                                tanggal,
-                                                lokasi,
+                                            val laporan =  LaporanRuangan(
                                                 nama,
-                                                listKelompok[index]
+                                                nama,
+                                                getCurrentEmail(),
+                                                lokasi,
+                                                tanggal,
+                                                status = NO_PROGRESS,
+                                                kelompok = listKelompok[index],
+                                                lantai = idLantai,
+                                                area = area
                                             )
+                                            putLaporanRuangan(laporan)
                                         }
                                     }
                                 }
@@ -288,12 +287,11 @@ class UserHomeViewModel: ViewModel() {
      * @param nama item name.
      * @return nothing.
      */
-    private fun putLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String, nama: String, kelompok: String) {
-        val emptyLaporan = LaporanRuangan(nama, nama, getCurrentEmail(), lokasi, tanggal, status = NO_PROGRESS, kelompok = kelompok, lantai = idLantai)
-        UserFirestoreRepo.getLaporanRuanganRef(email, tanggal, lokasi, nama)
-                .set(emptyLaporan)
+    private fun putLaporanRuangan(laporan: LaporanRuangan) {
+        UserFirestoreRepo.getLaporanRuanganRef(laporan.email, laporan.tanggal, laporan.lokasi, laporan.nama)
+                .set(laporan)
 
-        getListLaporanRuangan(idLantai, email, tanggal, lokasi)
+        getListLaporanRuangan(laporan.lantai, laporan.email, laporan.tanggal, laporan.lokasi)
     }
 
     fun clearLaporanRuangan() {
@@ -309,7 +307,7 @@ class UserHomeViewModel: ViewModel() {
                 .get()
                 .addOnSuccessListener { coll ->
 //                    12 ini jumlah item yang statis
-                    if (coll.size() < 12) {
+                    if (coll.size() < 15) {
                         val laporanExists = coll.mapNotNull { it.toLaporanRuangan() }
                         setListLaporanRuangan(idLantai, email, tanggal, lokasi, laporanExists)
                     } else {

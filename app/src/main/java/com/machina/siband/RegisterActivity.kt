@@ -60,12 +60,16 @@ class RegisterActivity : AppCompatActivity() {
                     .addOnSuccessListener {
                         when (account.tipeAkun) {
                             "Admin" -> {
-                                val intent = Intent(this, AdminActivity::class.java)
-                                startActivityForResult(intent, 200)
+//                                val intent = Intent(this, AdminActivity::class.java)
+//                                startActivityForResult(intent, 200)
+                                setResult(501)
+                                finish()
                             }
                             "User" -> {
-                                val intent = Intent(this, UserActivity::class.java)
-                                startActivityForResult(intent, 200)
+//                                val intent = Intent(this, UserActivity::class.java)
+//                                startActivityForResult(intent, 200)
+                                setResult(502)
+                                finish()
                             }
                             else -> {
                                 Toast.makeText(this, "Unknown error occured please try again later", Toast.LENGTH_LONG).show()
@@ -77,7 +81,6 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == 200 && resultCode == 1000) {
             setResult(101)
             finish()

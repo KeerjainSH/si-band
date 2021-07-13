@@ -13,8 +13,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.machina.siband.R
 import com.machina.siband.databinding.FragmentUserHomeBinding
+import com.machina.siband.module.GlideApp
+import com.machina.siband.repository.FirebaseStorageRepo
 import com.machina.siband.user.recycler.ListRuanganAdapter
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
@@ -48,11 +51,6 @@ class UserHomeFragment : Fragment(), AdapterView.OnItemSelectedListener {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-    }
-
     private fun setupRecycler() {
         val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         mAdapter = ListRuanganAdapter(this::onItemRuanganClicked)
@@ -67,7 +65,11 @@ class UserHomeFragment : Fragment(), AdapterView.OnItemSelectedListener {
         // Listening to selectedLantai, update adapter dataset when selectedLantai changed
         viewModel.selectedLantai.observe(viewLifecycleOwner, {
             viewModel.updateLantaiListOnHome(it)
-            viewModel.loadMapImage(it, binding.fragmentUserHomeMap)
+            val storageRef = FirebaseStorageRepo.getMapImageRef(it.nama)
+            GlideApp.with(requireContext())
+                .load(storageRef)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(binding.fragmentUserHomeMap)
         })
 
         viewModel.listRuangan.observe(viewLifecycleOwner, {

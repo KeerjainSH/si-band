@@ -98,8 +98,16 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "result code [$resultCode]")
-        if (requestCode == 200 && resultCode == 0) {
-            finish()
+        if (requestCode == 200) {
+            if (resultCode == 0) {
+                finish()
+            } else if (resultCode == 501) {
+                val intent = Intent(this, AdminActivity::class.java)
+                startActivityForResult(intent, 200)
+            } else if (resultCode == 502) {
+                val intent = Intent(this, UserActivity::class.java)
+                startActivityForResult(intent, 200)
+            }
         } else {
             binding.mainEmail.editText?.setText("")
             binding.mainPassword.editText?.setText("")

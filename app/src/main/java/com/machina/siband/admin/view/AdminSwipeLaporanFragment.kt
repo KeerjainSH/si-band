@@ -1,6 +1,5 @@
 package com.machina.siband.admin.view
 
-import android.icu.text.UnicodeSet
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -15,6 +14,7 @@ import com.machina.siband.admin.dialog.DialogDatePicker
 import com.machina.siband.admin.recycler.AdminSwipeViewAdapter
 import com.machina.siband.admin.viewmodel.AdminViewModel
 import com.machina.siband.databinding.FragmentAdminSwipeLaporanBinding
+import com.machina.siband.model.LaporanRuangan
 import com.machina.siband.repository.FirebaseStorageRepo
 import com.opencsv.CSVWriter
 import java.io.File
@@ -57,6 +57,8 @@ class AdminSwipeLaporanFragment: Fragment() {
             tab.text = tabTitleList[position]
         }.attach()
 
+        viewModel.getListLantai()
+        viewModel.getListAreaRuangan()
         viewModel.getListLaporanBase()
         viewModel.getListAreaRuangan()
     }
@@ -67,93 +69,159 @@ class AdminSwipeLaporanFragment: Fragment() {
     }
 
     private fun createCsvFile(tanggal: String) {
+        val urutArea = listOf("A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "O.", "P.", "Q.", "R.", "S.", "T.", "U.", "V.", "W.", "X.", "Y.", "Z.",)
         val filteredLaporan = viewModel.getListLaporanByDate(tanggal)
-        val listNamaRuangan = viewModel.getListNamaRuangan()
+        val listLantai = viewModel.listLantai.value
+        val listArea = viewModel.listAreaRuangan.value
+        val listItem = resources.getStringArray(R.array.item)
         val csv = File(context?.getExternalFilesDir(null), "${tanggal}.csv") // Here csv file name is MyCsvFile.csv
         Log.d(TAG, "csv [${csv.absolutePath}] nama [${csv.name}]")
 
-        if (filteredLaporan.isEmpty() || listNamaRuangan.isNullOrEmpty()) {
+        if (filteredLaporan.isEmpty()) {
             Toast.makeText(requireContext(), "Tidak ada laporan pada $tanggal", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val safeLaporan = filteredLaporan.filter { it.tipe.isEmpty() }
+        if (listLantai.isNullOrEmpty() && listArea.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "An error occured please try again in a moment", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Group laporan by its lantai then area ruangan then the ruangan itself
+        val allLaporanByLantai = mutableListOf<MutableList<MutableList<LaporanRuangan>>>()
+
+        var laporanByArea = mutableListOf<MutableList<LaporanRuangan>>()
+        var mutableTempLaporan: MutableList<LaporanRuangan>
+        var temp: MutableList<LaporanRuangan>
+        for (lantai in listLantai!!) {
+            mutableTempLaporan = filteredLaporan.filter {
+                it.lantai == lantai.nama
+            }.toMutableList()
+            for (area in listArea!!) {
+                temp = mutableListOf()
+                for (laporan in mutableTempLaporan) {
+                    if (laporan.area == area.nama) {
+                        temp.add(laporan)
+                    }
+                }
+                laporanByArea.add(temp)
+            }
+            allLaporanByLantai.add(laporanByArea)
+            laporanByArea = mutableListOf(mutableListOf())
+        }
+
+        for (lantai in allLaporanByLantai) {
+            for (laporanArea in lantai) {
+                for (laporan in laporanArea) {
+                    Log.d(TAG, "lantai [${laporan.lantai}] area [${laporan.area}] ruangan [${laporan.lokasi}] item [${laporan.nama}]")
+                }
+            }
+        }
         val brokenLaporan = filteredLaporan.filter { it.tipe.isNotBlank() }
-
-        val laporanStruktur = safeLaporan.filter { it.kelompok == "Struktur" }
-        val laporanArsitektur = safeLaporan.filter { it.kelompok == "Arsitektur" }
-        val laporanMekanikal = safeLaporan.filter { it.kelompok == "Mekanikal" }
-
-        val namaLaporanStruktur = mutableSetOf<String>()
-        for (item in laporanStruktur) namaLaporanStruktur.add(item.nama)
-        val namaLaporanArsitektur = mutableSetOf<String>()
-        for (item in laporanArsitektur) namaLaporanArsitektur.add(item.nama)
-        val namaLaporanMekanikal = mutableSetOf<String>()
-        for (item in laporanMekanikal) namaLaporanMekanikal.add(item.nama)
 
         try {
             val writer = CSVWriter(FileWriter(csv))
             val data: MutableList<Array<String>> = ArrayList()
-            var pos: Int
-            var temp = mutableListOf("No.", "Fasilitas")
-            temp.addAll(listNamaRuangan)
-            data.add(temp.toTypedArray())
-            data.add(arrayOf("1.", "STRUKTUR"))
-            for (nama in namaLaporanStruktur) {
-                temp = MutableList(listNamaRuangan.size + 2) { "" }
-                temp.add(1, nama)
-                for (item in laporanStruktur) {
-                    if (nama == item.nama) {
-                        pos = listNamaRuangan.indexOf(item.lokasi)
-                        if (pos != -1) {
-                            temp[pos + 2] = "x"
+            var counterArea = 0
+            var counterRuangan = 1
+            var flagLantai = 1
+            var flagArea = 1
+            var flagRuangan = 1
+            var tempString: String
+            var currentRuangan = ""
+            for (lantai in allLaporanByLantai) {
+                var laporanMutable = MutableList(19) { "" }
+                for (laporanArea in lantai) {
+                    laporanArea.forEachIndexed { index, laporan ->
+                        if (flagRuangan == 1) {
+                            currentRuangan = laporan.lokasi
                         }
-                    }
-                }
-                data.add(temp.toTypedArray())
-            }
+                        tempString = laporan.lokasi
 
-            data.add(arrayOf("2.", "ARSITEKTUR"))
-            for (nama in namaLaporanArsitektur) {
-                temp = MutableList(listNamaRuangan.size + 2) { "" }
-                temp.add(1, nama)
-                for (item in laporanArsitektur) {
-                    if (nama == item.nama) {
-                        pos = listNamaRuangan.indexOf(item.lokasi)
-                        if (pos != -1) {
-                            temp[pos + 2] = "x"
+                        if (tempString != currentRuangan) {
+                            flagRuangan = 1
+                            currentRuangan = laporan.lokasi
+                            counterRuangan++
+                            Log.d(TAG, "write ruangan ke csv ${laporanMutable}")
+                            data.add(laporanMutable.toTypedArray())
+                            laporanMutable = MutableList(19) { "" }
                         }
-                    }
-                }
-                data.add(temp.toTypedArray())
-            }
 
-            data.add(arrayOf("3.", "MEKANIKAL"))
-            for (nama in namaLaporanMekanikal) {
-                temp = MutableList(listNamaRuangan.size + 2) { "" }
-                temp.add(1, nama)
-                for (item in laporanMekanikal) {
-                    if (nama == item.nama) {
-                        pos = listNamaRuangan.indexOf(item.lokasi)
-                        if (pos != -1) {
-                            temp[pos + 2] = "x"
+                        var tempMutable = MutableList(19) { "" }
+
+                        if (flagLantai == 1) {
+                            flagLantai = 0
+                            data.add(arrayOf(""))
+                            data.add(arrayOf(""))
+                            data.add(arrayOf("${laporan.lantai}"))
+                            tempMutable[2] = "FASILITAS"
+                            data.add(tempMutable.toTypedArray())
+                            tempMutable = MutableList(19) { "" }
+                            tempMutable[0] = "NO."
+                            tempMutable[1] = "RUANGAN"
+                            tempMutable[2] = "Struktur"
+                            tempMutable[6] = "Arsitektur"
+                            tempMutable[12] = "Mekanikal (Sanitasi)"
+                            data.add(tempMutable.toTypedArray())
+                            tempMutable = MutableList(19) { "" }
+                            listItem.forEachIndexed { index, s ->
+                                tempMutable[index + 2] = s
+                            }
+                            data.add(tempMutable.toTypedArray())
                         }
+
+                        if (flagArea == 1) {
+                            flagArea = 0
+                            tempMutable = MutableList(19) { "" }
+                            tempMutable[0] = urutArea[counterArea]
+                            tempMutable[1] = laporan.area
+                            data.add(tempMutable.toTypedArray())
+                            counterArea++
+                        }
+
+                        if (flagRuangan == 1) {
+                            Log.d(TAG, "${laporan.area} ${laporan.lokasi}")
+                            flagRuangan = 0
+                            laporanMutable[0] = "$counterRuangan."
+                            laporanMutable[1] = laporan.lokasi
+                        }
+
+                        if (laporan.tipe.isEmpty()) {
+                            val index = listItem.indexOf(laporan.nama) + 2
+                            laporanMutable[index] = "x"
+                        } else {
+                            Log.d(TAG, "ruangan ${laporan.lokasi} item ${laporan.nama} rusak")
+                        }
+                        Log.d(TAG, "$laporanMutable")
+//                        Log.d(TAG, "lantai [${laporan.lantai}] area [${laporan.area}] ruangan [${laporan.lokasi}] item [${laporan.nama}]")
                     }
+                    if (flagRuangan == 0) {
+                        flagRuangan = 1
+                        counterRuangan++
+                        Log.d(TAG, "write ruangan ke csv ${laporanMutable}")
+                        data.add(laporanMutable.toTypedArray())
+                        laporanMutable = MutableList(19) { "" }
+                    }
+                    flagArea = 1
+                    counterRuangan = 1
                 }
-                data.add(temp.toTypedArray())
+                counterArea = 0
+                flagLantai = 1
             }
 
             data.add(arrayOf(""))
             data.add(arrayOf(""))
             data.add(arrayOf("Kerusakan: "))
-            data.add(arrayOf("No.", "Lokasi", "Tipe Kerusakan", "Dokumentasi Kerusakan Sebelum Perbaikan", "Dokumentasi Seletah Perbaikan", "Keterangan"))
+            data.add(arrayOf("No.", "Lokasi", "Tipe Kerusakan", "Kelompok", "Item/Fasilitas", "Dokumentasi Sebelum Perbaikan", "Dokumentasi Seletah Perbaikan", "Keterangan"))
 
             brokenLaporan.forEachIndexed { index, item ->
                 val tempInternal = MutableList(8) { "" }
                 tempInternal[0] = "${index + 1}"
                 tempInternal[1] = item.lokasi
                 tempInternal[2] = item.tipe
-                tempInternal[5] = item.keterangan
+                tempInternal[3] = item.kelompok
+                tempInternal[4] = item.nama
+                tempInternal[7] = item.keterangan
                 val dok = item.dokumentasi
                 val dokPerbaikan = item.dokumentasiPerbaikan
 
@@ -167,7 +235,7 @@ class AdminSwipeLaporanFragment: Fragment() {
                         }
                         if (ref.isSuccessful) {
                             dokText = "$dokText \n${ref.result}"
-                            tempInternal[3] = dokText
+                            tempInternal[5] = dokText
                         }
                     }
                 }
@@ -181,7 +249,7 @@ class AdminSwipeLaporanFragment: Fragment() {
                         }
                         if (ref.isSuccessful) {
                             dokText = "$dokText \n${ref.result}"
-                            tempInternal[4] = dokText
+                            tempInternal[6] = dokText
                         }
                     }
                 }
@@ -190,7 +258,6 @@ class AdminSwipeLaporanFragment: Fragment() {
                 data.add(tempInternal.toTypedArray())
             }
 
-//            data.add(temp.toTypedArray())
             writer.writeAll(data) // data is adding to csv
             writer.close()
             Toast.makeText(requireContext(), "Rekap Laporan Berhasil Dibuat\n${csv.absolutePath}", Toast.LENGTH_LONG).show()
