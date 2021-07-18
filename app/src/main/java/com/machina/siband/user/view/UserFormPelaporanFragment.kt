@@ -246,29 +246,39 @@ class UserFormPelaporanFragment : Fragment() {
 
 
 
-        if (lokasi.isNotEmpty() && item.isNotEmpty() && tipe.isNotEmpty() && kelompok.isNotEmpty() && !area.isNullOrEmpty()) {
-            val newTime = Calendar.getInstance().timeInMillis.toString()
-            val laporanBase = LaporanBase(lokasi, email, tanggal, newTime,true)
-            val laporanRuangan = LaporanRuangan(
-                item,
-                item,
-                email,
-                lokasi,
-                tanggal,
-                tipe,
-                dokumentasi.size,
-                keterangan,
-                status,
-                0,
-                kelompok,
-                lantai,
-                area,
-                isChecked = true
-            )
 
-            viewModel.putFormPelaporan(laporanBase, laporanRuangan, dokumentasi)
+        if (lokasi.isNotEmpty() && item.isNotEmpty() && tipe.isNotEmpty() && kelompok.isNotEmpty() && !area.isNullOrEmpty()) {
+            AdminFirestoreRepo.getRuanganRef(lantai, lokasi)
+                .get()
+                .addOnSuccessListener {
+                    Log.d(TAG, it.toString())
+                    val indexRuangan = it.toRuangan()?.index
+                    val newTime = Calendar.getInstance().timeInMillis.toString()
+
+                    if (indexRuangan != null) {
+                        val laporanBase = LaporanBase(lokasi, email, tanggal, newTime, indexRuangan, true)
+                        val laporanRuangan = LaporanRuangan(
+                            item,
+                            item,
+                            email,
+                            lokasi,
+                            tanggal,
+                            tipe,
+                            dokumentasi.size,
+                            keterangan,
+                            status,
+                            0,
+                            kelompok,
+                            lantai,
+                            area,
+                            indexRuangan,
+                            isChecked = true
+                        )
+                        viewModel.putFormPelaporan(laporanBase, laporanRuangan, dokumentasi)
+                        findNavController().navigateUp()
+                    }
+                }
         }
-        findNavController().navigateUp()
     }
 
     override fun onDestroy() {

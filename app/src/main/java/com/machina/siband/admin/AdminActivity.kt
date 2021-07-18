@@ -125,8 +125,8 @@ class AdminActivity: AppCompatActivity() {
     }
 
     private fun logOut() {
-        Firebase.auth.signOut()
         setResult(1000)
+        Firebase.auth.signOut()
         finish()
     }
 

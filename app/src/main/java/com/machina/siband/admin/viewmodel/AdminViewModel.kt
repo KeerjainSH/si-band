@@ -72,6 +72,9 @@ class AdminViewModel: ViewModel() {
 
     var currentImageUri: Uri? = null
 
+    var errorFlag = MutableLiveData(false)
+    var errorMessage: String? = ""
+
 
     fun getListLaporanByDate(tanggal: String): List<LaporanRuangan> {
         val listLaporan = _listLaporanResult
@@ -262,21 +265,68 @@ class AdminViewModel: ViewModel() {
             }
     }
 
+     fun isOnlyLetterOrDigit(string: String): Boolean {
+        val length = string.length - 1
+        for (i in 0..length) {
+            if (string[i] == ' ' || string[i] == '&' || string[i] == '.') {
+                continue
+            }
+            if (!string[i].isLetterOrDigit()) {
+                return false
+            }
+        }
+        return true
+    }
+
     fun addRuangan(lantai: Lantai, itemName: String, area: String, listItem: ArrayList<String>, listKelompok: ArrayList<String>) {
+        if (itemName == ".") {
+            errorMessage = "Field Name tidak boleh hanya '.'"
+            errorFlag.value = true
+            return
+        }
+        if (itemName == "..") {
+            errorMessage = "Field Nama tidak boleh hanya '..'"
+            errorFlag.value = true
+            return
+        }
+        if (itemName.find { it == '/' } != null) {
+            errorMessage = "Field Nama tidak boleh menggunakan '/'"
+            errorFlag.value = true
+            return
+        }
+        if (!isOnlyLetterOrDigit(itemName)) {
+            errorMessage = "Field Nama hanya boleh menggunakan symbol spesifik, alphabet, dan angka"
+            errorFlag.value = true
+            return
+        }
+
+
         AdminFirestoreRepo.getAreaRuanganRef(area)
             .get()
             .addOnSuccessListener {
                 val warna = it.toAreaRuangan()?.warna
                 if (warna.isNullOrBlank()) return@addOnSuccessListener
-
-                val newRuangan = Ruangan(listItem, listKelompok, itemName, area, warna, lantai.nama)
-                AdminFirestoreRepo.getRuanganRef(lantai.nama, itemName)
-                    .set(newRuangan)
-                    .addOnSuccessListener {
-                        getListRuangan(lantai)
-                    }
-                    .addOnFailureListener {
-                        sendCrashlytic("Failed to add Ruangan on admin", it)
+                AdminFirestoreRepo.getLantaiRef(lantai.nama)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val tempLantai = snapshot.toLantai()
+                        if (tempLantai != null) {
+                            val index = tempLantai.lastRuanganIndex
+                            val newRuangan = Ruangan(listItem, listKelompok, itemName, area, warna, lantai.nama, index + 1)
+                            AdminFirestoreRepo.getRuanganRef(lantai.nama, itemName)
+                                .set(newRuangan)
+                                .addOnSuccessListener {
+                                    getListRuangan(lantai)
+                                    AdminFirestoreRepo.getLantaiRef(lantai.nama)
+                                        .update("lastRuanganIndex", index + 1)
+                                        .addOnFailureListener { e ->
+                                            sendCrashlytic("Failed to update last index", e)
+                                        }
+                                }
+                                .addOnFailureListener { e ->
+                                    sendCrashlytic("Failed to add Ruangan on admin", e)
+                                }
+                        }
                     }
             }
             .addOnFailureListener {

@@ -21,6 +21,7 @@ import com.machina.siband.model.LaporanRuangan.Companion.toLaporanRuangan
 import com.machina.siband.model.Ruangan
 import com.machina.siband.model.Ruangan.Companion.toRuangan
 import com.machina.siband.module.GlideApp
+import com.machina.siband.repository.AdminFirestoreRepo
 import com.machina.siband.repository.FirebaseStorageRepo
 import com.machina.siband.repository.UserFirestoreRepo
 import kotlinx.coroutines.*
@@ -232,49 +233,55 @@ class UserHomeViewModel: ViewModel() {
     // this function only called one time in one day, when user open ListLaporan for the first time
     // Generate dummy laporan in appropriate path
     private fun setListLaporanRuangan(idLantai: String, email: String, tanggal: String, lokasi: String, laporanExists: List<LaporanRuangan>) {
-        val laporanBaseRef = UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
-        val laporanBase = LaporanBase(lokasi, email, tanggal, Calendar.getInstance().timeInMillis.toString(),false)
-        val listDetailRuanganRef = UserFirestoreRepo.getListDetailRuanganRef(idLantai, lokasi)
-
-        laporanBaseRef.set(laporanBase)
-                .addOnSuccessListener {
-                    listDetailRuanganRef.get()
-                            .addOnSuccessListener { docs ->
-                                val arrayKeluhan = docs.get("listItem")!!
-                                val arrayKelompok = docs.get("listKelompok")!!
-                                val area = docs.getString("area")!!
-                                if (arrayKeluhan is ArrayList<*> && arrayKelompok is ArrayList<*>) {
-                                    val listKeluhan = arrayKeluhan.toList() as List<String>
-                                    val listKelompok = arrayKelompok.toList() as List<String>
-                                    listKeluhan.forEachIndexed { index, nama ->
-                                        val flag = laporanExists.find {
-                                            it.nama == nama
-                                        }
-                                        if (flag == null) {
-                                            val laporan =  LaporanRuangan(
-                                                nama,
-                                                nama,
-                                                getCurrentEmail(),
-                                                lokasi,
-                                                tanggal,
-                                                status = NO_PROGRESS,
-                                                kelompok = listKelompok[index],
-                                                lantai = idLantai,
-                                                area = area
-                                            )
-                                            putLaporanRuangan(laporan)
+        AdminFirestoreRepo.getRuanganRef(idLantai, lokasi)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val indexRuangan = snapshot.toRuangan()?.index
+                if (indexRuangan != null) {
+                    val laporanBase = LaporanBase(lokasi, email, tanggal, Calendar.getInstance().timeInMillis.toString(), indexRuangan,false)
+                    UserFirestoreRepo.getLaporanBaseRef(email, tanggal, lokasi)
+                        .set(laporanBase)
+                        .addOnSuccessListener {
+                            UserFirestoreRepo.getListDetailRuanganRef(idLantai, lokasi)
+                                .get()
+                                .addOnSuccessListener { docs ->
+                                    val arrayKeluhan = docs.get("listItem")!!
+                                    val arrayKelompok = docs.get("listKelompok")!!
+                                    val area = docs.getString("area")!!
+                                    if (arrayKeluhan is ArrayList<*> && arrayKelompok is ArrayList<*>) {
+                                        val listKeluhan = arrayKeluhan.toList() as List<String>
+                                        val listKelompok = arrayKelompok.toList() as List<String>
+                                        listKeluhan.forEachIndexed { index, nama ->
+                                            val flag = laporanExists.find {
+                                                it.nama == nama
+                                            }
+                                            if (flag == null) {
+                                                val laporan =  LaporanRuangan(
+                                                    nama,
+                                                    nama,
+                                                    getCurrentEmail(),
+                                                    lokasi,
+                                                    tanggal,
+                                                    status = NO_PROGRESS,
+                                                    kelompok = listKelompok[index],
+                                                    lantai = idLantai,
+                                                    area = area,
+                                                    index = indexRuangan
+                                                )
+                                                putLaporanRuangan(laporan)
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            .addOnFailureListener {
-                                sendCrashlytics("Failed to put LaporanRuangan", it)
-                            }
+                                .addOnFailureListener {
+                                    sendCrashlytics("Failed to put LaporanRuangan", it)
+                                }
+                        }
+                        .addOnFailureListener {
+                            sendCrashlytics("Failed to put LaporanBase", it)
+                        }
                 }
-                .addOnFailureListener {
-                    sendCrashlytics("Failed to put LaporanBase", it)
-                }
-
+            }
     }
 
     /**

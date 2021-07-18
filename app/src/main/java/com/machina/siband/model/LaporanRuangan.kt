@@ -21,6 +21,7 @@ data class LaporanRuangan(
         val kelompok: String,
         val lantai: String,
         val area: String,
+        val index: Long,
         @field:JvmField
         val isChecked: Boolean = false): Parcelable {
 
@@ -42,8 +43,9 @@ data class LaporanRuangan(
                 val lantai = getString("lantai")!!
                 val area = getString("area")!!
                 val isChecked = getBoolean("isChecked")!!
+                val index = getLong("index")!!
                 Log.d(TAG, "Converted to LaporanRuangan nama [$nama] lokasi [$lokasi]")
-                LaporanRuangan(id, nama, email, lokasi, tanggal, tipe, dokumentasi.toInt(), keterangan, status, dokumentasiPerbaikan.toInt(), kelompok, lantai, area, isChecked)
+                LaporanRuangan(id, nama, email, lokasi, tanggal, tipe, dokumentasi.toInt(), keterangan, status, dokumentasiPerbaikan.toInt(), kelompok, lantai, area, index, isChecked)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting to LaporanRuangan", e)
                 FirebaseCrashlytics.getInstance().log("Error converting to LaporanRuangan")

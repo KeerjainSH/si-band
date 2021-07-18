@@ -1,11 +1,14 @@
 package com.machina.siband.admin.view
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
@@ -47,7 +50,7 @@ class AdminListRuanganFragment : Fragment(), DialogAddRuangan.DialogAddItemListe
             if (listAreaRuangan != null) {
                 for (areaRuangan in listAreaRuangan) {
                     temp.add(areaRuangan.nama)
-                    Log.d(TAG, "nama [${areaRuangan.nama}")
+                    Log.d(TAG, "nama [${areaRuangan.nama}]")
                 }
             }
 
@@ -58,13 +61,21 @@ class AdminListRuanganFragment : Fragment(), DialogAddRuangan.DialogAddItemListe
                 "Tambah Ruangan",
                 arrayListAreaRuangan
             )
-            dialog.show(parentFragmentManager, "AddRuanganDialog")
+            dialog.show(parentFragmentManager, ADD_RUANGAN)
         }
     }
 
     private fun setupObserver() {
         viewModel.listRuangan.observe(viewLifecycleOwner) {
             mAdapter.setData(it)
+        }
+
+        viewModel.errorFlag.observe(viewLifecycleOwner) {
+            if (it == true) {
+                viewModel.errorFlag.value = false
+                val message = viewModel.errorMessage
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -83,7 +94,19 @@ class AdminListRuanganFragment : Fragment(), DialogAddRuangan.DialogAddItemListe
     }
 
     private fun onItemDelete(ruangan: Ruangan) {
-        viewModel.deleteRuangan(args.lantai, ruangan.nama)
+        val title = "Yakin ingin menghapus ${ruangan.nama}?"
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setPositiveButton("Hapus") { dialog, which ->
+                viewModel.deleteRuangan(args.lantai, ruangan.nama)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batalkan") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        dialog.create().show()
+
     }
 
     override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String, area: String) {
@@ -108,5 +131,7 @@ class AdminListRuanganFragment : Fragment(), DialogAddRuangan.DialogAddItemListe
 
     companion object {
         private const val TAG = "AdminListRuangan"
+        const val ADD_RUANGAN = "AddRuanganDialog"
+        const val DELETE_RUANGAN = "DeleteRuanganDialog"
     }
 }

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -74,7 +75,18 @@ class AdminListLantaiFragment : Fragment() {
     }
 
     private fun onItemDelete(lantai: Lantai) {
-        viewModel.deleteLantai(lantai)
+        val title = "Yakin ingin menghapus ${lantai.nama}?"
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setPositiveButton("Hapus") { dialog, which ->
+                viewModel.deleteLantai(lantai)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batalkan") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        dialog.create().show()
     }
 
     override fun onDestroy() {
@@ -83,19 +95,6 @@ class AdminListLantaiFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AdminListLantai.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AdminListLantaiFragment().apply {
 
-            }
     }
 }

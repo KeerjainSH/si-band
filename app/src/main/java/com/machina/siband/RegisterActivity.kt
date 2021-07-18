@@ -27,6 +27,7 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupArrayAdapter()
+        setResult(20)
 
         binding.registerButton.setOnClickListener {
             validateRegister()

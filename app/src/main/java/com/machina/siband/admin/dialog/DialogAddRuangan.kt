@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.machina.siband.R
@@ -22,7 +23,7 @@ class DialogAddRuangan(private val dialogAddItemListener: DialogAddItemListener,
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return activity?.let {
+        return activity?.let { it ->
             // Use the Builder class for convenient dialog construction
             val builder = AlertDialog.Builder(it)
             val binding = DialogAddItemBinding.inflate(layoutInflater)
@@ -34,11 +35,13 @@ class DialogAddRuangan(private val dialogAddItemListener: DialogAddItemListener,
                 .setPositiveButton("Add") { _, _ ->
                     val itemName = binding.dialogAddItemNama.editText?.text.toString()
                     val area = binding.dialogAddItemKelompok.editText?.text.toString()
-                    if (itemName.isNotEmpty() || area.isNotBlank()) {
-                        listener.onDialogPositiveClick(this, itemName, area)
-                    } else {
-                        listener.onDialogNegativeClick(this)
+
+                    if (itemName.isBlank() || area.isBlank()) {
+                        Toast.makeText(requireContext(), "Fields cannot be empty", Toast.LENGTH_LONG).show()
+                        return@setPositiveButton
                     }
+
+                    listener.onDialogPositiveClick(this, itemName, area)
                 }
                 .setNegativeButton("Cancel") { _, _ ->
                     listener.onDialogNegativeClick(this)

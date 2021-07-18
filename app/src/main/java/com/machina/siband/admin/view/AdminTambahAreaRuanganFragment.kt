@@ -39,8 +39,15 @@ class AdminTambahAreaRuanganFragment : Fragment() {
         val nama = binding.fragmentAdminTambahAreaRuanganNama.editText?.text.toString()
         var warna = ""
 
+
+        if (!viewModel.isOnlyLetterOrDigit(nama)) {
+            val message = "Nama Lantai hanya boleh menggunakan alphabet dan angka"
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            return
+        }
+
         if (id == View.NO_ID || nama.isBlank()) {
-            Toast.makeText(requireContext(), "Nama dan Warna cannot be empty", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Nama dan Warna tidak boleh kosong", Toast.LENGTH_LONG).show()
             return
         }
 

@@ -78,8 +78,14 @@ class AdminAddLantaiFragment : Fragment() {
 
     private fun onSubmit() {
         val nama = binding.fragmentAdminAddLantaiNama.editText?.text.toString()
-        val newLantai = Lantai(nama)
+        val newLantai = Lantai(nama, 0)
         val imageUri = viewModel.currentImageUri
+
+        if (!viewModel.isOnlyLetterOrDigit(nama)) {
+            val message = "Nama Lantai hanya boleh menggunakan alphabet dan angka"
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            return
+        }
 
         if (nama.isNotEmpty() && imageUri != null) {
             viewModel.addLantai(newLantai, imageUri)

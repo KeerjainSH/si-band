@@ -12,6 +12,7 @@ data class LaporanBase(
         val email: String,
         val tanggal: String,
         val lastUpdated: String,
+        val indexRuangan: Long,
         @field:JvmField
         val isSubmitted: Boolean) : Parcelable {
 
@@ -25,8 +26,9 @@ data class LaporanBase(
                 val tanggal = getString("tanggal")!!
                 val lastUpdated = getString("lastUpdated")!!
                 val isSubmitted = getBoolean("isSubmitted")!!
+                val indexRuangan = getLong("indexRuangan")!!
                 Log.d(TAG, "Converted to LaporanBase")
-                LaporanBase(lokasi, email, tanggal, lastUpdated, isSubmitted)
+                LaporanBase(lokasi, email, tanggal, lastUpdated, indexRuangan, isSubmitted)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting snapshot to LaporanBase", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")

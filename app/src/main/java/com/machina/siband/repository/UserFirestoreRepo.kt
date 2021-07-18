@@ -75,11 +75,12 @@ object UserFirestoreRepo {
                 .collection(COL_LANTAI)
     }
 
-    fun getListRuanganRef(namaLantai: String): CollectionReference {
+    fun getListRuanganRef(namaLantai: String): Query {
         return Firebase.firestore
             .collection(COL_LANTAI)
             .document(namaLantai)
             .collection("col-ruangan")
+            .orderBy("index")
     }
 
     fun getListDetailRuanganRef(idLantai: String, namaRuangan: String): DocumentReference {

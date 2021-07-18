@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -63,7 +64,18 @@ class AdminListAreaRuanganFragment : Fragment() {
     }
 
     private fun onDeleteAreaRuangan(areaRuangan: AreaRuangan) {
-        viewModel.deleteAreaRuangan(areaRuangan)
+        val title = "Yakin ingin menghapus ${areaRuangan.nama}?"
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setPositiveButton("Hapus") { dialog, which ->
+                viewModel.deleteAreaRuangan(areaRuangan)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batalkan") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        dialog.create().show()
     }
 
     override fun onDestroy() {

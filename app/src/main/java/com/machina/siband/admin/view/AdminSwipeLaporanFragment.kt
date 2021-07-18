@@ -87,6 +87,10 @@ class AdminSwipeLaporanFragment: Fragment() {
             return
         }
 
+        val newLaporanList = filteredLaporan.sortedBy {
+            it.index
+        }
+
         // Group laporan by its lantai then area ruangan then the ruangan itself
         val allLaporanByLantai = mutableListOf<MutableList<MutableList<LaporanRuangan>>>()
 
@@ -94,7 +98,7 @@ class AdminSwipeLaporanFragment: Fragment() {
         var mutableTempLaporan: MutableList<LaporanRuangan>
         var temp: MutableList<LaporanRuangan>
         for (lantai in listLantai!!) {
-            mutableTempLaporan = filteredLaporan.filter {
+            mutableTempLaporan = newLaporanList.filter {
                 it.lantai == lantai.nama
             }.toMutableList()
             for (area in listArea!!) {
@@ -113,12 +117,12 @@ class AdminSwipeLaporanFragment: Fragment() {
         for (lantai in allLaporanByLantai) {
             for (laporanArea in lantai) {
                 for (laporan in laporanArea) {
-                    Log.d(TAG, "lantai [${laporan.lantai}] area [${laporan.area}] ruangan [${laporan.lokasi}] item [${laporan.nama}]")
+                    Log.d(TAG, "index [${laporan.index}] lantai [${laporan.lantai}] area [${laporan.area}] ruangan [${laporan.lokasi}] nama [${laporan.nama}]")
                 }
             }
         }
         val brokenLaporan = filteredLaporan.filter { it.tipe.isNotBlank() }
-
+//        return
         try {
             val writer = CSVWriter(FileWriter(csv))
             val data: MutableList<Array<String>> = ArrayList()
@@ -187,8 +191,8 @@ class AdminSwipeLaporanFragment: Fragment() {
                         }
 
                         if (laporan.tipe.isEmpty()) {
-                            val index = listItem.indexOf(laporan.nama) + 2
-                            laporanMutable[index] = "x"
+                            val supp = listItem.indexOf(laporan.nama) + 2
+                            laporanMutable[supp] = "B"
                         } else {
                             Log.d(TAG, "ruangan ${laporan.lokasi} item ${laporan.nama} rusak")
                         }

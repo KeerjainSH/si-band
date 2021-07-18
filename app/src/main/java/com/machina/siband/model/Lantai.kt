@@ -9,7 +9,8 @@ import java.lang.Exception
 
 @Parcelize
 data class Lantai(
-    val nama: String
+    val nama: String,
+    val lastRuanganIndex: Long
 ) : Parcelable {
 
     companion object {
@@ -18,7 +19,8 @@ data class Lantai(
         fun DocumentSnapshot.toLantai(): Lantai? {
             return try {
                 val nama = getString("nama")!!
-                Lantai(nama)
+                val lastRuanganIndex = getLong("lastRuanganIndex")!!
+                Lantai(nama, lastRuanganIndex)
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting lantai data", e)
                 FirebaseCrashlytics.getInstance().log("Error converting user profile")

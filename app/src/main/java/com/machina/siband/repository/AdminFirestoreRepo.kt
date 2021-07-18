@@ -19,11 +19,12 @@ object AdminFirestoreRepo {
             .document(nama)
     }
 
-    fun getListRuanganRef(id: String): CollectionReference {
+    fun getListRuanganRef(id: String): Query {
         return Firebase.firestore
             .collection("list-lantai")
             .document(id)
             .collection("col-ruangan")
+            .orderBy("index")
     }
 
     fun getRuanganRef(id: String, lokasi: String): DocumentReference {
