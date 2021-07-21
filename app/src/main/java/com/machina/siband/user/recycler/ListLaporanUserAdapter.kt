@@ -6,50 +6,51 @@ import androidx.recyclerview.widget.RecyclerView
 import com.machina.siband.databinding.ItemComplaintBinding
 import com.machina.siband.model.LaporanRuangan
 
-class ListLaporanUserAdapter(private val listener: (LaporanRuangan) -> Unit): RecyclerView.Adapter<ComplaintVh>() {
+class ListLaporanUserAdapter(private val listener: (LaporanRuangan) -> Unit) :
+  RecyclerView.Adapter<ComplaintVh>() {
 
-    private var dataSet = listOf<LaporanRuangan>()
+  private var dataSet = listOf<LaporanRuangan>()
 
-    fun setData(newData: List<LaporanRuangan>) {
-        dataSet = newData
-        notifyDataSetChanged()
-    }
+  fun setData(newData: List<LaporanRuangan>) {
+    dataSet = newData
+    notifyDataSetChanged()
+  }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComplaintVh {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemComplaintBinding.inflate(
-                layoutInflater,
-                parent,
-                false)
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComplaintVh {
+    val layoutInflater = LayoutInflater.from(parent.context)
+    val binding = ItemComplaintBinding.inflate(
+      layoutInflater,
+      parent,
+      false
+    )
 
-        return ComplaintVh(binding)
-    }
+    return ComplaintVh(binding)
+  }
 
-    override fun onBindViewHolder(holder: ComplaintVh, position: Int) {
-        holder.onBind(dataSet[position], listener)
-    }
+  override fun onBindViewHolder(holder: ComplaintVh, position: Int) {
+    holder.onBind(dataSet[position], listener)
+  }
 
-    override fun getItemCount(): Int {
-        return dataSet.size
-    }
+  override fun getItemCount(): Int {
+    return dataSet.size
+  }
 }
 
 
+class ComplaintVh(binding: ItemComplaintBinding) : RecyclerView.ViewHolder(binding.root) {
 
-class ComplaintVh(binding: ItemComplaintBinding): RecyclerView.ViewHolder(binding.root) {
+  private val container = binding.itemComplaintContainer
+  private val tanggalTv = binding.itemComplaintTanggal
+  private val lokasiTv = binding.itemComplaintLokasi
+  private val itemTv = binding.itemComplaintName
+  private val statusTv = binding.itemComplaintStatus
 
-    private val container = binding.itemComplaintContainer
-    private val tanggalTv = binding.itemComplaintTanggal
-    private val lokasiTv = binding.itemComplaintLokasi
-    private val itemTv = binding.itemComplaintName
-    private val statusTv = binding.itemComplaintStatus
+  fun onBind(data: LaporanRuangan, listener: (LaporanRuangan) -> Unit) {
+    lokasiTv.text = data.lokasi
+    tanggalTv.text = data.tanggal
+    itemTv.text = data.nama
+    statusTv.text = data.status
 
-    fun onBind(data: LaporanRuangan, listener: (LaporanRuangan) -> Unit) {
-        lokasiTv.text = data.lokasi
-        tanggalTv.text = data.tanggal
-        itemTv.text = data.nama
-        statusTv.text = data.status
-
-        container.setOnClickListener { listener(data) }
-    }
+    container.setOnClickListener { listener(data) }
+  }
 }

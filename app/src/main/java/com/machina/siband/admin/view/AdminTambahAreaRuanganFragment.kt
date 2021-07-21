@@ -16,56 +16,57 @@ import com.machina.siband.model.AreaRuangan
 
 class AdminTambahAreaRuanganFragment : Fragment() {
 
-    private var _binding: FragmentAdminTambahAreaRuanganBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentAdminTambahAreaRuanganBinding? = null
+  private val binding get() = _binding!!
 
-    private val viewModel: AdminViewModel by activityViewModels()
+  private val viewModel: AdminViewModel by activityViewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentAdminTambahAreaRuanganBinding.inflate(inflater, container, false)
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    _binding = FragmentAdminTambahAreaRuanganBinding.inflate(inflater, container, false)
 
-        binding.fragmentAdminTambahAreaRuanganButton.setOnClickListener {
-            onTambahArea()
-        }
-
-        return binding.root
+    binding.fragmentAdminTambahAreaRuanganButton.setOnClickListener {
+      onTambahArea()
     }
 
-    private fun onTambahArea() {
-        val id = binding.fragmentAdminTambahAreaRuanganRadio.checkedRadioButtonId
-        val nama = binding.fragmentAdminTambahAreaRuanganNama.editText?.text.toString()
-        var warna = ""
+    return binding.root
+  }
+
+  private fun onTambahArea() {
+    val id = binding.fragmentAdminTambahAreaRuanganRadio.checkedRadioButtonId
+    val nama = binding.fragmentAdminTambahAreaRuanganNama.editText?.text.toString()
+    var warna = ""
 
 
-        if (!viewModel.isOnlyLetterOrDigit(nama)) {
-            val message = "Nama Lantai hanya boleh menggunakan alphabet dan angka"
-            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-            return
-        }
-
-        if (id == View.NO_ID || nama.isBlank()) {
-            Toast.makeText(requireContext(), "Nama dan Warna tidak boleh kosong", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        when (id) {
-            binding.fragmentAdminTambahAreaRuanganMerah.id -> warna = "#ff99a5"
-            binding.fragmentAdminTambahAreaRuanganHijau.id -> warna = "#99ffb4"
-            binding.fragmentAdminTambahAreaRuanganKuning.id -> warna = "#fff599"
-            binding.fragmentAdminTambahAreaRuanganBiru.id -> warna = "#99fff3"
-            binding.fragmentAdminTambahAreaRuanganUngu.id -> warna = "#e6a8ff"
-            binding.fragmentAdminTambahAreaRuanganOren.id -> warna = "#ffc1a8"
-        }
-
-        val areaRuangan = AreaRuangan(nama, warna)
-        viewModel.addAreaRuangan(areaRuangan)
-        findNavController().navigateUp()
+    if (!viewModel.isOnlyLetterOrDigit(nama)) {
+      val message = "Nama Lantai hanya boleh menggunakan alphabet dan angka"
+      Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+      return
     }
 
-    companion object {
-        private const val TAG = "AdminTambahAreaRuangan"
+    if (id == View.NO_ID || nama.isBlank()) {
+      Toast.makeText(requireContext(), "Nama dan Warna tidak boleh kosong", Toast.LENGTH_LONG)
+        .show()
+      return
     }
+
+    when (id) {
+      binding.fragmentAdminTambahAreaRuanganMerah.id -> warna = "#ff99a5"
+      binding.fragmentAdminTambahAreaRuanganHijau.id -> warna = "#99ffb4"
+      binding.fragmentAdminTambahAreaRuanganKuning.id -> warna = "#fff599"
+      binding.fragmentAdminTambahAreaRuanganBiru.id -> warna = "#99fff3"
+      binding.fragmentAdminTambahAreaRuanganUngu.id -> warna = "#e6a8ff"
+      binding.fragmentAdminTambahAreaRuanganOren.id -> warna = "#ffc1a8"
+    }
+
+    val areaRuangan = AreaRuangan(nama, warna)
+    viewModel.addAreaRuangan(areaRuangan)
+    findNavController().navigateUp()
+  }
+
+  companion object {
+    private const val TAG = "AdminTambahAreaRuangan"
+  }
 }

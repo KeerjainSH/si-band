@@ -21,61 +21,62 @@ import com.machina.siband.user.viewModel.UserHomeViewModel
  */
 class UserLaporanFragment(private val position: Int) : Fragment() {
 
-    private var _binding: FragmentUserLaporanBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentUserLaporanBinding? = null
+  private val binding get() = _binding!!
 
-    private val viewModel: UserHomeViewModel by activityViewModels()
+  private val viewModel: UserHomeViewModel by activityViewModels()
 
-    private lateinit var mAdapter: ListLaporanUserAdapter
+  private lateinit var mAdapter: ListLaporanUserAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        _binding = FragmentUserLaporanBinding.inflate(layoutInflater, container, false)
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    // Inflate the layout for this fragment
+    _binding = FragmentUserLaporanBinding.inflate(layoutInflater, container, false)
 
-        setupRecycler()
-        setupObserver()
+    setupRecycler()
+    setupObserver()
 
-        return binding.root
+    return binding.root
+  }
+
+  private fun setupObserver() {
+    when (position) {
+      0 -> {
+        viewModel.listLaporanNoProgressYet.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+      }
+      1 -> {
+        viewModel.listLaporanOnProgress.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+      }
+      2 -> {
+        viewModel.listLaporanDone.observe(viewLifecycleOwner, { mAdapter.setData(it) })
+      }
     }
+  }
 
-    private fun setupObserver() {
-        when (position) {
-            0 -> {
-                viewModel.listLaporanNoProgressYet.observe(viewLifecycleOwner, { mAdapter.setData(it) })
-            }
-            1 -> {
-                viewModel.listLaporanOnProgress.observe(viewLifecycleOwner, { mAdapter.setData(it) })
-            }
-            2 -> {
-                viewModel.listLaporanDone.observe(viewLifecycleOwner, { mAdapter.setData(it) })
-            }
-        }
+  private fun setupRecycler() {
+    mAdapter = ListLaporanUserAdapter(this::onItemLaporanClick)
+    val recyclerView = binding.fragmentUserLaporanRecycler
+    val mLinearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+    recyclerView.apply {
+      adapter = mAdapter
+      layoutManager = mLinearLayoutManager
     }
+  }
 
-    private fun setupRecycler() {
-        mAdapter = ListLaporanUserAdapter(this::onItemLaporanClick)
-        val recyclerView = binding.fragmentUserLaporanRecycler
-        val mLinearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        recyclerView.apply {
-            adapter = mAdapter
-            layoutManager = mLinearLayoutManager
-        }
-    }
+  private fun onItemLaporanClick(data: LaporanRuangan) {
+    val action =
+      UserSwipeLaporanFragmentDirections.actionSwipeLaporanFragmentToUserReviewLaporanFragment(data)
+    findNavController().navigate(action)
+  }
 
-    private fun onItemLaporanClick(data: LaporanRuangan) {
-        val action = UserSwipeLaporanFragmentDirections.actionSwipeLaporanFragmentToUserReviewLaporanFragment(data)
-        findNavController().navigate(action)
-    }
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
+  }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
-    companion object {
-        private const val TAG = "UserLaporanFragment"
-    }
+  companion object {
+    private const val TAG = "UserLaporanFragment"
+  }
 }

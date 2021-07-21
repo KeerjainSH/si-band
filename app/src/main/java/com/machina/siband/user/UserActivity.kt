@@ -17,87 +17,91 @@ import com.machina.siband.R
 import com.machina.siband.databinding.ActivityUserBinding
 import com.machina.siband.user.view.UserHomeFragmentDirections
 
-class UserActivity: AppCompatActivity() {
+class UserActivity : AppCompatActivity() {
 
-    private var _binding: ActivityUserBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: ActivityUserBinding? = null
+  private val binding get() = _binding!!
 
-    private lateinit var navController: NavController
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var drawerLayout: DrawerLayout
-    private lateinit var navigationView: NavigationView
+  private lateinit var navController: NavController
+  private lateinit var appBarConfiguration: AppBarConfiguration
+  private lateinit var drawerLayout: DrawerLayout
+  private lateinit var navigationView: NavigationView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initiateView()
-        initiateDrawerLayout()
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    initiateView()
+    initiateDrawerLayout()
+  }
 
-    private fun initiateView() {
-        _binding = ActivityUserBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+  private fun initiateView() {
+    _binding = ActivityUserBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.activity_user_nav_host) as NavHostFragment
-        navController = navHostFragment.navController
-        drawerLayout = binding.activityUserDrawerLayout
-        navigationView = binding.activityUserDrawer
-    }
+    val navHostFragment =
+      supportFragmentManager.findFragmentById(R.id.activity_user_nav_host) as NavHostFragment
+    navController = navHostFragment.navController
+    drawerLayout = binding.activityUserDrawerLayout
+    navigationView = binding.activityUserDrawer
+  }
 
-    private fun initiateDrawerLayout() {
-        // Create set for Top-Level destination in DrawerLayout
-        val topLevelDestinations: Set<Int> = setOf(R.id.userHomeFragment, R.id.swipeLaporanFragment, R.id.formPelaporanFragment)
-        appBarConfiguration = AppBarConfiguration
-                .Builder(topLevelDestinations)
-                .setOpenableLayout(drawerLayout)
-                .build()
+  private fun initiateDrawerLayout() {
+    // Create set for Top-Level destination in DrawerLayout
+    val topLevelDestinations: Set<Int> =
+      setOf(R.id.userHomeFragment, R.id.swipeLaporanFragment, R.id.formPelaporanFragment)
+    appBarConfiguration = AppBarConfiguration
+      .Builder(topLevelDestinations)
+      .setOpenableLayout(drawerLayout)
+      .build()
 
-        // Bind action bar to change based on destination that opened
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+    // Bind action bar to change based on destination that opened
+    NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
-        // Set listener to NavigationView item
-        navigationView.setCheckedItem(R.id.userHomeFragment)
-        navigationView.setNavigationItemSelectedListener { dest ->
-            when (dest.itemId) {
-                R.id.userLogoutOption -> { logOut() }
-                else -> {
-                    NavigationUI.onNavDestinationSelected(dest, navController)
-                    myCloseDrawer()
-                }
-            }
-            true
+    // Set listener to NavigationView item
+    navigationView.setCheckedItem(R.id.userHomeFragment)
+    navigationView.setNavigationItemSelectedListener { dest ->
+      when (dest.itemId) {
+        R.id.userLogoutOption -> {
+          logOut()
         }
-    }
-
-    private fun logOut() {
-        Firebase.auth.signOut()
-        setResult(1000)
-        finish()
-    }
-
-    private fun myCloseDrawer() {
-        drawerLayout.closeDrawer(GravityCompat.START)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        // This navController enable drawer layout for multiple top level destinations
-        return navController.navigateUp(appBarConfiguration) ||
-                super.onSupportNavigateUp()
-    }
-
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-            val dest = navController.currentDestination
-            if (dest != null) {
-                Log.d(TAG, "id: ${dest.id} | label: ${dest.label} | navName: ${dest.navigatorName}")
-                navigationView.setCheckedItem(dest.id)
-            }
+        else -> {
+          NavigationUI.onNavDestinationSelected(dest, navController)
+          myCloseDrawer()
         }
+      }
+      true
     }
+  }
 
-    companion object {
-        private const val TAG = "UserActivity"
+  private fun logOut() {
+    Firebase.auth.signOut()
+    setResult(1000)
+    finish()
+  }
+
+  private fun myCloseDrawer() {
+    drawerLayout.closeDrawer(GravityCompat.START)
+  }
+
+  override fun onSupportNavigateUp(): Boolean {
+    // This navController enable drawer layout for multiple top level destinations
+    return navController.navigateUp(appBarConfiguration) ||
+      super.onSupportNavigateUp()
+  }
+
+  override fun onBackPressed() {
+    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+      drawerLayout.closeDrawer(GravityCompat.START)
+    } else {
+      super.onBackPressed()
+      val dest = navController.currentDestination
+      if (dest != null) {
+        Log.d(TAG, "id: ${dest.id} | label: ${dest.label} | navName: ${dest.navigatorName}")
+        navigationView.setCheckedItem(dest.id)
+      }
     }
+  }
+
+  companion object {
+    private const val TAG = "UserActivity"
+  }
 }

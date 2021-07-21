@@ -17,38 +17,38 @@ import com.machina.siband.databinding.FragmentAdminListItemBinding
 
 class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
 
-    private var _binding: FragmentAdminListItemBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentAdminListItemBinding? = null
+  private val binding get() = _binding!!
 
-//    private val args: AdminListItemFragmentArgs by navArgs()
-    private val viewModel: AdminViewModel by activityViewModels()
+  //    private val args: AdminListItemFragmentArgs by navArgs()
+  private val viewModel: AdminViewModel by activityViewModels()
 
-    private lateinit var mAdapter: AdminListItemAdapter
+  private lateinit var mAdapter: AdminListItemAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentAdminListItemBinding.inflate(layoutInflater)
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    _binding = FragmentAdminListItemBinding.inflate(layoutInflater)
 
-        setupRecycler()
-        setupObserver()
+    setupRecycler()
+    setupObserver()
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    binding.fragmentAdminListItemFab.setOnClickListener {
+      val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Item", "item")
+      dialog.show(parentFragmentManager, "AddItemDialog")
     }
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.fragmentAdminListItemFab.setOnClickListener {
-            val dialog = DialogAddItem(this as DialogAddItem.DialogAddItemListener, "Tambah Item", "item")
-            dialog.show(parentFragmentManager, "AddItemDialog")
-        }
-    }
-
-    private fun onDeleteItem(itemName: String) {
+  private fun onDeleteItem(itemName: String) {
 //        viewModel.deleteItem(args.lantai, args.ruangan, itemName)
-    }
+  }
 
-    private fun setupRecycler() {
+  private fun setupRecycler() {
 //        mAdapter = AdminListItemAdapter(this::onDeleteItem)
 
 //        val recycler = binding.fragmentAdminListItemRecycler
@@ -60,49 +60,49 @@ class AdminListItemFragment : Fragment(), DialogAddItem.DialogAddItemListener {
 //            adapter = mAdapter
 //            layoutManager = mLayoutManager
 //        }
-    }
+  }
 
-    private fun setupObserver() {
-        viewModel.listItem.observe(viewLifecycleOwner) {
-            mAdapter.setData(it)
-        }
+  private fun setupObserver() {
+    viewModel.listItem.observe(viewLifecycleOwner) {
+      mAdapter.setData(it)
     }
+  }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String, kelompok: String) {
-        if (kelompok.isEmpty()) {
-            dialog.dismiss()
-            return
-        }
+  override fun onDialogPositiveClick(dialog: DialogFragment, itemName: String, kelompok: String) {
+    if (kelompok.isEmpty()) {
+      dialog.dismiss()
+      return
+    }
 
 //        viewModel.addItem(args.lantai, args.ruangan, itemName, kelompok)
-        dialog.dismiss()
-    }
+    dialog.dismiss()
+  }
 
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
-        dialog.dismiss()
-    }
+  override fun onDialogNegativeClick(dialog: DialogFragment) {
+    dialog.dismiss()
+  }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-        viewModel.clearListItem()
-    }
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
+    viewModel.clearListItem()
+  }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AdminListItemFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AdminListItemFragment().apply {
+  companion object {
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment AdminListItemFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    @JvmStatic
+    fun newInstance(param1: String, param2: String) =
+      AdminListItemFragment().apply {
 
-            }
-    }
+      }
+  }
 
 }
