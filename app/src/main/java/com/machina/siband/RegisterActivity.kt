@@ -55,32 +55,40 @@ class RegisterActivity : AppCompatActivity() {
     val auth = Firebase.auth
 
     auth.createUserWithEmailAndPassword(account.email, account.password)
-      .addOnCompleteListener {
-        AdminFirestoreRepo.getAccountRef(account.email)
-          .set(account)
-          .addOnSuccessListener {
-            when (account.tipeAkun) {
-              "Admin" -> {
+      .addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+          AdminFirestoreRepo.getAccountRef(account.email)
+            .set(account)
+            .addOnSuccessListener {
+              when (account.tipeAkun) {
+                "Admin" -> {
 //                                val intent = Intent(this, AdminActivity::class.java)
 //                                startActivityForResult(intent, 200)
-                setResult(501)
-                finish()
-              }
-              "User" -> {
+                  setResult(501)
+                  finish()
+                }
+                "User" -> {
 //                                val intent = Intent(this, UserActivity::class.java)
 //                                startActivityForResult(intent, 200)
-                setResult(502)
-                finish()
-              }
-              else -> {
-                Toast.makeText(
-                  this,
-                  "Unknown error occured please try again later",
-                  Toast.LENGTH_LONG
-                ).show()
+                  setResult(502)
+                  finish()
+                }
+                else -> {
+                  Toast.makeText(
+                    this,
+                    "Unknown error occured please try again later",
+                    Toast.LENGTH_LONG
+                  ).show()
+                }
               }
             }
-          }
+        } else {
+          Toast.makeText(
+            this,
+            "${task.exception}",
+            Toast.LENGTH_LONG
+          ).show()
+        }
       }
   }
 
