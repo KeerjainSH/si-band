@@ -17,77 +17,81 @@ import com.machina.siband.user.viewModel.UserHomeViewModel
 
 class UserDetailRuanganFragment : Fragment() {
 
-    private var _binding: FragmentUserDetailRuanganBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentUserDetailRuanganBinding? = null
+  private val binding get() = _binding!!
 
-    private val args: UserDetailRuanganFragmentArgs by navArgs()
-    private val viewModel: UserHomeViewModel by activityViewModels()
+  private val args: UserDetailRuanganFragmentArgs by navArgs()
+  private val viewModel: UserHomeViewModel by activityViewModels()
 
-    private lateinit var mAdapter: ListLaporanRuanganAdapter
+  private lateinit var mAdapter: ListLaporanRuanganAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        _binding = FragmentUserDetailRuanganBinding.inflate(inflater, container, false)
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    _binding = FragmentUserDetailRuanganBinding.inflate(inflater, container, false)
 
-        setupObserver()
-        setupRecycler()
+    setupObserver()
+    setupRecycler()
 
-        binding.fragmentDetailRuanganSubmit.setOnClickListener {
-            val email =  viewModel.getCurrentEmail()
-            val tanggal = viewModel.getCurrentDate()
-            val lokasi = args.lokasi
+    binding.fragmentDetailRuanganSubmit.setOnClickListener {
+      val email = viewModel.getCurrentEmail()
+      val tanggal = viewModel.getCurrentDate()
+      val lokasi = args.lokasi
 
-            viewModel.putLaporanLantai(email, tanggal, lokasi)
-            findNavController().navigateUp()
-        }
-
-        return binding.root
+      viewModel.putLaporanLantai(email, tanggal, lokasi)
+      findNavController().navigateUp()
     }
 
-    private fun onItemLaporanClicked(data: LaporanRuangan) {
-        val action = UserDetailRuanganFragmentDirections
-            .actionDetailRuanganFragmentToLaporanFragment(data)
+    viewModel.getPenggunaData()
 
-        findNavController().navigate(action)
+    return binding.root
+  }
+
+  private fun onItemLaporanClicked(data: LaporanRuangan) {
+    val action = UserDetailRuanganFragmentDirections
+      .actionDetailRuanganFragmentToLaporanFragment(data)
+
+    findNavController().navigate(action)
+  }
+
+  private fun onCheckBoxClicked(data: LaporanRuangan) {
+    viewModel.putLaporanRuanganOnCheck(data, args.idLantai)
+  }
+
+  // SetUp observer for liveData in this fragment
+  private fun setupObserver() {
+    viewModel.listLaporanRuangan.observe(viewLifecycleOwner, {
+      mAdapter.setData(it)
+    })
+  }
+
+
+  private fun setupRecycler() {
+    val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+    mAdapter = ListLaporanRuanganAdapter(this::onItemLaporanClicked, this::onCheckBoxClicked)
+
+    binding.fragmentDetailRuanganRecycler.apply {
+      adapter = mAdapter
+      layoutManager = mLayoutManager
     }
 
-    private fun onCheckBoxClicked(data: LaporanRuangan) {
-        viewModel.putLaporanRuanganOnCheck(data, args.idLantai)
-    }
+    // On Production change this param into dynamic
+    val idLantai = args.idLantai
+    val email = viewModel.getCurrentEmail()
+    val tanggal = viewModel.getCurrentDate()
+    val lokasi = args.lokasi
 
-    // SetUp observer for liveData in this fragment
-    private fun setupObserver() {
-        viewModel.listLaporanRuangan.observe(viewLifecycleOwner, {
-            mAdapter.setData(it)
-        })
-    }
+    viewModel.getListLaporanRuangan(idLantai, email, tanggal, lokasi)
+  }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    viewModel.clearLaporanRuangan()
+    _binding = null
+  }
 
-    private fun setupRecycler() {
-        val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        mAdapter = ListLaporanRuanganAdapter(this::onItemLaporanClicked, this::onCheckBoxClicked)
-
-        binding.fragmentDetailRuanganRecycler.apply {
-            adapter = mAdapter
-            layoutManager = mLayoutManager
-        }
-
-        // On Production change this param into dynamic
-        val idLantai = args.idLantai
-        val email = viewModel.getCurrentEmail()
-        val tanggal = viewModel.getCurrentDate()
-        val lokasi = args.lokasi
-
-        viewModel.getListLaporanRuangan(idLantai, email, tanggal, lokasi)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.clearLaporanRuangan()
-        _binding = null
-    }
-
-    companion object {
-        private const val TAG = "DetailRuanganFragment"
-    }
+  companion object {
+    private const val TAG = "DetailRuanganFragment"
+  }
 }

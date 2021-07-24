@@ -8,58 +8,58 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 
 object AdminFirestoreRepo {
-    fun getListLantaiRef(): CollectionReference {
-        return Firebase.firestore
-            .collection("list-lantai")
-    }
+  fun getListLantaiRef(): CollectionReference {
+    return Firebase.firestore
+      .collection("list-lantai")
+  }
 
-    fun getLantaiRef(nama: String): DocumentReference {
-        return Firebase.firestore
-            .collection("list-lantai")
-            .document(nama)
-    }
+  fun getLantaiRef(nama: String): DocumentReference {
+    return Firebase.firestore
+      .collection("list-lantai")
+      .document(nama)
+  }
 
-    fun getListRuanganRef(id: String): Query {
-        return Firebase.firestore
-            .collection("list-lantai")
-            .document(id)
-            .collection("col-ruangan")
-            .orderBy("index")
-    }
+  fun getListRuanganRef(id: String): Query {
+    return Firebase.firestore
+      .collection("list-lantai")
+      .document(id)
+      .collection("col-ruangan")
+      .orderBy("index")
+  }
 
-    fun getRuanganRef(id: String, lokasi: String): DocumentReference {
-        return Firebase.firestore
-            .collection("list-lantai")
-            .document(id)
-            .collection("col-ruangan")
-            .document(lokasi)
-    }
+  fun getRuanganRef(id: String, lokasi: String): DocumentReference {
+    return Firebase.firestore
+      .collection("list-lantai")
+      .document(id)
+      .collection("col-ruangan")
+      .document(lokasi)
+  }
 
-    fun getListLaporanBaseRef(): Query {
-        return Firebase.firestore
-            .collection("list-laporan")
-            .whereEqualTo("isSubmitted", true)
-    }
+  fun getListLaporanBaseRef(): Query {
+    return Firebase.firestore
+      .collection("list-laporan")
+      .whereEqualTo("isSubmitted", true)
+  }
 
-    fun getAccountRef(email: String): DocumentReference {
-        return Firebase.firestore
-            .collection("user-info")
-            .document(email)
-    }
+  fun getAccountRef(email: String): DocumentReference {
+    return Firebase.firestore
+      .collection("user-info")
+      .document(email)
+  }
 
-    fun getListAccountRef(): CollectionReference {
-        return Firebase.firestore
-            .collection("user-info")
-    }
+  fun getListAccountRef(): CollectionReference {
+    return Firebase.firestore
+      .collection("user-info")
+  }
 
-    fun getListAreaRuanganRef(): CollectionReference {
-        return Firebase.firestore
-            .collection("list-letak-ruangan")
-    }
+  fun getListAreaRuanganRef(): CollectionReference {
+    return Firebase.firestore
+      .collection("list-letak-ruangan")
+  }
 
-    fun getAreaRuanganRef(nama: String): DocumentReference {
-        return Firebase.firestore
-            .collection("list-letak-ruangan")
-            .document(nama)
-    }
+  fun getAreaRuanganRef(nama: String): DocumentReference {
+    return Firebase.firestore
+      .collection("list-letak-ruangan")
+      .document(nama)
+  }
 }

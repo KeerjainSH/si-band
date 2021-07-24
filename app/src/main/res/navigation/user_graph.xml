@@ -1,107 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/user_graph"
-    app:startDestination="@id/userHomeFragment">
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/user_graph"
+  app:startDestination="@id/userHomeFragment">
 
-    <fragment
-        android:id="@+id/userHomeFragment"
-        android:name="com.machina.siband.user.view.UserHomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_user_home" >
-        <argument
-            android:name="idLantai"
-            app:argType="string"
-            android:defaultValue=" "/>
-        <argument
-            android:name="namaRuangan"
-            app:argType="string"
-            android:defaultValue=" "/>
-        <action
-            android:id="@+id/action_userHomeFragment_to_detailRuanganFragment"
-            app:destination="@id/detailRuanganFragment" />
-        <action
-            android:id="@+id/action_userHomeFragment_to_userComplaintFragment"
-            app:destination="@id/userLaporanFragment"
-            app:popUpTo="@id/userHomeFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+  <fragment
+    android:id="@+id/userHomeFragment"
+    android:name="com.machina.siband.user.view.UserHomeFragment"
+    android:label="Home"
+    tools:layout="@layout/fragment_user_home">
+    <argument
+      android:name="idLantai"
+      android:defaultValue=" "
+      app:argType="string" />
+    <argument
+      android:name="namaRuangan"
+      android:defaultValue=" "
+      app:argType="string" />
+    <action
+      android:id="@+id/action_userHomeFragment_to_detailRuanganFragment"
+      app:destination="@id/detailRuanganFragment" />
+    <action
+      android:id="@+id/action_userHomeFragment_to_userComplaintFragment"
+      app:destination="@id/userLaporanFragment"
+      app:popUpTo="@id/userHomeFragment"
+      app:popUpToInclusive="true" />
+  </fragment>
 
-    <fragment
-        android:id="@+id/userLaporanFragment"
-        android:name="com.machina.siband.user.view.UserLaporanFragment"
-        android:label="List Laporan"
-        tools:layout="@layout/fragment_user_laporan" >
-        <action
-            android:id="@+id/action_userComplaintFragment_to_userHomeFragment"
-            app:destination="@id/userHomeFragment" />
-    </fragment>
+  <fragment
+    android:id="@+id/userLaporanFragment"
+    android:name="com.machina.siband.user.view.UserLaporanFragment"
+    android:label="List Laporan"
+    tools:layout="@layout/fragment_user_laporan">
+    <action
+      android:id="@+id/action_userComplaintFragment_to_userHomeFragment"
+      app:destination="@id/userHomeFragment" />
+  </fragment>
 
-    <fragment
-        android:id="@+id/detailRuanganFragment"
-        android:name="com.machina.siband.user.view.UserDetailRuanganFragment"
-        android:label="{lokasi}"
-        tools:layout="@layout/fragment_user_detail_ruangan" >
-        <argument
-            android:name="idLantai"
-            app:argType="string"
-            android:defaultValue=" "/>
-        <argument
-            android:name="lokasi"
-            app:argType="string"/>
+  <fragment
+    android:id="@+id/detailRuanganFragment"
+    android:name="com.machina.siband.user.view.UserDetailRuanganFragment"
+    android:label="{lokasi}"
+    tools:layout="@layout/fragment_user_detail_ruangan">
+    <argument
+      android:name="idLantai"
+      android:defaultValue=" "
+      app:argType="string" />
+    <argument
+      android:name="lokasi"
+      app:argType="string" />
 
-        <action
-            android:id="@+id/action_detailRuanganFragment_to_userHomeFragment"
-            app:destination="@id/userHomeFragment" />
-        <action
-            android:id="@+id/action_detailRuanganFragment_to_laporanFragment"
-            app:destination="@id/userFormLaporanFragment" />
-    </fragment>
+    <action
+      android:id="@+id/action_detailRuanganFragment_to_userHomeFragment"
+      app:destination="@id/userHomeFragment" />
+    <action
+      android:id="@+id/action_detailRuanganFragment_to_laporanFragment"
+      app:destination="@id/userFormLaporanFragment" />
+  </fragment>
 
-    <fragment
-        android:id="@+id/userFormLaporanFragment"
-        android:name="com.machina.siband.user.view.UserFormLaporanFragment"
-        android:label="Laporan"
-        tools:layout="@layout/fragment_user_form_laporan">
+  <fragment
+    android:id="@+id/userFormLaporanFragment"
+    android:name="com.machina.siband.user.view.UserFormLaporanFragment"
+    android:label="Laporan"
+    tools:layout="@layout/fragment_user_form_laporan">
 
-        <action
-            android:id="@+id/action_laporanFragment_to_detailRuanganFragment"
-            app:destination="@id/detailRuanganFragment" />
-        <argument
-            android:name="laporanRuangan"
-            app:argType="com.machina.siband.model.LaporanRuangan" />
-    </fragment>
+    <action
+      android:id="@+id/action_laporanFragment_to_detailRuanganFragment"
+      app:destination="@id/detailRuanganFragment" />
+    <argument
+      android:name="laporanRuangan"
+      app:argType="com.machina.siband.model.LaporanRuangan" />
+  </fragment>
 
-    <fragment
-        android:id="@+id/userReviewLaporanFragment"
-        android:name="com.machina.siband.user.view.UserReviewLaporanFragment"
-        android:label="Laporan"
-        tools:layout="@layout/fragment_user_review_laporan" >
-
-
-        <argument
-            android:name="laporanRuangan"
-            app:argType="com.machina.siband.model.LaporanRuangan"/>
-        <action
-            android:id="@+id/action_userReviewLaporanFragment_to_swipeLaporanFragment"
-            app:destination="@id/swipeLaporanFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/formPelaporanFragment"
-        android:name="com.machina.siband.user.view.UserFormPelaporanFragment"
-        android:label="Pelaporan"
-        tools:layout="@layout/fragment_user_form_pelaporan" />
+  <fragment
+    android:id="@+id/userReviewLaporanFragment"
+    android:name="com.machina.siband.user.view.UserReviewLaporanFragment"
+    android:label="Laporan"
+    tools:layout="@layout/fragment_user_review_laporan">
 
 
-    <fragment
-        android:id="@+id/swipeLaporanFragment"
-        android:name="com.machina.siband.user.view.UserSwipeLaporanFragment"
-        android:label="List Laporan" >
+    <argument
+      android:name="laporanRuangan"
+      app:argType="com.machina.siband.model.LaporanRuangan" />
+    <action
+      android:id="@+id/action_userReviewLaporanFragment_to_swipeLaporanFragment"
+      app:destination="@id/swipeLaporanFragment" />
+  </fragment>
 
-        <action
-            android:id="@+id/action_swipeLaporanFragment_to_userReviewLaporanFragment"
-            app:destination="@id/userReviewLaporanFragment" />
-    </fragment>
+  <fragment
+    android:id="@+id/formPelaporanFragment"
+    android:name="com.machina.siband.user.view.UserFormPelaporanFragment"
+    android:label="Pelaporan"
+    tools:layout="@layout/fragment_user_form_pelaporan" />
+
+
+  <fragment
+    android:id="@+id/swipeLaporanFragment"
+    android:name="com.machina.siband.user.view.UserSwipeLaporanFragment"
+    android:label="List Laporan">
+
+    <action
+      android:id="@+id/action_swipeLaporanFragment_to_userReviewLaporanFragment"
+      app:destination="@id/userReviewLaporanFragment" />
+  </fragment>
 </navigation>

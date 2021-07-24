@@ -19,111 +19,110 @@ import com.machina.siband.user.UserActivity
 
 class MainActivity : AppCompatActivity() {
 
-    private var _binding: ActivityMainBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: ActivityMainBinding? = null
+  private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        _binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    _binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
-        resolveLogin()
+    resolveLogin()
 
 
-        binding.mainLogin.setOnClickListener {
-            onLogin()
-        }
-
-        binding.mainRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivityForResult(intent, 200)
-        }
+    binding.mainLogin.setOnClickListener {
+      onLogin()
     }
 
-    private fun resolveLogin() {
-        val auth = Firebase.auth
-        val currUser = auth.currentUser
-
-        if (currUser != null) {
-            val email = currUser.email
-            if (email != null) {
-                resolveTipeAkun(email)
-            }
-
-        }
-
+    binding.mainRegister.setOnClickListener {
+      val intent = Intent(this, RegisterActivity::class.java)
+      startActivityForResult(intent, 200)
     }
+  }
 
-    private fun onLogin() {
-        val email = binding.mainEmail.editText?.text.toString()
-        val password = binding.mainPassword.editText?.text.toString()
-        val auth = Firebase.auth
+  private fun resolveLogin() {
+    val auth = Firebase.auth
+    val currUser = auth.currentUser
 
-        if (email.isBlank() || password.isBlank()) {
-            Toast.makeText(this, "Please fill the email and password", Toast.LENGTH_SHORT).show()
-            return
-        }
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    resolveTipeAkun(email)
-                } else {
-                    Log.d(TAG, "${task.exception}")
-                    Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show()
-                }
-            }
+    if (currUser != null) {
+      val email = currUser.email
+      if (email != null) {
+        resolveTipeAkun(email)
+      }
     }
+  }
 
-    private fun resolveTipeAkun(email: String) {
-        AdminFirestoreRepo.getAccountRef(email)
-            .get()
-            .addOnSuccessListener {
-                val res = it.toAccount()
-                when (res?.tipeAkun) {
-                    "Admin" -> {
-                        val intent = Intent(this, AdminActivity::class.java)
-                        startActivityForResult(intent, 200)
-                    }
-                    "User" -> {
-                        val intent = Intent(this, UserActivity::class.java)
-                        startActivityForResult(intent, 200)
-                    }
-                    else -> {
-                        Toast.makeText(this, "Unknown error occured please try again later", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
+  private fun onLogin() {
+    val email = binding.mainEmail.editText?.text.toString()
+    val password = binding.mainPassword.editText?.text.toString()
+    val auth = Firebase.auth
+
+    if (email.isBlank() || password.isBlank()) {
+      Toast.makeText(this, "Please fill the email and password", Toast.LENGTH_SHORT).show()
+      return
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        Log.d(TAG, "result code [$resultCode]")
-        if (requestCode == 200) {
-            if (resultCode == 0) {
-                finish()
-            } else if (resultCode == 501) {
-                val intent = Intent(this, AdminActivity::class.java)
-                startActivityForResult(intent, 200)
-            } else if (resultCode == 502) {
-                val intent = Intent(this, UserActivity::class.java)
-                startActivityForResult(intent, 200)
-            }
+    auth.signInWithEmailAndPassword(email, password)
+      .addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+          resolveTipeAkun(email)
         } else {
-            binding.mainEmail.editText?.setText("")
-            binding.mainPassword.editText?.setText("")
+          Log.d(TAG, "${task.exception}")
+          Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show()
         }
-    }
+      }
+  }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
+  private fun resolveTipeAkun(email: String) {
+    AdminFirestoreRepo.getAccountRef(email)
+      .get()
+      .addOnSuccessListener {
+        val res = it.toAccount()
+        when (res?.tipeAkun) {
+          "Admin" -> {
+            val intent = Intent(this, AdminActivity::class.java)
+            startActivityForResult(intent, 200)
+          }
+          "User" -> {
+            val intent = Intent(this, UserActivity::class.java)
+            startActivityForResult(intent, 200)
+          }
+          else -> {
+            Toast.makeText(this, "Unknown error occured please try again later", Toast.LENGTH_LONG)
+              .show()
+          }
+        }
+      }
+  }
 
-    companion object {
-        private const val TAG = "MainActivity"
-        const val PREF_LOGIN = "main.PreferenceLogin"
-        const val PREF_EMAIL = "main.PreferenceEmail"
-        const val PREF_PASSWORD = "main.PreferencePassword"
-        const val PREF_IS_REMEMBER = "main.isRemember"
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    Log.d(TAG, "result code [$resultCode]")
+    if (requestCode == 200) {
+      if (resultCode == 0) {
+        finish()
+      } else if (resultCode == 501) {
+        val intent = Intent(this, AdminActivity::class.java)
+        startActivityForResult(intent, 200)
+      } else if (resultCode == 502) {
+        val intent = Intent(this, UserActivity::class.java)
+        startActivityForResult(intent, 200)
+      }
+    } else {
+      binding.mainEmail.editText?.setText("")
+      binding.mainPassword.editText?.setText("")
     }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
+  }
+
+  companion object {
+    private const val TAG = "MainActivity"
+    const val PREF_LOGIN = "main.PreferenceLogin"
+    const val PREF_EMAIL = "main.PreferenceEmail"
+    const val PREF_PASSWORD = "main.PreferencePassword"
+    const val PREF_IS_REMEMBER = "main.isRemember"
+  }
 }

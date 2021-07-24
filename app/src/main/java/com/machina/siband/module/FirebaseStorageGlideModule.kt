@@ -11,12 +11,12 @@ import java.io.InputStream
 
 
 @GlideModule
-class FirebaseStorageGlideModule: AppGlideModule() {
-    override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
-        registry.append(
-            StorageReference::class.java,
-            InputStream::class.java,
-            FirebaseImageLoader.Factory()
-        )
-    }
+class FirebaseStorageGlideModule : AppGlideModule() {
+  override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
+    registry.append(
+      StorageReference::class.java,
+      InputStream::class.java,
+      FirebaseImageLoader.Factory()
+    )
+  }
 }

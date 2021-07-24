@@ -21,69 +21,70 @@ import com.machina.siband.model.AreaRuangan
 
 class AdminListAreaRuanganFragment : Fragment() {
 
-    private var _binding: FragmentAdminListAreaRuanganBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentAdminListAreaRuanganBinding? = null
+  private val binding get() = _binding!!
 
-    private val viewModel: AdminViewModel by activityViewModels()
+  private val viewModel: AdminViewModel by activityViewModels()
 
-    private lateinit var mAdapter: AdminListLetakRuanganAdapter
+  private lateinit var mAdapter: AdminListLetakRuanganAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentAdminListAreaRuanganBinding.inflate(inflater, container, false)
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    _binding = FragmentAdminListAreaRuanganBinding.inflate(inflater, container, false)
 
-        setupRecycler()
-        setupObserver()
-        binding.fragmentAdminListLetakRuanganFab.setOnClickListener {
-            val action = AdminListAreaRuanganFragmentDirections.actionAdminListLetakRuanganFragmentToAdminTambahAreaRuanganFragment()
-            findNavController().navigate(action)
-        }
-
-        return binding.root
+    setupRecycler()
+    setupObserver()
+    binding.fragmentAdminListLetakRuanganFab.setOnClickListener {
+      val action =
+        AdminListAreaRuanganFragmentDirections.actionAdminListLetakRuanganFragmentToAdminTambahAreaRuanganFragment()
+      findNavController().navigate(action)
     }
 
-    private fun setupRecycler() {
-        mAdapter = AdminListLetakRuanganAdapter(this::onDeleteAreaRuangan)
+    return binding.root
+  }
 
-        val recycler = binding.fragmentAdminListLetakRuanganRecycler
-        val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        viewModel.getListAreaRuangan()
+  private fun setupRecycler() {
+    mAdapter = AdminListLetakRuanganAdapter(this::onDeleteAreaRuangan)
 
-        recycler.apply {
-            adapter = mAdapter
-            layoutManager = mLayoutManager
-        }
+    val recycler = binding.fragmentAdminListLetakRuanganRecycler
+    val mLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+    viewModel.getListAreaRuangan()
+
+    recycler.apply {
+      adapter = mAdapter
+      layoutManager = mLayoutManager
     }
+  }
 
-    private fun setupObserver() {
-        viewModel.listAreaRuangan.observe(viewLifecycleOwner) {
-            mAdapter.setData(it)
-        }
+  private fun setupObserver() {
+    viewModel.listAreaRuangan.observe(viewLifecycleOwner) {
+      mAdapter.setData(it)
     }
+  }
 
-    private fun onDeleteAreaRuangan(areaRuangan: AreaRuangan) {
-        val title = "Yakin ingin menghapus ${areaRuangan.nama}?"
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(title)
-            .setPositiveButton("Hapus") { dialog, which ->
-                viewModel.deleteAreaRuangan(areaRuangan)
-                dialog.dismiss()
-            }
-            .setNegativeButton("Batalkan") { dialog, _ ->
-                dialog.dismiss()
-            }
+  private fun onDeleteAreaRuangan(areaRuangan: AreaRuangan) {
+    val title = "Yakin ingin menghapus ${areaRuangan.nama}?"
+    val dialog = AlertDialog.Builder(requireContext())
+      .setTitle(title)
+      .setPositiveButton("Hapus") { dialog, which ->
+        viewModel.deleteAreaRuangan(areaRuangan)
+        dialog.dismiss()
+      }
+      .setNegativeButton("Batalkan") { dialog, _ ->
+        dialog.dismiss()
+      }
 
-        dialog.create().show()
-    }
+    dialog.create().show()
+  }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
+  }
 
-    companion object {
-        private const val TAG = "AdminListAreaRuangan"
-    }
+  companion object {
+    private const val TAG = "AdminListAreaRuangan"
+  }
 }

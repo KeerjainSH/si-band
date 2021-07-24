@@ -13,46 +13,48 @@ import com.machina.siband.databinding.FragmentUserSwipeLaporanBinding
 import com.machina.siband.user.recycler.SwipeViewAdapter
 import com.machina.siband.user.viewModel.UserHomeViewModel
 
-class UserSwipeLaporanFragment: Fragment() {
-    private lateinit var mSwipeViewAdapter: SwipeViewAdapter
-    private lateinit var viewPager: ViewPager2
-    private lateinit var tabLayout: TabLayout
+class UserSwipeLaporanFragment : Fragment() {
+  private lateinit var mSwipeViewAdapter: SwipeViewAdapter
+  private lateinit var viewPager: ViewPager2
+  private lateinit var tabLayout: TabLayout
 
-    private var _binding: FragmentUserSwipeLaporanBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentUserSwipeLaporanBinding? = null
+  private val binding get() = _binding!!
 
-    private val viewModel: UserHomeViewModel by activityViewModels()
+  private val viewModel: UserHomeViewModel by activityViewModels()
 
-    private val tabTitleList = listOf("No Progress Yet", "On Progress", "Done")
+  private val tabTitleList = listOf("No Progress Yet", "On Progress", "Done")
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentUserSwipeLaporanBinding.inflate(inflater)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    _binding = FragmentUserSwipeLaporanBinding.inflate(inflater)
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        mSwipeViewAdapter = SwipeViewAdapter(this)
-        viewPager = binding.fragmentSwipeLaporanPager
-        viewPager.adapter = mSwipeViewAdapter
-        tabLayout = binding.fragmentSwipeLaporanTab
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    viewModel.getPenggunaData()
 
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = tabTitleList[position]
-        }.attach()
+    mSwipeViewAdapter = SwipeViewAdapter(this)
+    viewPager = binding.fragmentSwipeLaporanPager
+    viewPager.adapter = mSwipeViewAdapter
+    tabLayout = binding.fragmentSwipeLaporanTab
 
-        val email = viewModel.getCurrentEmail()
-        viewModel.getListLaporanBase(email)
-    }
+    TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+      tab.text = tabTitleList[position]
+    }.attach()
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.clearLaporanRuangan()
-        _binding = null
-    }
+    val email = viewModel.getCurrentEmail()
+    viewModel.getListLaporanBase(email)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    viewModel.clearLaporanRuangan()
+    _binding = null
+  }
 }
 // No Progress Yet, On Progress, dan Done

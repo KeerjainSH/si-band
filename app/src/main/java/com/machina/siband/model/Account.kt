@@ -9,30 +9,30 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Account(
-    val email: String,
-    val nama: String,
-    val password: String,
-    val tipeAkun: String
-): Parcelable {
+  val email: String,
+  val nama: String,
+  val password: String,
+  val tipeAkun: String
+) : Parcelable {
 
-    companion object {
-        private const val TAG = "Account"
+  companion object {
+    private const val TAG = "Account"
 
-        fun DocumentSnapshot.toAccount(): Account? {
-            return try {
-                val nama = getString("nama")!!
-                val password = getString("password")!!
-                val tipeAkun = getString("tipeAkun")!!
+    fun DocumentSnapshot.toAccount(): Account? {
+      return try {
+        val nama = getString("nama")!!
+        val password = getString("password")!!
+        val tipeAkun = getString("tipeAkun")!!
 
-                Log.d(TAG, "Converted to Account email [$id]")
-                Account(id, nama, password, tipeAkun)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error converting to Account", e)
-                FirebaseCrashlytics.getInstance().log("Error converting to Account")
-                FirebaseCrashlytics.getInstance().setCustomKey("userId", id)
-                FirebaseCrashlytics.getInstance().recordException(e)
-                null
-            }
-        }
+        Log.d(TAG, "Converted to Account email [$id]")
+        Account(id, nama, password, tipeAkun)
+      } catch (e: Exception) {
+        Log.e(TAG, "Error converting to Account", e)
+        FirebaseCrashlytics.getInstance().log("Error converting to Account")
+        FirebaseCrashlytics.getInstance().setCustomKey("userId", id)
+        FirebaseCrashlytics.getInstance().recordException(e)
+        null
+      }
     }
+  }
 }
